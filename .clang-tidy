@@ -1,0 +1,14 @@
+# vim: ft=yaml nospell
+---
+Checks: >
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  *,
+  -fuchsia-default-arguments,
+  -fuchsia-overloaded-operator,
+  -readability-magic-numbers
+WarningsAsErrors: '*'
+HeaderFilterRegex: ''
+AnalyzeTemporaryDtors: false
+FormatStyle: file
+...

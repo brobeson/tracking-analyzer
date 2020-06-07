@@ -1,0 +1,31 @@
+# vim: ft=yaml nospell
+---
+Language: Cpp
+BasedOnStyle: LLVM
+AlignEscapedNewlines: Left
+AllowAllParametersOfDeclarationOnNextLine: false
+AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: false
+BinPackParameters: false
+BreakBeforeBinaryOperators: All
+BreakBeforeBraces: Allman
+BreakInheritanceList: AfterColon
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializers: AfterColon
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+ConstructorInitializerIndentWidth: 2
+ContinuationIndentWidth: 2
+Cpp11BracedListStyle: true
+FixNamespaceComments: true
+IncludeBlocks: Merge
+IncludeIsMainRegex: '(_test)?$'
+IndentPPDirectives: AfterHash
+KeepEmptyLinesAtTheStartOfBlocks: false
+NamespaceIndentation: All
+PointerAlignment: Left
+SpaceBeforeCpp11BracedList: true
+SpaceBeforeCtorInitializerColon: false
+SpaceBeforeInheritanceColon: false
+SpacesBeforeTrailingComments: 2
+TabWidth: 2
+...

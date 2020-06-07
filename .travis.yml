@@ -1,0 +1,152 @@
+# vim: nospell
+
+language: cpp
+dist: bionic
+
+matrix:
+  include:
+    - os: linux
+      name: GCC 7
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            # - llvm-toolchain-bionic-9
+          packages:
+            - cppcheck
+            - g++-7
+            - clang-format
+            # - clang-format-9
+            # - clang-tidy-9
+            - libqt5charts5-dev
+            # - valgrind
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+    # - os: linux
+    #   name: GCC 8
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #         - llvm-toolchain-bionic-9
+    #       packages:
+    #         - cppcheck
+    #         - g++-8
+    #         - clang-format-9
+    #         - clang-tidy-9
+    #         - valgrind
+    #   env:
+    #     - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+    # - os: linux
+    #   name: GCC 9
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #         - llvm-toolchain-bionic-9
+    #       packages:
+    #         - cppcheck
+    #         - g++-9
+    #         - clang-format-9
+    #         - clang-tidy-9
+    #         - valgrind
+    #   env:
+    #     - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
+    # - os: linux
+    #   name: Clang 7
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #         - llvm-toolchain-bionic-7
+    #         - llvm-toolchain-bionic-9
+    #       packages:
+    #         - cppcheck
+    #         - clang-7
+    #         - clang-format-9
+    #         - clang-tidy-9
+    #         - libc++-7-dev
+    #         - valgrind
+    #   env:
+    #     - MATRIX_EVAL="CC=clang && CXX=clang++"
+    # - os: linux
+    #   name: Clang 8
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #         - llvm-toolchain-bionic-9
+    #       packages:
+    #         - cppcheck
+    #         - clang-8
+    #         - clang-format-9
+    #         - clang-tidy-9
+    #         - libc++-8-dev
+    #         - valgrind
+    #   env:
+    #     - MATRIX_EVAL="CC=clang && CXX=clang++"
+
+install:
+  - eval "${MATRIX_EVAL}"
+  - pip install --user ${USER} lizard
+
+  # Set up a build directory, because in-source builds are not allowed.
+  - source_directory="${TRAVIS_BUILD_DIR}"
+  - build_directory="${TRAVIS_BUILD_DIR}/../build"
+  - mkdir "${build_directory}"
+
+before_script:
+  - shopt -s globstar
+
+script:
+  - cd "${source_directory}"
+  - lizard --CCN 10 --arguments 4 --length 100 --warnings_only --modified
+
+  # Ensure that there are no formatting issues.
+  - clang-format -i -style=file **/*.{h,cpp}
+  - test -z "$(git status --porcelain)"
+
+  # # release build & test
+  - cd "${build_directory}"
+  - cmake
+    -Werror=deprecated
+    -Werror=dev
+    -D CMAKE_BUILD_TYPE=Release
+    -D CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=true
+    "${source_directory}"
+  - cmake --build . --parallel $(nproc)
+  # - ctest --output-on-failure
+
+  # - cppcheck
+  #   --enable=all
+  #   --language=c++
+  #   --quiet
+  #   --relative_paths=${source_directory}
+  #   --library=qt
+  #   --project=compile_commands.json
+
+  # # debug build & test with address sanitizer
+  - rm -r *
+  - cmake
+    -Werror=deprecated
+    -Werror=dev
+    -D CMAKE_BUILD_TYPE=Debug
+    "${source_directory}"
+  - cmake --build . --parallel $(nproc)
+  # - ctest --output-on-failure --label-regex unit
+
+  # # debug build & test with Valgrind
+  - rm -r *
+  - cmake
+    -Werror=deprecated
+    -Werror=dev
+    -D CMAKE_BUILD_TYPE=Debug
+    "${source_directory}"
+    # -D fits_enable_asan:BOOL=off
+  - cmake --build . --parallel $(nproc)
+  #   && ctest 
+  #     --output-on-failure
+  #     --label-regex unit
+  #     --dashboard ExperimentalMemCheck
+  #   && find Testing/Temporary -size 0 -exec rm {} \;
+  #   && find Testing/Temporary -name 'MemoryChecker.*.log' -exec cat {} \;

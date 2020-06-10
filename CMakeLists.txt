@@ -8,26 +8,20 @@ project(
 )
 
 # include(cmake/compiler.cmake)
+set(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_CXX_STANDARD_REQUIRED true)
 
 add_subdirectory(tracking-analyzer)
-return()
 
-option(fits_enable_tests "Enable or disable building FITS tests." on)
-if(fits_enable_tests)
-  string(
-    CONCAT
-      MEMORYCHECK_COMMAND_OPTIONS
-      "--quiet"
-      " --gen-suppressions=all"
-      " --tool=memcheck"
-      " --leak-check=yes"
-      " --track-origins=yes"
-      " --error-exitcode=1"
-  )
-  include(CTest)
-  if(BUILD_TESTING)
-    add_subdirectory(catch2)
-    add_subdirectory(unit_tests)
-    # add_subdirectory(compilation_tests)
-  endif()
-endif()
+string(
+  CONCAT
+    MEMORYCHECK_COMMAND_OPTIONS
+    "--quiet"
+    " --gen-suppressions=all"
+    " --tool=memcheck"
+    " --leak-check=yes"
+    " --track-origins=yes"
+    " --error-exitcode=1"
+)
+include(CTest)
+add_subdirectory(unit_tests)

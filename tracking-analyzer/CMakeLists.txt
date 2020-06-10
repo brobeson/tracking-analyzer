@@ -1,6 +1,8 @@
 find_package(Qt5 REQUIRED COMPONENTS Charts Core Gui Widgets)
 add_executable(
   ${PROJECT_NAME}
+  bounding_box.cpp
+  bounding_box.h
   gui/main_window.cpp
   gui/main_window.h
   main.cpp

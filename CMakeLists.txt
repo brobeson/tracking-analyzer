@@ -7,12 +7,8 @@ project(
   LANGUAGES CXX
 )
 
-# include(cmake/compiler.cmake)
-set(CMAKE_CXX_STANDARD 17)
-SET(CMAKE_CXX_STANDARD_REQUIRED true)
-
+include(cmake/compiler.cmake)
 add_subdirectory(tracking-analyzer)
-
 string(
   CONCAT
     MEMORYCHECK_COMMAND_OPTIONS

@@ -11,6 +11,8 @@ if(BUILD_TESTING)
         "${PROJECT_BINARY_DIR}"
         "${CMAKE_SOURCE_DIR}/tracking-analyzer"
     )
+    target_compile_options(${test_name} PRIVATE ${compiler_options})
+    target_compile_features(${test_name} PRIVATE cxx_std_20)
     set_target_properties(${test_name} PROPERTIES AUTOMOC on)
     add_test(NAME ${test_name} COMMAND ${test_name})
   endfunction()

@@ -17,6 +17,8 @@ namespace analyzer::gui
 
   public:
     explicit main_window(QWidget* parent = nullptr);
+    main_window(const main_window&) = delete;
+    main_window& operator=(const main_window&) = delete;
     ~main_window();
 
     void add_graph(QtCharts::QLineSeries* graph);

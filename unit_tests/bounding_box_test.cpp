@@ -8,35 +8,45 @@ Q_DECLARE_METATYPE(analyzer::bounding_box_list)
 
 namespace analyzer
 {
+  // This operator must be not be an unnamed namespace, or the compiler can't
+  // find it for later operations. Also, I know comparing floating point data
+  // like this is generally unsafe, but it works for this unit test.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-declarations"
+#pragma GCC diagnostic ignored "-Wfloat-equal"
   [[nodiscard]] bool operator==(const analyzer::bounding_box& a,
                                 const analyzer::bounding_box& b)
   {
     return a.x == b.x && a.y == b.y && a.width == b.width
            && a.height == b.height;
   }
+#pragma GCC diagnostic pop
 }  // namespace analyzer
 
 namespace analyzer_test
 {
   using namespace std::literals::string_literals;
 
-  void create_list_data()
+  namespace
   {
-    QTest::addColumn<analyzer::bounding_box_list>("a");
-    QTest::addColumn<analyzer::bounding_box_list>("b");
-    QTest::addColumn<analyzer::overlap_list>("overlaps");
-    QTest::addColumn<analyzer::offset_list>("offsets");
-    QTest::newRow("empty list")
-      << analyzer::bounding_box_list {} << analyzer::bounding_box_list {}
-      << analyzer::overlap_list {} << analyzer::offset_list {};
-    QTest::newRow("a list")
-      << analyzer::bounding_box_list {{0.0f, 0.0f, 0.0f, 0.0f},
-                                      {0.0f, 0.0f, 10.0f, 10.0f}}
-      << analyzer::bounding_box_list {{0.0f, 0.0f, 100.0f, 100.0f},
-                                      {0.0f, 0.0f, 5.0f, 10.0f}}
-      << analyzer::overlap_list {0.0f, 0.5f}
-      << analyzer::offset_list {70.71067811865476f, 2.5f};
-  }
+    void create_list_data()
+    {
+      QTest::addColumn<analyzer::bounding_box_list>("a");
+      QTest::addColumn<analyzer::bounding_box_list>("b");
+      QTest::addColumn<analyzer::overlap_list>("overlaps");
+      QTest::addColumn<analyzer::offset_list>("offsets");
+      QTest::newRow("empty list")
+        << analyzer::bounding_box_list {} << analyzer::bounding_box_list {}
+        << analyzer::overlap_list {} << analyzer::offset_list {};
+      QTest::newRow("a list")
+        << analyzer::bounding_box_list {{0.0f, 0.0f, 0.0f, 0.0f},
+                                        {0.0f, 0.0f, 10.0f, 10.0f}}
+        << analyzer::bounding_box_list {{0.0f, 0.0f, 100.0f, 100.0f},
+                                        {0.0f, 0.0f, 5.0f, 10.0f}}
+        << analyzer::overlap_list {0.0f, 0.5f}
+        << analyzer::offset_list {70.71067811865476f, 2.5f};
+    }
+  }  // namespace
 
   class bounding_box_test final: public QObject
   {

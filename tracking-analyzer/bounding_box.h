@@ -30,12 +30,8 @@ namespace analyzer
   using offset = float;
   using offset_list = std::vector<analyzer::offset>;
 
-  template <typename CharT, class Traits>
   [[nodiscard]] analyzer::bounding_box_list
-  read_bounding_boxes(std::basic_istream<CharT, Traits>& /*stream*/)
-  {
-    return analyzer::bounding_box_list {};
-  }
+  read_bounding_boxes(std::istream& stream);
 
   [[nodiscard]] analyzer::overlap
   calculate_overlap(const analyzer::bounding_box& a,

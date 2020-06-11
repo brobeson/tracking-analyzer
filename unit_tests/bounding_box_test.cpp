@@ -35,7 +35,7 @@ namespace analyzer_test
       << analyzer::bounding_box_list {{0.0f, 0.0f, 100.0f, 100.0f},
                                       {0.0f, 0.0f, 5.0f, 10.0f}}
       << analyzer::overlap_list {0.0f, 0.5f}
-      << analyzer::offset_list {2.5f, 70.71067811865476f};
+      << analyzer::offset_list {70.71067811865476f, 2.5f};
   }
 
   class bounding_box_test final: public QObject
@@ -109,7 +109,7 @@ namespace analyzer_test
     {
       QTest::addColumn<analyzer::bounding_box>("a");
       QTest::addColumn<analyzer::bounding_box>("b");
-      QTest::addColumn<analyzer::offset>("expected_offset");
+      QTest::addColumn<analyzer::offset>("expected_overlap");
       QTest::newRow("a left of b")
         << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}
         << analyzer::bounding_box {25.0f, 5.0f, 20.0f, 30.0f} << 0.0f;
@@ -127,7 +127,7 @@ namespace analyzer_test
         << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f} << 1.0f;
       QTest::newRow("half overlap")
         << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {13.0f, 5.0f, 20.0f, 30.0f} << 0.5f;
+        << analyzer::bounding_box {13.0f, 5.0f, 10.0f, 30.0f} << 0.5f;
       QTest::newRow("one seventh overlap")
         << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}
         << analyzer::bounding_box {13.0f, 20.0f, 20.0f, 30.0f} << 1.0f / 7.0f;
@@ -140,7 +140,7 @@ namespace analyzer_test
     {
       QFETCH(const analyzer::bounding_box, a);
       QFETCH(const analyzer::bounding_box, b);
-      QTEST(analyzer::calculate_overlap(a, b), "expected_offset");
+      QTEST(analyzer::calculate_overlap(a, b), "expected_overlap");
     }
 
     void calculate_offset_data() const
@@ -162,7 +162,7 @@ namespace analyzer_test
         << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f} << 30.0f;
       QTest::newRow("coincident boxes")
         << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {3.0f, 35.0f, 10.0f, 10.0f} << 0.0f;
+        << analyzer::bounding_box {8.0f, 45.0f, 10.0f, 10.0f} << 0.0f;
       QTest::newRow("one seventh overlap")
         << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}
         << analyzer::bounding_box {13.0f, 20.0f, 34.0f, 29.0f}

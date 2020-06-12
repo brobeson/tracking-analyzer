@@ -123,7 +123,9 @@ namespace analyzer
   {
     if (a.size() != b.size())
     {
-      throw std::invalid_argument {"Bounding box lists have different sizes."};
+      throw std::invalid_argument {"Bounding box lists have different sizes: "
+                                   + std::to_string(a.size()) + " and "
+                                   + std::to_string(b.size())};
     }
     analyzer::offset_list offsets;
     offsets.reserve(a.size());

@@ -11,7 +11,7 @@ namespace analyzer::gui
 
   main_window::~main_window() { delete ui; }
 
-  void main_window::add_graph(QtCharts::QLineSeries* graph)
+  void main_window::add_graph(QtCharts::QScatterSeries* graph)
   {
     ui->graphicsView->chart()->addSeries(graph);
     ui->graphicsView->chart()->createDefaultAxes();

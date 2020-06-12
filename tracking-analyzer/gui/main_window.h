@@ -1,8 +1,8 @@
 #ifndef ANALYZER_GUI_MAIN_WINDOW_H
 #define ANALYZER_GUI_MAIN_WINDOW_H
 
-#include <QLineSeries>
 #include <QMainWindow>
+#include <QScatterSeries>
 
 namespace analyzer::gui
 {
@@ -21,7 +21,7 @@ namespace analyzer::gui
     main_window& operator=(const main_window&) = delete;
     ~main_window();
 
-    void add_graph(QtCharts::QLineSeries* graph);
+    void add_graph(QtCharts::QScatterSeries* graph);
 
   private:
     Ui::main_window* ui;

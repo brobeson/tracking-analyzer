@@ -1,6 +1,7 @@
 #include "bounding_box.h"
 #include "gui/main_window.h"
 #include <QApplication>
+#include <QImageReader>
 #include <QScatterSeries>
 #include <fstream>
 
@@ -39,6 +40,10 @@ int main(int argc, char* argv[])
     overlap_data->append(i, overlaps[i]);
   }
   window.set_overlap_data(overlap_data);
+
+  QImageReader reader {"~/Videos/otb/Deer/img/0001.jpg"};
+  const auto image {reader.read()};
+  window.set_image(image);
 
   return application.exec();
 }

@@ -22,4 +22,9 @@ namespace analyzer::gui
     ui->overlap_graph->chart()->addSeries(overlap_data);
     ui->overlap_graph->chart()->createDefaultAxes();
   }
+
+  void main_window::set_image(const QImage& image)
+  {
+    ui->label->setPixmap(QPixmap::fromImage(image));
+  }
 }  // namespace analyzer::gui

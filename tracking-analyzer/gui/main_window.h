@@ -1,6 +1,7 @@
 #ifndef ANALYZER_GUI_MAIN_WINDOW_H
 #define ANALYZER_GUI_MAIN_WINDOW_H
 
+#include <QImage>
 #include <QMainWindow>
 #include <QScatterSeries>
 
@@ -23,6 +24,7 @@ namespace analyzer::gui
 
     void set_offset_data(QtCharts::QScatterSeries* data);
     void set_overlap_data(QtCharts::QScatterSeries* data);
+    void set_image(const QImage& image);
 
   private:
     Ui::main_window* ui;

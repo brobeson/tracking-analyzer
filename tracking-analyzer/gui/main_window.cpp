@@ -11,9 +11,15 @@ namespace analyzer::gui
 
   main_window::~main_window() { delete ui; }
 
-  void main_window::add_graph(QtCharts::QScatterSeries* graph)
+  void main_window::set_offset_data(QtCharts::QScatterSeries* offset_data)
   {
-    ui->graphicsView->chart()->addSeries(graph);
-    ui->graphicsView->chart()->createDefaultAxes();
+    ui->offset_graph->chart()->addSeries(offset_data);
+    ui->offset_graph->chart()->createDefaultAxes();
+  }
+
+  void main_window::set_overlap_data(QtCharts::QScatterSeries* overlap_data)
+  {
+    ui->overlap_graph->chart()->addSeries(overlap_data);
+    ui->overlap_graph->chart()->createDefaultAxes();
   }
 }  // namespace analyzer::gui

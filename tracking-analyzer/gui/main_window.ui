@@ -6,17 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1048</width>
+    <height>875</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QChartView" name="graphicsView"/>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QChartView" name="offset_graph"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="QChartView" name="overlap_graph"/>
     </item>
    </layout>
   </widget>
@@ -25,7 +28,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1048</width>
      <height>26</height>
     </rect>
    </property>

@@ -21,7 +21,8 @@ namespace analyzer::gui
     main_window& operator=(const main_window&) = delete;
     ~main_window();
 
-    void add_graph(QtCharts::QScatterSeries* graph);
+    void set_offset_data(QtCharts::QScatterSeries* data);
+    void set_overlap_data(QtCharts::QScatterSeries* data);
 
   private:
     Ui::main_window* ui;

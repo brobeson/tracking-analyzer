@@ -5,6 +5,7 @@ add_executable(
   bounding_box.h
   gui/main_window.cpp
   gui/main_window.h
+  gui/main_window.ui
   main.cpp
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Charts Qt5::Widgets)

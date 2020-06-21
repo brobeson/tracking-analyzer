@@ -8,7 +8,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     -Wdate-time
     -Wduplicated-branches
     -Wduplicated-cond
-    -Weffc++
     -Werror
     -Wfloat-equal
     -Wformat=2

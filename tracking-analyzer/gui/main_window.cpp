@@ -84,16 +84,20 @@ namespace analyzer::gui
       }
     }
 
-    class path_validator final: public QValidator
+    void update_sequence_combobox(QComboBox& combobox,
+                                  const QStringList& sequence_names)
     {
-      virtual ~path_validator() = default;
+      combobox.clear();
+      combobox.addItems(sequence_names);
+      combobox.setCurrentIndex(-1);  // Ensure no item is selected.
+    }
 
-      QValidator::State validate(QString& /*intput*/,
-                                 int& /*position*/) const final
-      {
-        return QValidator::Intermediate;
-      }
-    };
+    void clear_display(const Ui::main_window& display)
+    {
+      display.offset_graph->chart()->removeAllSeries();
+      display.overlap_graph->chart()->removeAllSeries();
+      display.frame_display->setPixmap(QPixmap {});
+    }
   }  // namespace
 
   main_window::main_window(QWidget* parent):
@@ -102,7 +106,20 @@ namespace analyzer::gui
     ui->setupUi(this);
     analyzer::gui::setup_offset_chart(ui->offset_graph->chart());
     analyzer::gui::setup_overlap_chart(ui->overlap_graph->chart());
-    ui->dataset_path->setValidator(new analyzer::gui::path_validator);
+    connect(ui->dataset_path,
+            &QLineEdit::textEdited,
+            this,
+            &analyzer::gui::main_window::check_dataset_path);
+    connect(ui->dataset_path,
+            &QLineEdit::editingFinished,
+            this,
+            &analyzer::gui::main_window::load_dataset);
+    connect(ui->sequence,
+            QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this,
+            &analyzer::gui::main_window::sequence_changed);
+    check_dataset_path(ui->dataset_path->text());
+    load_dataset();
   }
 
   main_window::~main_window() { delete ui; }
@@ -149,18 +166,44 @@ namespace analyzer::gui
     ui->frame_display->setPixmap(QPixmap::fromImage(image));
   }
 
-  // void main_window::change_dataset_path(const QString& path_text) const
-  // {
-  //   try
-  //   {
-  //     if (std::filesystem::is_directory(path_text.toStdString()))
-  //     {
-  //       ui->dataset_path->
-  //     }
-  //   }
-  //   catch (...)
-  //   {
-  //     return false;
-  //   }
-  // }
+  void main_window::check_dataset_path(QString path_text) const
+  {
+    try
+    {
+      const auto absolute_path {analyzer::make_absolute_path(path_text)};
+      if (std::filesystem::is_directory(absolute_path.toStdString()))
+      {
+        ui->dataset_path->setStyleSheet("");
+      }
+      else
+      {
+        ui->dataset_path->setStyleSheet("QLineEdit#dataset_path{color:red}");
+      }
+    }
+    catch (...)
+    {
+      ui->dataset_path->setStyleSheet("");
+    }
+  }
+
+  void main_window::load_dataset()
+  {
+    const auto new_dataset {analyzer::load_dataset(ui->dataset_path->text())};
+    if (!new_dataset.root_path().isEmpty())
+    {
+      m_dataset = new_dataset;
+      analyzer::gui::update_sequence_combobox(
+        *(ui->sequence), analyzer::sequence_names(m_dataset.sequences()));
+      ui->sequence_count->setText(
+        QString::number(m_dataset.sequences().length()) + " sequences.");
+    }
+  }
+
+  void main_window::sequence_changed(const int index) const
+  {
+    analyzer::gui::clear_display(*ui);
+    if (index >= 0)
+    {
+    }
+  }
 }  // namespace analyzer::gui

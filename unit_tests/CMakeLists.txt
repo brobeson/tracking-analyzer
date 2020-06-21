@@ -22,6 +22,24 @@ if(BUILD_TESTING)
     SOURCE_FILES
       bounding_box_test.cpp
       "${CMAKE_SOURCE_DIR}/tracking-analyzer/bounding_box.cpp"
-      "${CMAKE_SOURCE_DIR}/tracking-analyzer/bounding_box.h"
+  )
+  add_analyzer_unit_test(
+    dataset_test
+    SOURCE_FILES
+      dataset_test.cpp
+      "${CMAKE_SOURCE_DIR}/tracking-analyzer/dataset.cpp"
+  )
+  set_tests_properties(dataset_test PROPERTIES ENVIRONMENT "HOME=/home/user")
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+      "test_dataset/Basketball"
+      "test_dataset/Biker/img"
+      "test_dataset/Bird1"
+      "test_dataset/Bird2"
+    COMMAND ${CMAKE_COMMAND} -E touch
+      "test_dataset/Biker/img/0001.jpg"
+      "test_dataset/Biker/img/0002.jpg"
+      "test_dataset/Biker/img/0003.jpg"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   )
 endif()

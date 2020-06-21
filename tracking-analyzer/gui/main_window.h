@@ -1,6 +1,7 @@
 #ifndef ANALYZER_GUI_MAIN_WINDOW_H
 #define ANALYZER_GUI_MAIN_WINDOW_H
 
+#include "dataset.h"
 #include <QImage>
 #include <QMainWindow>
 #include <QScatterSeries>
@@ -26,11 +27,14 @@ namespace analyzer::gui
     void set_overlap_data(QtCharts::QScatterSeries* data);
     void set_image(const QImage& image);
 
-    // public slots:
-    //   void change_dataset_path(const QString& path_text) const;
+  public slots:
+    void check_dataset_path(QString path_text) const;
+    void load_dataset();
+    void sequence_changed(int index) const;
 
   private:
     Ui::main_window* ui;
+    analyzer::dataset m_dataset;
   };
 }  // namespace analyzer::gui
 

@@ -8,7 +8,7 @@ Q_DECLARE_METATYPE(analyzer::bounding_box_list)
 
 namespace analyzer
 {
-  // This operator must be not be an unnamed namespace, or the compiler can't
+  // This operator must not be in an unnamed namespace, or the compiler can't
   // find it for later operations. Also, I know comparing floating point data
   // like this is generally unsafe, but it works for this unit test.
 #pragma GCC diagnostic push

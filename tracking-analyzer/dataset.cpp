@@ -6,13 +6,13 @@ namespace analyzer
 {
   namespace
   {
-    QStringList read_sequence_names(const QString& dataset_path)
+    auto read_sequence_names(const QString& dataset_path)
     {
       const QDir directory {dataset_path};
       return directory.entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
     }
 
-    QVector<analyzer::sequence> read_sequences(const QString& dataset_path)
+    auto read_sequences(const QString& dataset_path)
     {
       const QDir directory {dataset_path};
       const auto sequence_names {
@@ -34,7 +34,7 @@ namespace analyzer
       return sequences;
     }
 
-    QStringList make_sequence_frame_paths(const QString& sequence_path)
+    auto make_sequence_frame_paths(const QString& sequence_path)
     {
       QDir directory {sequence_path};
       directory.cd("img");
@@ -55,8 +55,8 @@ namespace analyzer
   {
   }
 
-  QString invalid_sequence::name() const { return m_name; }
-  QString invalid_sequence::path() const { return m_path; }
+  auto invalid_sequence::name() const -> QString { return m_name; }
+  auto invalid_sequence::path() const -> QString { return m_path; }
 
   sequence::sequence(const QString& name, const QString& path):
     m_name {name},
@@ -85,8 +85,8 @@ namespace analyzer
     }
   }
 
-  QString sequence::name() const { return m_name; }
-  QStringList sequence::frame_paths() const { return m_frame_paths; }
+  auto sequence::name() const -> QString { return m_name; }
+  auto sequence::frame_paths() const -> QStringList { return m_frame_paths; }
 
   dataset::dataset(const QString& root_path,
                    const QVector<sequence>& sequences):
@@ -94,22 +94,17 @@ namespace analyzer
   {
   }
 
-  const QVector<analyzer::sequence>& dataset::sequences() const noexcept
+  auto dataset::sequences() const noexcept -> const QVector<analyzer::sequence>&
   {
     return m_sequences;
   }
 
-  // const QStringList& dataset::sequence_names() const noexcept
-  // {
-  //   return m_sequence_names;
-  // }
-
-  const QString& dataset::root_path() const noexcept
+  auto dataset::root_path() const noexcept -> const QString&
   {
     return m_root_directory;
   }
 
-  QString make_absolute_path(const QString& path)
+  auto make_absolute_path(const QString& path) -> QString
   {
     if (path.front() == '~')
     {
@@ -118,7 +113,7 @@ namespace analyzer
     return path;
   }
 
-  analyzer::dataset load_dataset(const QString& path)
+  auto load_dataset(const QString& path) -> analyzer::dataset
   {
     const auto dataset_path {analyzer::make_absolute_path(path)};
     const auto sequences {analyzer::read_sequence_names(dataset_path)};
@@ -126,7 +121,8 @@ namespace analyzer
                               analyzer::read_sequences(dataset_path)};
   }
 
-  QStringList sequence_names(const QVector<analyzer::sequence>& sequences)
+  auto sequence_names(const QVector<analyzer::sequence>& sequences)
+    -> QStringList
   {
     QStringList names;
     names.reserve(sequences.length());

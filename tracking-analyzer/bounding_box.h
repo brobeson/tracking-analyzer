@@ -9,13 +9,6 @@ namespace analyzer
   struct bounding_box final
   {
     using value_type = float;
-
-    bounding_box() = default;
-    bounding_box(value_type x,
-                 value_type y,
-                 value_type width,
-                 value_type height);
-
     value_type x {0.0f};
     value_type y {0.0f};
     value_type width {0.0f};
@@ -30,24 +23,24 @@ namespace analyzer
   using offset = float;
   using offset_list = std::vector<analyzer::offset>;
 
-  [[nodiscard]] analyzer::bounding_box_list
-  read_bounding_boxes(std::istream& stream);
+  [[nodiscard]] auto read_bounding_boxes(std::istream& stream)
+    -> analyzer::bounding_box_list;
 
-  [[nodiscard]] analyzer::overlap
-  calculate_overlap(const analyzer::bounding_box& a,
-                    const analyzer::bounding_box& b);
+  [[nodiscard]] auto calculate_overlap(const analyzer::bounding_box& a,
+                                       const analyzer::bounding_box& b)
+    -> analyzer::overlap;
 
-  [[nodiscard]] analyzer::overlap_list
-  calculate_overlaps(const analyzer::bounding_box_list& a,
-                     const analyzer::bounding_box_list& b);
+  [[nodiscard]] auto calculate_overlaps(const analyzer::bounding_box_list& a,
+                                        const analyzer::bounding_box_list& b)
+    -> analyzer::overlap_list;
 
-  [[nodiscard]] analyzer::offset
-  calculate_offset(const analyzer::bounding_box& a,
-                   const analyzer::bounding_box& b);
+  [[nodiscard]] auto calculate_offset(const analyzer::bounding_box& a,
+                                      const analyzer::bounding_box& b)
+    -> analyzer::offset;
 
-  [[nodiscard]] analyzer::offset_list
-  calculate_offsets(const analyzer::bounding_box_list& a,
-                    const analyzer::bounding_box_list& b);
+  [[nodiscard]] auto calculate_offsets(const analyzer::bounding_box_list& a,
+                                       const analyzer::bounding_box_list& b)
+    -> analyzer::offset_list;
 }  // namespace analyzer
 
 #endif

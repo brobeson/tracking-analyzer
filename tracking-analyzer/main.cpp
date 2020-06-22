@@ -5,13 +5,13 @@
 #include <QScatterSeries>
 #include <fstream>
 
-int main(int argc, char* argv[])
+auto main(int argc, char* argv[]) -> int
 {
   QApplication application {argc, argv};
-  application.setApplicationDisplayName("Tracking Analyzer");
-  application.setApplicationName("tracking-analyzer");
-  application.setApplicationVersion("0.0");
-  application.setOrganizationName("brobeson");
+  QGuiApplication::setApplicationDisplayName("Tracking Analyzer");
+  QCoreApplication::setApplicationName("tracking-analyzer");
+  QCoreApplication::setApplicationVersion("0.0");
+  QCoreApplication::setOrganizationName("brobeson");
 
   analyzer::gui::main_window window;
   window.show();
@@ -45,5 +45,5 @@ int main(int argc, char* argv[])
   const auto image {reader.read()};
   window.set_image(image);
 
-  return application.exec();
+  return QCoreApplication::exec();
 }

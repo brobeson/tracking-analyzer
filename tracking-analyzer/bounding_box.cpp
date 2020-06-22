@@ -21,17 +21,16 @@ namespace analyzer
                                      strings[3].toFloat()};
     }
 
-    [[nodiscard]] analyzer::bounding_box
-    center(const analyzer::bounding_box box)
+    [[nodiscard]] auto center(const analyzer::bounding_box box)
     {
-      return analyzer::bounding_box {box.x + 0.5f * box.width,
-                                     box.y + 0.5f * box.height,
+      return analyzer::bounding_box {box.x + 0.5f * box.width,   // NOLINT
+                                     box.y + 0.5f * box.height,  // NOLINT
                                      box.width,
                                      box.height};
     }
 
-    [[nodiscard]] analyzer::bounding_box
-    intersection(const analyzer::bounding_box a, const analyzer::bounding_box b)
+    [[nodiscard]] auto intersection(const analyzer::bounding_box a,
+                                    const analyzer::bounding_box b)
     {
       const auto x {std::max(a.x, b.x)};
       const auto y {std::max(a.y, b.y)};
@@ -42,12 +41,12 @@ namespace analyzer
                                        - y};
     }
 
-    [[nodiscard]] float area(const analyzer::bounding_box a)
+    [[nodiscard]] auto area(const analyzer::bounding_box a)
     {
       return a.width * a.height;
     }
 
-    [[nodiscard]] bool does_intersect(const analyzer::bounding_box& a,
+    [[nodiscard]] auto does_intersect(const analyzer::bounding_box& a,
                                       const analyzer::bounding_box& b)
     {
       return a.x + a.width > b.x       // Box a is to the left of box b.
@@ -57,15 +56,7 @@ namespace analyzer
     }
   }  // namespace
 
-  bounding_box::bounding_box(value_type x_,
-                             value_type y_,
-                             value_type width_,
-                             value_type height_):
-    x {x_}, y {y_}, width {width_}, height {height_}
-  {
-  }
-
-  analyzer::bounding_box_list read_bounding_boxes(std::istream& stream)
+  auto read_bounding_boxes(std::istream& stream) -> analyzer::bounding_box_list
   {
     std::string line;
     analyzer::bounding_box_list boxes;
@@ -76,8 +67,8 @@ namespace analyzer
     return boxes;
   }
 
-  analyzer::overlap calculate_overlap(const analyzer::bounding_box& a,
-                                      const analyzer::bounding_box& b)
+  auto calculate_overlap(const analyzer::bounding_box& a,
+                         const analyzer::bounding_box& b) -> analyzer::overlap
   {
     if (analyzer::does_intersect(a, b))
     {
@@ -88,9 +79,9 @@ namespace analyzer
     return 0.0f;
   }
 
-  analyzer::overlap_list
-  calculate_overlaps(const analyzer::bounding_box_list& a,
-                     const analyzer::bounding_box_list& b)
+  auto calculate_overlaps(const analyzer::bounding_box_list& a,
+                          const analyzer::bounding_box_list& b)
+    -> analyzer::overlap_list
   {
     if (a.size() != b.size())
     {
@@ -109,17 +100,18 @@ namespace analyzer
     return overlaps;
   }
 
-  analyzer::offset calculate_offset(const analyzer::bounding_box& a,
-                                    const analyzer::bounding_box& b)
+  auto calculate_offset(const analyzer::bounding_box& a,
+                        const analyzer::bounding_box& b) -> analyzer::offset
   {
     const auto centered_a {analyzer::center(a)};
     const auto centered_b {analyzer::center(b)};
-    return std::sqrt(std::pow(centered_a.x - centered_b.x, 2.0f)
-                     + std::pow(centered_a.y - centered_b.y, 2.0f));
+    return std::sqrt(std::pow(centered_a.x - centered_b.x, 2.0f)      // NOLINT
+                     + std::pow(centered_a.y - centered_b.y, 2.0f));  // NOLINT
   }
 
-  analyzer::offset_list calculate_offsets(const analyzer::bounding_box_list& a,
-                                          const analyzer::bounding_box_list& b)
+  auto calculate_offsets(const analyzer::bounding_box_list& a,
+                         const analyzer::bounding_box_list& b)
+    -> analyzer::offset_list
   {
     if (a.size() != b.size())
     {

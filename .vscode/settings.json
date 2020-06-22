@@ -1,4 +1,12 @@
 {
+  "clang-tidy.blacklist": [
+    ".*_test.cpp"
+  ],
+  "clang-tidy.compilerArgs": [
+    "-I ${workspaceFolder}/**",
+    "-I ../build",
+    "-Wno-unknown-warning-options"
+  ],
   "cSpell.words": [
     "Wfloat",
     "qreal"

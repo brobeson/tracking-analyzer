@@ -13,7 +13,7 @@ namespace analyzer::gui
       chart->setTitle("Center Offset (pixels)");
     }
 
-    QtCharts::QValueAxis* make_overlap_y_axis()
+    auto make_overlap_y_axis() -> QtCharts::QValueAxis*
     {
       QtCharts::QValueAxis* axis {nullptr};
       try
@@ -31,7 +31,7 @@ namespace analyzer::gui
       }
     }
 
-    QtCharts::QValueAxis* make_offset_y_axis(const qreal maximum)
+    auto make_offset_y_axis(const qreal maximum) -> QtCharts::QValueAxis*
     {
       QtCharts::QValueAxis* axis {nullptr};
       try
@@ -49,7 +49,7 @@ namespace analyzer::gui
       }
     }
 
-    QtCharts::QValueAxis* make_x_axis(const qreal maximum)
+    auto make_x_axis(const qreal maximum) -> QtCharts::QValueAxis*
     {
       QtCharts::QValueAxis* axis {nullptr};
       try
@@ -57,7 +57,7 @@ namespace analyzer::gui
         axis = new QtCharts::QValueAxis();
         axis->setRange(0.0, maximum);
         axis->setTickAnchor(0.0);
-        axis->setTickInterval(10.0);
+        axis->setTickInterval(10.0);  // NOLINT
         axis->setTickType(QtCharts::QValueAxis::TicksDynamic);
         axis->setLabelFormat("%i");
         axis->setTitleText("Frame Number");
@@ -74,13 +74,13 @@ namespace analyzer::gui
     {
       chart->setTitle("Overlap Ratio");
       const auto axis {analyzer::gui::make_overlap_y_axis()};
-      if (axis)
+      if (axis == nullptr)
       {
-        chart->addAxis(axis, Qt::AlignLeft);
+        chart->createDefaultAxes();
       }
       else
       {
-        chart->createDefaultAxes();
+        chart->addAxis(axis, Qt::AlignLeft);
       }
     }
 
@@ -135,14 +135,14 @@ namespace analyzer::gui
         std::end(offset_vector),
         [](const auto& a, const auto& b) { return a.y() < b.y(); })
         ->y())};
-    if (x_axis && y_axis)
+    if (x_axis == nullptr || y_axis == nullptr)
     {
-      ui->offset_graph->chart()->addAxis(x_axis, Qt::AlignBottom);
-      ui->offset_graph->chart()->addAxis(y_axis, Qt::AlignLeft);
+      ui->offset_graph->chart()->createDefaultAxes();
     }
     else
     {
-      ui->offset_graph->chart()->createDefaultAxes();
+      ui->offset_graph->chart()->addAxis(x_axis, Qt::AlignBottom);
+      ui->offset_graph->chart()->addAxis(y_axis, Qt::AlignLeft);
     }
   }
 
@@ -151,13 +151,13 @@ namespace analyzer::gui
     ui->overlap_graph->chart()->addSeries(overlap_data);
     const auto axis {
       analyzer::gui::make_x_axis(overlap_data->pointsVector().size())};
-    if (axis)
+    if (axis == nullptr)
     {
-      ui->overlap_graph->chart()->addAxis(axis, Qt::AlignBottom);
+      ui->overlap_graph->chart()->createDefaultAxes();
     }
     else
     {
-      ui->overlap_graph->chart()->createDefaultAxes();
+      ui->overlap_graph->chart()->addAxis(axis, Qt::AlignBottom);
     }
   }
 
@@ -166,7 +166,7 @@ namespace analyzer::gui
     ui->frame_display->setPixmap(QPixmap::fromImage(image));
   }
 
-  void main_window::check_dataset_path(QString path_text) const
+  void main_window::check_dataset_path(const QString& path_text) const
   {
     try
     {

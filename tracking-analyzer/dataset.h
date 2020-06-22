@@ -13,8 +13,8 @@ namespace analyzer
     invalid_sequence(const QString& name,
                      const QString& path,
                      const std::string& what);
-    QString name() const;
-    QString path() const;
+    [[nodiscard]] auto name() const -> QString;
+    [[nodiscard]] auto path() const -> QString;
 
   private:
     QString m_name;
@@ -26,9 +26,8 @@ namespace analyzer
   public:
     sequence() = default;
     sequence(const QString& name, const QString& path);
-
-    QString name() const;
-    QStringList frame_paths() const;
+    [[nodiscard]] auto name() const -> QString;
+    [[nodiscard]] auto frame_paths() const -> QStringList;
 
   private:
     QString m_name;
@@ -40,26 +39,23 @@ namespace analyzer
   {
   public:
     dataset() = default;
-    dataset(const QString& root_directory,
+    dataset(const QString& root_path,
             const QVector<analyzer::sequence>& sequences);
-
-    // [[nodiscard]] const QStringList& sequence_names() const noexcept;
-
-    [[nodiscard]] const QString& root_path() const noexcept;
-
-    [[nodiscard]] const QVector<analyzer::sequence>& sequences() const noexcept;
+    [[nodiscard]] auto root_path() const noexcept -> const QString&;
+    [[nodiscard]] auto sequences() const noexcept
+      -> const QVector<analyzer::sequence>&;
 
   private:
     QString m_root_directory;
-    // QStringList m_sequence_names;
     QVector<analyzer::sequence> m_sequences;
   };
 
-  QString make_absolute_path(const QString& path);
+  auto make_absolute_path(const QString& path) -> QString;
 
-  dataset load_dataset(const QString& path);
+  auto load_dataset(const QString& path) -> dataset;
 
-  QStringList sequence_names(const QVector<analyzer::sequence>& sequences);
+  auto sequence_names(const QVector<analyzer::sequence>& sequences)
+    -> QStringList;
 }  // namespace analyzer
 
 #endif

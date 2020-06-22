@@ -1,12 +1,17 @@
-# vim: ft=yaml nospell
 ---
 Checks: >
   clang-diagnostic-*,
   clang-analyzer-*,
   *,
-  -fuchsia-default-arguments,
-  -fuchsia-overloaded-operator,
-  -readability-magic-numbers
+  -cppcoreguidelines-owning-memory,
+  -fuchsia-*,
+  -google-runtime-references,
+  -hicpp-uppercase-literal-suffix,
+  -hicpp-use-override,
+  -llvm-header-guard,
+  -modernize-pass-by-value,
+  -readability-magic-numbers,
+  -readability-uppercase-literal-suffix
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false

@@ -78,3 +78,17 @@ else()
       " Detected CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}\n"
   )
 endif()
+
+set(
+  CMAKE_CXX_CPPCHECK
+  cppcheck
+  --enable=all
+  --language=c++
+  --library=qt
+  --project=${CMAKE_BINARY_DIR}/compile_commands.json
+  --std=c++20
+  --quiet
+  --inline-suppr
+  -i ${CMAKE_BINARY_DIR}
+  -D Q_MOC_OUTPUT_REVISION=67
+)

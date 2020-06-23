@@ -115,15 +115,19 @@ script:
     -D CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=true
     "${source_directory}"
   - cmake --build . --parallel $(nproc)
-  # - ctest --output-on-failure
+  - ctest --output-on-failure
 
-  # - cppcheck
-  #   --enable=all
-  #   --language=c++
-  #   --quiet
-  #   --relative_paths=${source_directory}
-  #   --library=qt
-  #   --project=compile_commands.json
+  - cppcheck
+    --enable=all
+    --language=c++
+    --library=qt
+    --project=compile_commands.json
+    --std=c++20
+    --quiet
+    --inline-suppr
+    -i ${CMAKE_BINARY_DIR}
+    -D Q_MOC_OUTPUT_REVISION=67
+    --relative_paths=${source_directory}
 
   # # debug build & test with address sanitizer
   - rm -r *
@@ -133,7 +137,7 @@ script:
     -D CMAKE_BUILD_TYPE=Debug
     "${source_directory}"
   - cmake --build . --parallel $(nproc)
-  # - ctest --output-on-failure --label-regex unit
+  - ctest --output-on-failure --label-regex unit
 
   # # debug build & test with Valgrind
   - rm -r *
@@ -144,9 +148,9 @@ script:
     "${source_directory}"
     # -D fits_enable_asan:BOOL=off
   - cmake --build . --parallel $(nproc)
-  #   && ctest 
-  #     --output-on-failure
-  #     --label-regex unit
-  #     --dashboard ExperimentalMemCheck
-  #   && find Testing/Temporary -size 0 -exec rm {} \;
-  #   && find Testing/Temporary -name 'MemoryChecker.*.log' -exec cat {} \;
+  - ctest 
+    --output-on-failure
+    --label-regex unit
+    --dashboard ExperimentalMemCheck
+  - find Testing/Temporary -size 0 -exec rm {} \;
+  - find Testing/Temporary -name 'MemoryChecker.*.log' -exec cat {} \;

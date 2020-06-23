@@ -15,11 +15,11 @@ namespace analyzer
     auto read_sequences(const QString& dataset_path)
     {
       const QDir directory {dataset_path};
-      const auto sequence_names {
+      const auto names {
         directory.entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name)};
       QVector<analyzer::sequence> sequences;
-      sequences.reserve(sequence_names.size());
-      for (const auto& name : sequence_names)
+      sequences.reserve(names.size());
+      for (const auto& name : names)
       {
         try
         {
@@ -125,9 +125,12 @@ namespace analyzer
     -> QStringList
   {
     QStringList names;
-    names.reserve(sequences.length());
     for (const auto& sequence : sequences)
     {
+      // There is no straight forward way to use std::transform here. QList does
+      // not provide a constructor that creates a list with N default
+      // constructed elements.
+      // cppcheck-suppress useStlAlgorithm
       names.push_back(sequence.name());
     }
     return names;

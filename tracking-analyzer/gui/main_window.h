@@ -28,7 +28,6 @@ namespace analyzer::gui
 
     void set_offset_data(QtCharts::QScatterSeries* data);
     void set_overlap_data(QtCharts::QScatterSeries* data);
-    void set_image(const QImage& image);
 
   public slots:
     void check_dataset_path(const QString& path_text) const;

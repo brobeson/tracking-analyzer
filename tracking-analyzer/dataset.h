@@ -28,6 +28,7 @@ namespace analyzer
     sequence(const QString& name, const QString& path);
     [[nodiscard]] auto name() const -> QString;
     [[nodiscard]] auto frame_paths() const -> QStringList;
+    [[nodiscard]] auto path() const -> QString;
 
   private:
     QString m_name;

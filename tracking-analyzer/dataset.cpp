@@ -87,6 +87,7 @@ namespace analyzer
 
   auto sequence::name() const -> QString { return m_name; }
   auto sequence::frame_paths() const -> QStringList { return m_frame_paths; }
+  auto sequence::path() const -> QString { return m_root_path; }
 
   dataset::dataset(const QString& root_path,
                    const QVector<sequence>& sequences):

@@ -97,6 +97,21 @@ namespace analyzer::gui
       display.offset_graph->chart()->removeAllSeries();
       display.overlap_graph->chart()->removeAllSeries();
       display.frame_display->setPixmap(QPixmap {});
+      display.frame_number->setText("");
+      display.frame_slider->setValue(0);
+      display.sequence_path->setText("");
+    }
+
+    void set_current_frame(const Ui::main_window& display, int number)
+    {
+      display.frame_number->setText(QString::number(number));
+      display.frame_slider->setValue(number);
+    }
+
+    void load_and_display_frame(const QString& frame_path, QLabel& display)
+    {
+      QImageReader reader {frame_path};
+      display.setPixmap(QPixmap::fromImage(reader.read()));
     }
   }  // namespace
 
@@ -161,11 +176,6 @@ namespace analyzer::gui
     }
   }
 
-  void main_window::set_image(const QImage& image)
-  {
-    ui->frame_display->setPixmap(QPixmap::fromImage(image));
-  }
-
   void main_window::check_dataset_path(const QString& path_text) const
   {
     try
@@ -204,6 +214,15 @@ namespace analyzer::gui
     analyzer::gui::clear_display(*ui);
     if (index >= 0)
     {
+      analyzer::gui::set_current_frame(*ui, 1);
+      ui->sequence_path->setText(m_dataset.sequences()[index].path());
+      analyzer::gui::load_and_display_frame(
+        m_dataset.sequences()[index].frame_paths()[1], *(ui->frame_display));
+      ui->frame_number->setEnabled(true);
+      ui->frame_slider->setEnabled(true);
+      ui->frame_slider->setMinimum(1);
+      ui->frame_slider->setMaximum(
+        m_dataset.sequences()[index].frame_paths().length());
     }
   }
 }  // namespace analyzer::gui

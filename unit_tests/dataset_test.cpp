@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <QTest>
 
-Q_DECLARE_METATYPE(analyzer::dataset)
+Q_DECLARE_METATYPE(analyzer::dataset)  // NOLINT
 
 namespace analyzer
 {
@@ -10,13 +10,13 @@ namespace analyzer
   // find it for later operations.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
-  [[nodiscard]] bool operator==(const analyzer::dataset& a,
+  [[nodiscard]] auto operator==(const analyzer::dataset& a,
                                 const analyzer::dataset& b)
   {
     return a.root_path() == b.root_path() && a.sequences() == b.sequences();
   }
 
-  [[nodiscard]] bool operator==(const analyzer::sequence& a,
+  [[nodiscard]] auto operator==(const analyzer::sequence& a,
                                 const analyzer::sequence& b)
   {
     return a.name() == b.name() && a.frame_paths() == b.frame_paths();
@@ -28,10 +28,13 @@ namespace analyzer_test
 {
   class dataset_test final: public QObject
   {
-    Q_OBJECT
+    Q_OBJECT  // NOLINT
 
+      // clang-format off
   private slots:
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     void make_absolute_path_data() const
+    // clang-format on
     {
       QTest::addColumn<QString>("path");
       QTest::addColumn<QString>("absolute_path");
@@ -47,12 +50,14 @@ namespace analyzer_test
                                     << "C:\\Users\\user\\Videos\\";
     }
 
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     void make_absolute_path() const
     {
       QFETCH(const QString, path);
       QTEST(analyzer::make_absolute_path(path), "absolute_path");
     }
 
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     void load_dataset_data() const
     {
       QTest::addColumn<QString>("path");
@@ -69,12 +74,14 @@ namespace analyzer_test
                               {{"Biker", "test_dataset/Biker"}}};
     }
 
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     void load_dataset() const
     {
       QFETCH(const QString, path);
       QTEST(analyzer::load_dataset(path), "dataset");
     }
 
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     void construct_invalid_sequence_data() const
     {
       QTest::addColumn<QString>("path");
@@ -83,6 +90,7 @@ namespace analyzer_test
       QTest::newRow("path has no data") << "test_dataset/Basketball";
     }
 
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     void construct_invalid_sequence() const
     {
       QFETCH(const QString, path);
@@ -90,11 +98,12 @@ namespace analyzer_test
                                analyzer::invalid_sequence);
     }
 
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     void construct_sequence() const
     {
       const analyzer::sequence biker {"Biker", "test_dataset/Biker"};
       const auto current_working_directory {QDir::currentPath()};
-      QCOMPARE(biker.name(), "Biker");
+      QCOMPARE(biker.name(), QString {"Biker"});
       const QStringList expected_paths {
         current_working_directory + "/test_dataset/Biker/img/0001.jpg",
         current_working_directory + "/test_dataset/Biker/img/0002.jpg",
@@ -104,5 +113,5 @@ namespace analyzer_test
   };
 }  // namespace analyzer_test
 
-QTEST_APPLESS_MAIN(analyzer_test::dataset_test)
+QTEST_APPLESS_MAIN(analyzer_test::dataset_test)  // NOLINT
 #include "dataset_test.moc"

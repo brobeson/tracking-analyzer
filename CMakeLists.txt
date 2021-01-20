@@ -20,4 +20,6 @@ string(
     " --error-exitcode=1"
 )
 include(CTest)
-add_subdirectory(unit_tests)
+if(BUILD_TESTING)
+  add_subdirectory(unit_tests)
+endif()

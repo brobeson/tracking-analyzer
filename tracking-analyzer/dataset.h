@@ -51,6 +51,7 @@ namespace analyzer
     QVector<analyzer::sequence> m_sequences;
   };
 
+  // TODO Extract this into a utilities file of some sort.
   auto make_absolute_path(const QString& path) -> QString;
 
   auto load_dataset(const QString& path) -> dataset;

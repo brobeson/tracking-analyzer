@@ -1,4 +1,5 @@
 #include "main_window.h"
+#include "tracking_results.h"
 #include "ui_main_window.h"
 #include <QValueAxis>
 #include <algorithm>
@@ -8,6 +9,34 @@ namespace analyzer::gui
 {
   namespace
   {
+    // NOLINTNEXTLINE(clang-diagnostic-unused-parameter)
+    void set_tick_anchor(QtCharts::QValueAxis& axis, const qreal anchor)
+    {
+      // The tick anchor property was added in Qt 5.12. If the Qt version is
+      // earlier than that, no-op.
+#if QT_VERSION >= 0x051200
+      axis.setTickAnchor(anchor);
+#endif
+    }
+
+    // NOLINTNEXTLINE(clang-diagnostic-unused-parameter)
+    void set_tick_interval(QtCharts::QValueAxis& axis, const qreal interval)
+    {
+#if QT_VERSION >= 0x051200
+      axis.setTickInterval(interval);
+#endif
+    }
+
+    // NOLINTNEXTLINE(clang-diagnostic-unused-parameter)
+    void set_tick_type(QtCharts::QValueAxis& axis,
+                       // NOLINTNEXTLINE(clang-diagnostic-unused-parameter)
+                       const QtCharts::QValueAxis::TickType type)
+    {
+#if QT_VERSION >= 0x051200
+      axis.setTickType(type);
+#endif
+    }
+
     void setup_offset_chart(QtCharts::QChart* chart)
     {
       chart->setTitle("Center Offset (pixels)");
@@ -20,7 +49,7 @@ namespace analyzer::gui
       {
         axis = new QtCharts::QValueAxis();
         axis->setRange(0.0, 1.0);
-        axis->setTickAnchor(0.0);
+        set_tick_anchor(*axis, 0.0);
         axis->setTitleText("Overlap Ratio");
         return axis;
       }
@@ -38,7 +67,7 @@ namespace analyzer::gui
       {
         axis = new QtCharts::QValueAxis();
         axis->setRange(0.0, maximum);
-        axis->setTickAnchor(0.0);
+        set_tick_anchor(*axis, 0.0);
         axis->setTitleText("Center Offset (pixels)");
         return axis;
       }
@@ -56,9 +85,10 @@ namespace analyzer::gui
       {
         axis = new QtCharts::QValueAxis();
         axis->setRange(0.0, maximum);
-        axis->setTickAnchor(0.0);
-        axis->setTickInterval(10.0);  // NOLINT
-        axis->setTickType(QtCharts::QValueAxis::TicksDynamic);
+        set_tick_anchor(*axis, 0.0);
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
+        set_tick_interval(*axis, 10.0);
+        set_tick_type(*axis, QtCharts::QValueAxis::TicksDynamic);
         axis->setLabelFormat("%i");
         axis->setTitleText("Frame Number");
         return axis;
@@ -73,7 +103,7 @@ namespace analyzer::gui
     void setup_overlap_chart(QtCharts::QChart* chart)
     {
       chart->setTitle("Overlap Ratio");
-      const auto axis {analyzer::gui::make_overlap_y_axis()};
+      auto* const axis {analyzer::gui::make_overlap_y_axis()};
       if (axis == nullptr)
       {
         chart->createDefaultAxes();
@@ -135,6 +165,7 @@ namespace analyzer::gui
             &analyzer::gui::main_window::sequence_changed);
     check_dataset_path(ui->dataset_path->text());
     load_dataset();
+    load_tracking_results(ui->results_path->text());
   }
 
   main_window::~main_window() { delete ui; }
@@ -143,8 +174,8 @@ namespace analyzer::gui
   {
     ui->offset_graph->chart()->addSeries(offset_data);
     const auto offset_vector {offset_data->pointsVector()};
-    const auto x_axis {analyzer::gui::make_x_axis(offset_vector.size())};
-    const auto y_axis {analyzer::gui::make_offset_y_axis(
+    auto* const x_axis {analyzer::gui::make_x_axis(offset_vector.size())};
+    auto* const y_axis {analyzer::gui::make_offset_y_axis(
       std::max_element(
         std::begin(offset_vector),
         std::end(offset_vector),
@@ -164,7 +195,7 @@ namespace analyzer::gui
   void main_window::set_overlap_data(QtCharts::QScatterSeries* overlap_data)
   {
     ui->overlap_graph->chart()->addSeries(overlap_data);
-    const auto axis {
+    auto* const axis {
       analyzer::gui::make_x_axis(overlap_data->pointsVector().size())};
     if (axis == nullptr)
     {
@@ -224,5 +255,10 @@ namespace analyzer::gui
       ui->frame_slider->setMaximum(
         m_dataset.sequences()[index].frame_paths().length());
     }
+  }
+
+  void main_window::load_tracking_results(const QString& path)  // NOLINT
+  {
+    const auto new_results {analyzer::load_tracking_results(path)};
   }
 }  // namespace analyzer::gui

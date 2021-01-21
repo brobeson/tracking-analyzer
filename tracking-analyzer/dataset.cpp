@@ -37,7 +37,12 @@ namespace analyzer
     auto make_sequence_frame_paths(const QString& sequence_path)
     {
       QDir directory {sequence_path};
-      directory.cd("img");
+      if (!directory.cd("img"))
+      {
+        throw std::invalid_argument {
+          sequence_path.toStdString()
+          + " does not contain the img subdirectory."};
+      }
       auto frame_paths {
         directory.entryList({"*.jpg"}, QDir::Files, QDir::Name)};
       for (auto& frame_path : frame_paths)
@@ -107,7 +112,7 @@ namespace analyzer
 
   auto make_absolute_path(const QString& path) -> QString
   {
-    if (path.front() == '~')
+    if (path.at(0) == '~')
     {
       return path.right(path.length() - 1).prepend(QDir::homePath());
     }

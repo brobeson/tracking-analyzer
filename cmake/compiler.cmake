@@ -79,16 +79,19 @@ else()
   )
 endif()
 
-set(
-  CMAKE_CXX_CPPCHECK
-  cppcheck
-  --enable=all
-  --language=c++
-  --library=qt
-  --project=${CMAKE_BINARY_DIR}/compile_commands.json
-  --std=c++20
-  --quiet
-  --inline-suppr
-  -i ${CMAKE_BINARY_DIR}
-  -D Q_MOC_OUTPUT_REVISION=67
-)
+# option(analyzer_CPPCHECK "Enable or disable running Cppcheck as part of the build." on)
+# if(analyzer_CPPCHECK)
+#   set(
+#     CMAKE_CXX_CPPCHECK
+#     cppcheck
+#     --enable=all
+#     --language=c++
+#     --library=qt
+#     --project=${CMAKE_BINARY_DIR}/compile_commands.json
+#     --std=c++20
+#     --quiet
+#     --inline-suppr
+#     -i ${CMAKE_BINARY_DIR}
+#     -D Q_MOC_OUTPUT_REVISION=67
+#   )
+# endif()

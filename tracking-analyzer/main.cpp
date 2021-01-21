@@ -25,7 +25,7 @@ auto main(int argc, char* argv[]) -> int
 
   const auto offsets {
     analyzer::calculate_offsets(actual_boxes, ground_truth_boxes)};
-  auto scatter_data {new QtCharts::QScatterSeries};
+  auto* const scatter_data {new QtCharts::QScatterSeries};
   for (auto i {0u}; i < offsets.size(); ++i)
   {
     scatter_data->append(i, offsets[i]);
@@ -34,16 +34,16 @@ auto main(int argc, char* argv[]) -> int
 
   const auto overlaps {
     analyzer::calculate_overlaps(actual_boxes, ground_truth_boxes)};
-  auto overlap_data {new QtCharts::QScatterSeries};
+  auto* const overlap_data {new QtCharts::QScatterSeries};
   for (auto i {0u}; i < overlaps.size(); ++i)
   {
     overlap_data->append(i, overlaps[i]);
   }
   window.set_overlap_data(overlap_data);
 
-  QImageReader reader {"~/Videos/otb/Deer/img/0001.jpg"};
-  const auto image {reader.read()};
-  window.set_image(image);
+  // QImageReader reader {"~/Videos/otb/Deer/img/0001.jpg"};
+  // const auto image {reader.read()};
+  // window.set_image(image);
 
   return QCoreApplication::exec();
 }

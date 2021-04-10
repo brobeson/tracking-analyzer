@@ -5,6 +5,7 @@ Checks: >
   *,
   -cppcoreguidelines-owning-memory,
   -fuchsia-*,
+  -google-readability-todo,
   -google-runtime-references,
   -hicpp-uppercase-literal-suffix,
   -hicpp-use-override,

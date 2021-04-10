@@ -5,10 +5,29 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "(gdb) Launch",
+      "name": "Tracking Analyzer",
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/../build/tracking-analyzer/tracking-analyzer",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/../build/",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+    },
+    {
+      "name": "Results Analyzer",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/../build/results-analyzer/results-analyzer",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/../build/",

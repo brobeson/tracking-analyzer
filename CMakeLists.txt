@@ -8,6 +8,8 @@ project(
 )
 
 include(cmake/compiler.cmake)
+add_subdirectory(analyzer)
+add_subdirectory(results-analyzer)
 add_subdirectory(tracking-analyzer)
 string(
   CONCAT

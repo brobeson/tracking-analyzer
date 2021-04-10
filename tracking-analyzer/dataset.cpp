@@ -110,6 +110,7 @@ namespace analyzer
     return m_root_directory;
   }
 
+  // TODO - Use the analyzer library.
   auto make_absolute_path(const QString& path) -> QString
   {
     if (path.at(0) == '~')

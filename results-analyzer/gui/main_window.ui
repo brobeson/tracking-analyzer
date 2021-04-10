@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>results_analyzer::gui::main_window</class>
+ <widget class="QMainWindow" name="results_analyzer::gui::main_window">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1048</width>
+    <height>875</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="2" column="0">
+     <widget class="QChartView" name="overlap_graph"/>
+    </item>
+    <item row="0" column="0">
+     <widget class="QChartView" name="offset_graph"/>
+    </item>
+    <item row="0" column="1" rowspan="2">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Results Path</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="results_path">
+          <property name="text">
+           <string>~/repositories/tracker_benchmark/results/OPE</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Attribute</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QComboBox" name="attributes">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QComboBox::AdjustToContents</enum>
+          </property>
+          <item>
+           <property name="text">
+            <string>All</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Background Clutter</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Deformation</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Fast Motion</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Illumination Variation</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>In-Plane Rotation</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Low Resolution</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Motion Blur</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Occlusion</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Out-of-Plane Rotation</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Out-of-View</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Scale Variation</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Graph Theme</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QComboBox" name="comboBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <item>
+           <property name="text">
+            <string>Light</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Blue Cerulean</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Dark</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Brown Sand</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Blue NCS</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>High Contrast</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Blue Icy</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Qt</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QListWidget" name="trackers">
+          <property name="selectionMode">
+           <enum>QAbstractItemView::MultiSelection</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Trackers</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Test</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QComboBox" name="tests"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1048</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QChartView</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">QtCharts</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

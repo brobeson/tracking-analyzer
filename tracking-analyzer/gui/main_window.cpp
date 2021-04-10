@@ -12,18 +12,22 @@ namespace analyzer::gui
     // NOLINTNEXTLINE(clang-diagnostic-unused-parameter)
     void set_tick_anchor(QtCharts::QValueAxis& axis, const qreal anchor)
     {
-      // The tick anchor property was added in Qt 5.12. If the Qt version is
-      // earlier than that, no-op.
-#if QT_VERSION >= 0x051200
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
       axis.setTickAnchor(anchor);
+#else
+      static_cast<void>(axis);
+      static_cast<void>(anchor);
 #endif
     }
 
     // NOLINTNEXTLINE(clang-diagnostic-unused-parameter)
     void set_tick_interval(QtCharts::QValueAxis& axis, const qreal interval)
     {
-#if QT_VERSION >= 0x051200
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
       axis.setTickInterval(interval);
+#else
+      static_cast<void>(axis);
+      static_cast<void>(anchor);
 #endif
     }
 
@@ -32,8 +36,11 @@ namespace analyzer::gui
                        // NOLINTNEXTLINE(clang-diagnostic-unused-parameter)
                        const QtCharts::QValueAxis::TickType type)
     {
-#if QT_VERSION >= 0x051200
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
       axis.setTickType(type);
+#else
+      static_cast<void>(axis);
+      static_cast<void>(anchor);
 #endif
     }
 

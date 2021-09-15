@@ -1,6 +1,7 @@
 #ifndef TRACKING_ANALYZER_DATASET_H
 #define TRACKING_ANALYZER_DATASET_H
 
+#include "bounding_box.h"
 #include <QStringList>
 #include <QVector>
 #include <stdexcept>
@@ -29,11 +30,13 @@ namespace analyzer
     [[nodiscard]] auto name() const -> QString;
     [[nodiscard]] auto frame_paths() const -> QStringList;
     [[nodiscard]] auto path() const -> QString;
+    [[nodiscard]] auto target_boxes() const -> analyzer::bounding_box_list;
 
   private:
     QString m_name;
     QString m_root_path;
     QStringList m_frame_paths;
+    analyzer::bounding_box_list m_target_boxes;
   };
 
   class dataset final

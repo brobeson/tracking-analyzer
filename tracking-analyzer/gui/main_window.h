@@ -29,15 +29,17 @@ namespace analyzer::gui
     void set_offset_data(QtCharts::QScatterSeries* data);
     void set_overlap_data(QtCharts::QScatterSeries* data);
 
-  public slots:
+  public slots:  // NOLINT(readability-redundant-access-specifiers)
     void check_dataset_path(const QString& path_text) const;
     void load_dataset();
-    void sequence_changed(int index) const;
+    void sequence_changed(int index);
     void load_tracking_results(const QString& path);
+    void change_frame(int frame_index) const;
 
   private:
     Ui::main_window* ui;
     analyzer::dataset m_dataset;
+    int m_sequence_index {0};
   };
 }  // namespace analyzer::gui
 

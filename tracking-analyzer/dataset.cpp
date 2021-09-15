@@ -1,6 +1,7 @@
 #include "dataset.h"
 #include <QDir>
 #include <filesystem>
+#include <fstream>
 
 namespace analyzer
 {
@@ -51,6 +52,12 @@ namespace analyzer
       }
       return frame_paths;
     }
+
+    auto read_ground_truth_boxes(const std::string& path)
+    {
+      std::ifstream s {path + "/groundtruth_rect.txt"};
+      return analyzer::read_bounding_boxes(s);
+    }
   }  // namespace
 
   invalid_sequence::invalid_sequence(const QString& name,
@@ -66,7 +73,8 @@ namespace analyzer
   sequence::sequence(const QString& name, const QString& path):
     m_name {name},
     m_root_path {path},
-    m_frame_paths {analyzer::make_sequence_frame_paths(path)}
+    m_frame_paths {analyzer::make_sequence_frame_paths(path)},
+    m_target_boxes {analyzer::read_ground_truth_boxes(path.toStdString())}
   {
     if (m_root_path.isEmpty())
     {
@@ -93,6 +101,10 @@ namespace analyzer
   auto sequence::name() const -> QString { return m_name; }
   auto sequence::frame_paths() const -> QStringList { return m_frame_paths; }
   auto sequence::path() const -> QString { return m_root_path; }
+  auto sequence::target_boxes() const -> analyzer::bounding_box_list
+  {
+    return m_target_boxes;
+  }
 
   dataset::dataset(const QString& root_path,
                    const QVector<sequence>& sequences):

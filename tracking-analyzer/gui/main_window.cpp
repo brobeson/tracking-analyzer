@@ -10,32 +10,41 @@ namespace analyzer::gui
   namespace
   {
     // NOLINTNEXTLINE(clang-diagnostic-unused-parameter)
-    void set_tick_anchor(QtCharts::QValueAxis& axis, const qreal anchor)
-    {
-      // The tick anchor property was added in Qt 5.12. If the Qt version is
-      // earlier than that, no-op.
-#if QT_VERSION >= 0x051200
-      axis.setTickAnchor(anchor);
-#endif
-    }
+    //     void set_tick_anchor(QtCharts::QValueAxis& axis, const qreal anchor)
+    //     {
+    //       // The tick anchor property was added in Qt 5.12. If the Qt version
+    //       is
+    //       // earlier than that, no-op.
+    // #if QT_VERSION >= 0x051200
+    //       axis.setTickAnchor(anchor);
+    // #endif
+    //     }
 
     // NOLINTNEXTLINE(clang-diagnostic-unused-parameter)
-    void set_tick_interval(QtCharts::QValueAxis& axis, const qreal interval)
-    {
-#if QT_VERSION >= 0x051200
-      axis.setTickInterval(interval);
-#endif
-    }
+    //     void set_tick_interval(QtCharts::QValueAxis& axis, const qreal
+    //     interval)
+    //     {
+    // #if QT_VERSION >= 0x051200
+    //       axis.setTickInterval(interval);
+    // #endif
+    //     }
+
+    // #if QT_VERSION >= 0x051200
+    //     using tick_type = QtCharts::QValueAxis::TickType;
+    // #else
+    //     using tick_type = int;
+    // #endif
 
     // NOLINTNEXTLINE(clang-diagnostic-unused-parameter)
-    void set_tick_type(QtCharts::QValueAxis& axis,
-                       // NOLINTNEXTLINE(clang-diagnostic-unused-parameter)
-                       const QtCharts::QValueAxis::TickType type)
-    {
-#if QT_VERSION >= 0x051200
-      axis.setTickType(type);
-#endif
-    }
+    //     void set_tick_type(QtCharts::QValueAxis& axis,
+    //                        //
+    //                        NOLINTNEXTLINE(clang-diagnostic-unused-parameter)
+    //                        const tick_type type)
+    //     {
+    // #if QT_VERSION >= 0x051200
+    //       axis.setTickType(type);
+    // #endif
+    //     }
 
     void setup_offset_chart(QtCharts::QChart* chart)
     {
@@ -49,7 +58,7 @@ namespace analyzer::gui
       {
         axis = new QtCharts::QValueAxis();
         axis->setRange(0.0, 1.0);
-        set_tick_anchor(*axis, 0.0);
+        // axis->setTickAnchor(*axis, 0.0);
         axis->setTitleText("Overlap Ratio");
         return axis;
       }
@@ -67,7 +76,7 @@ namespace analyzer::gui
       {
         axis = new QtCharts::QValueAxis();
         axis->setRange(0.0, maximum);
-        set_tick_anchor(*axis, 0.0);
+        // axis->setTickAnchor(*axis, 0.0);
         axis->setTitleText("Center Offset (pixels)");
         return axis;
       }
@@ -85,10 +94,9 @@ namespace analyzer::gui
       {
         axis = new QtCharts::QValueAxis();
         axis->setRange(0.0, maximum);
-        set_tick_anchor(*axis, 0.0);
-        // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
-        set_tick_interval(*axis, 10.0);
-        set_tick_type(*axis, QtCharts::QValueAxis::TicksDynamic);
+        // axis->setTickAnchor(*axis, 0.0);
+        // axis->setTickInterval(*axis, 10.0);
+        // axis->setTickType(*axis, QtCharts::QValueAxis::TicksDynamic);
         axis->setLabelFormat("%i");
         axis->setTitleText("Frame Number");
         return axis;

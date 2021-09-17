@@ -2,5 +2,8 @@
   "cSpell.words": [
     "Wfloat",
     "qreal"
+  ],
+  "clang-tidy.compilerArgs": [
+    "-Wno-unused-macros"
   ]
 }

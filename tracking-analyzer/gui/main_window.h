@@ -33,8 +33,9 @@ namespace analyzer::gui
     void check_dataset_path(const QString& path_text) const;
     void load_dataset();
     void sequence_changed(int index);
-    void load_tracking_results(const QString& path);
+    // void load_tracking_results(const QString& path);
     void change_frame(int frame_index) const;
+    void load_tracking_data();
 
   private:
     Ui::main_window* ui;

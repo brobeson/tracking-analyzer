@@ -200,9 +200,13 @@ namespace analyzer::gui
             qOverload<int>(&QSpinBox::valueChanged),
             this,
             &analyzer::gui::main_window::change_frame);
+    // connect(ui->results_path,
+    //         &QLineEdit::editingFinished,
+    //         this,
+    //         &analyzer::gui::main_window::load_tracking_data);
     check_dataset_path(ui->dataset_path->text());
     load_dataset();
-    load_tracking_results(ui->results_path->text());
+    // load_tracking_results(ui->results_path->text());
 
     // sequence_changed() is called by Qt during initialization. Reset the
     // frame slider and line edit enabled properties.
@@ -305,10 +309,10 @@ namespace analyzer::gui
     }
   }
 
-  void main_window::load_tracking_results(const QString& path)  // NOLINT
-  {
-    const auto new_results {analyzer::load_tracking_results(path)};
-  }
+  // void main_window::load_tracking_results(const QString& path)  // NOLINT
+  // {
+  //   const auto new_results {analyzer::load_tracking_results(path)};
+  // }
 
   void main_window::change_frame(const int frame_index) const
   {
@@ -323,5 +327,10 @@ namespace analyzer::gui
       m_dataset.sequences()[m_sequence_index]
         .target_boxes()[static_cast<analyzer::bounding_box_list::size_type>(
           frame_index)]);
+  }
+
+  void main_window::load_tracking_data()
+  {
+    const auto data {analyzer::load_tracking_data(ui->results_path->text())};
   }
 }  // namespace analyzer::gui

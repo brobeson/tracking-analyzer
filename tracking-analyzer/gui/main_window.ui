@@ -159,7 +159,11 @@
         <item row="4" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QLineEdit" name="results_path"/>
+           <widget class="QLineEdit" name="results_path">
+            <property name="text">
+             <string>~/repositories/tmft/Deer_update_metadata.json</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QToolButton" name="toolButton">
@@ -167,7 +171,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset theme="open"/>
+             <iconset theme="open">
+              <normaloff>.</normaloff>.</iconset>
             </property>
            </widget>
           </item>

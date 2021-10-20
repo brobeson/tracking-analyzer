@@ -19,6 +19,8 @@ namespace analyzer
 
   struct training_scores
   {
+    static constexpr int background_scores {0};
+    static constexpr int target_scores {1};
     QString sequence_name;
     QString dataset;
     std::vector<int> update_frames;

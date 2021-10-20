@@ -200,10 +200,10 @@ namespace analyzer::gui
             qOverload<int>(&QSpinBox::valueChanged),
             this,
             &analyzer::gui::main_window::change_frame);
-    // connect(ui->results_path,
-    //         &QLineEdit::editingFinished,
-    //         this,
-    //         &analyzer::gui::main_window::load_tracking_data);
+    connect(ui->results_path,
+            &QLineEdit::editingFinished,
+            this,
+            &analyzer::gui::main_window::load_tracking_data);
     check_dataset_path(ui->dataset_path->text());
     load_dataset();
     // load_tracking_results(ui->results_path->text());
@@ -331,6 +331,7 @@ namespace analyzer::gui
 
   void main_window::load_tracking_data()
   {
-    const auto data {analyzer::load_tracking_data(ui->results_path->text())};
+    const auto score_data {
+      analyzer::load_training_scores(ui->results_path->text())};
   }
 }  // namespace analyzer::gui

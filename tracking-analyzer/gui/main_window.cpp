@@ -204,6 +204,10 @@ namespace analyzer::gui
             &QLineEdit::editingFinished,
             this,
             &analyzer::gui::main_window::load_tracking_data);
+    connect(ui->update_frame_slider,
+            &QSlider::sliderMoved,
+            this,
+            &analyzer::gui::main_window::change_update_frame);
     check_dataset_path(ui->dataset_path->text());
     load_dataset();
     // load_tracking_results(ui->results_path->text());
@@ -329,9 +333,35 @@ namespace analyzer::gui
           frame_index)]);
   }
 
+  void main_window::change_update_frame(int update_frame_index) const
+  {
+    if (update_frame_index < 0)
+    {
+      return;
+    }
+    try
+    {
+      const auto frame {m_training_data.update_frames.at(
+        static_cast<std::vector<int>::size_type>(update_frame_index))};
+      if (ui->frame_slider->maximum() < frame)
+      {
+        return;
+      }
+      change_frame(frame);
+    }
+    catch (...)
+    {
+      return;
+    }
+  }
   void main_window::load_tracking_data()
   {
-    const auto score_data {
-      analyzer::load_training_scores(ui->results_path->text())};
+    m_training_data = analyzer::load_training_scores(ui->results_path->text());
+    ui->sequence->setCurrentText(m_training_data.sequence_name);
+    ui->update_frame_slider->setEnabled(true);
+    ui->update_frame_slider->setMinimum(0);
+    ui->update_frame_slider->setMaximum(
+      // TODO Change this a gsl::narrow_cast<int>.
+      static_cast<int>(m_training_data.update_frames.size()));
   }
 }  // namespace analyzer::gui

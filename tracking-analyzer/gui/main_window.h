@@ -2,6 +2,7 @@
 #define ANALYZER_GUI_MAIN_WINDOW_H
 
 #include "dataset.h"
+#include "tracking_results.h"
 #include <QImage>
 #include <QMainWindow>
 #include <QScatterSeries>
@@ -36,11 +37,13 @@ namespace analyzer::gui
     // void load_tracking_results(const QString& path);
     void change_frame(int frame_index) const;
     void load_tracking_data();
+    void change_update_frame(int update_frame_index) const;
 
   private:
     Ui::main_window* ui;
     analyzer::dataset m_dataset;
     int m_sequence_index {0};
+    analyzer::training_scores m_training_data;
   };
 }  // namespace analyzer::gui
 

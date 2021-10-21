@@ -186,9 +186,12 @@
          </widget>
         </item>
         <item row="5" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Update Frame</string>
+         <widget class="QSpinBox" name="update_frame_number">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="prefix">
+           <string>Update </string>
           </property>
          </widget>
         </item>

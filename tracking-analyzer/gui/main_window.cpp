@@ -239,6 +239,10 @@ namespace analyzer::gui
             &QSlider::sliderMoved,
             this,
             &analyzer::gui::main_window::change_update_frame);
+    connect(ui->update_frame_number,
+            qOverload<int>(&QSpinBox::valueChanged),
+            this,
+            &analyzer::gui::main_window::change_update_frame);
     check_dataset_path(ui->dataset_path->text());
     load_dataset();
     // load_tracking_results(ui->results_path->text());
@@ -375,7 +379,7 @@ namespace analyzer::gui
           frame_index)]);
   }
 
-  void main_window::change_update_frame(int update_frame_index) const
+  void main_window::change_update_frame(const int update_frame_index) const
   {
     if (update_frame_index < 0)
     {
@@ -389,6 +393,8 @@ namespace analyzer::gui
       {
         return;
       }
+      ui->update_frame_slider->setValue(update_frame_index);
+      ui->update_frame_number->setValue(update_frame_index);
       change_frame(frame);
     }
     catch (...)
@@ -400,13 +406,16 @@ namespace analyzer::gui
   void main_window::load_tracking_data()
   {
     m_training_data = analyzer::load_training_scores(ui->results_path->text());
+    // TODO Change this a gsl::narrow_cast<int>.
+    const auto maximum {static_cast<int>(m_training_data.update_frames.size())};
     ui->sequence->setCurrentText(m_training_data.sequence_name);
     ui->update_frame_slider->setEnabled(true);
     ui->update_frame_slider->setMinimum(0);
-    ui->update_frame_slider->setMaximum(
-      // TODO Change this a gsl::narrow_cast<int>.
-      static_cast<int>(m_training_data.update_frames.size()));
+    ui->update_frame_slider->setMaximum(maximum);
     ui->update_frame_slider->setValue(0);
+    ui->update_frame_number->setEnabled(true);
+    ui->update_frame_number->setMaximum(maximum);
+    ui->update_frame_number->setSuffix(" of " + QString::number(maximum));
     const auto series {new QtCharts::QScatterSeries};
     series->append(m_training_data.score_data);
     set_overlap_data(series);

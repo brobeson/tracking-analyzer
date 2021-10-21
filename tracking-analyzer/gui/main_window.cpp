@@ -1,6 +1,7 @@
 #include "main_window.h"
 #include "tracking_results.h"
 #include "ui_main_window.h"
+#include <QScatterSeries>
 #include <QValueAxis>
 #include <algorithm>
 #include <filesystem>
@@ -51,23 +52,23 @@ namespace analyzer::gui
       chart->setTitle("Center Offset (pixels)");
     }
 
-    auto make_overlap_y_axis() -> QtCharts::QValueAxis*
-    {
-      QtCharts::QValueAxis* axis {nullptr};
-      try
-      {
-        axis = new QtCharts::QValueAxis();
-        axis->setRange(0.0, 1.0);
-        // axis->setTickAnchor(*axis, 0.0);
-        axis->setTitleText("Overlap Ratio");
-        return axis;
-      }
-      catch (...)
-      {
-        delete axis;
-        return nullptr;
-      }
-    }
+    // auto make_overlap_y_axis() -> QtCharts::QValueAxis*
+    // {
+    //   QtCharts::QValueAxis* axis {nullptr};
+    //   try
+    //   {
+    //     axis = new QtCharts::QValueAxis();
+    //     axis->setRange(0.0, 1.0);
+    //     // axis->setTickAnchor(*axis, 0.0);
+    //     axis->setTitleText("Overlap Ratio");
+    //     return axis;
+    //   }
+    //   catch (...)
+    //   {
+    //     delete axis;
+    //     return nullptr;
+    //   }
+    // }
 
     auto make_offset_y_axis(const qreal maximum) -> QtCharts::QValueAxis*
     {
@@ -87,18 +88,18 @@ namespace analyzer::gui
       }
     }
 
-    auto make_x_axis(const qreal maximum) -> QtCharts::QValueAxis*
+    auto make_x_axis(const qreal /*maximum*/) -> QtCharts::QValueAxis*
     {
       QtCharts::QValueAxis* axis {nullptr};
       try
       {
         axis = new QtCharts::QValueAxis();
-        axis->setRange(0.0, maximum);
+        // axis->setRange(0.0, maximum);
         // axis->setTickAnchor(*axis, 0.0);
         // axis->setTickInterval(*axis, 10.0);
         // axis->setTickType(*axis, QtCharts::QValueAxis::TicksDynamic);
         axis->setLabelFormat("%i");
-        axis->setTitleText("Frame Number");
+        axis->setTitleText("Background Scores");
         return axis;
       }
       catch (...)
@@ -110,16 +111,16 @@ namespace analyzer::gui
 
     void setup_overlap_chart(QtCharts::QChart* chart)
     {
-      chart->setTitle("Overlap Ratio");
-      auto* const axis {analyzer::gui::make_overlap_y_axis()};
-      if (axis == nullptr)
-      {
-        chart->createDefaultAxes();
-      }
-      else
-      {
-        chart->addAxis(axis, Qt::AlignLeft);
-      }
+      chart->setTitle("Training Scores");
+      // auto* const axis {analyzer::gui::make_overlap_y_axis()};
+      // if (axis == nullptr)
+      // {
+      //   chart->createDefaultAxes();
+      // }
+      // else
+      // {
+      //   chart->addAxis(axis, Qt::AlignLeft);
+      // }
     }
 
     void update_sequence_combobox(QComboBox& combobox,
@@ -171,6 +172,36 @@ namespace analyzer::gui
       auto frame {load_frame(frame_path)};
       draw_bounding_box(frame, box);
       display.setPixmap(QPixmap::fromImage(frame));
+    }
+
+    auto get_chart_bounds(const QList<QPointF>& data)
+    {
+      const auto minimum_x {
+        std::min_element(
+          std::begin(data),
+          std::end(data),
+          [](const QPointF& a, const QPointF& b) { return a.x() < b.x(); })
+          ->x()};
+      const auto maximum_x {
+        std::max_element(
+          std::begin(data),
+          std::end(data),
+          [](const QPointF& a, const QPointF& b) { return a.x() < b.x(); })
+          ->x()};
+      const auto minimum_y {
+        std::min_element(
+          std::begin(data),
+          std::end(data),
+          [](const QPointF& a, const QPointF& b) { return a.y() < b.y(); })
+          ->y()};
+      const auto maximum_y {
+        std::max_element(
+          std::begin(data),
+          std::end(data),
+          [](const QPointF& a, const QPointF& b) { return a.y() < b.y(); })
+          ->y()};
+      return QPointF {std::min(minimum_x, minimum_y),
+                      std::max(maximum_x, maximum_y)};
     }
   }  // namespace
 
@@ -244,17 +275,28 @@ namespace analyzer::gui
 
   void main_window::set_overlap_data(QtCharts::QScatterSeries* overlap_data)
   {
+    ui->overlap_graph->chart()->removeAllSeries();
+    overlap_data->setName("Background Training Candidates");
     ui->overlap_graph->chart()->addSeries(overlap_data);
-    auto* const axis {
-      analyzer::gui::make_x_axis(overlap_data->pointsVector().size())};
-    if (axis == nullptr)
-    {
-      ui->overlap_graph->chart()->createDefaultAxes();
-    }
-    else
-    {
-      ui->overlap_graph->chart()->addAxis(axis, Qt::AlignBottom);
-    }
+    // auto* const axis {
+    //   analyzer::gui::make_x_axis(overlap_data->pointsVector().size())};
+    // if (axis == nullptr)
+    // {
+    //   ui->overlap_graph->chart()->createDefaultAxes();
+    // }
+    // else
+    // {
+    //   ui->overlap_graph->chart()->addAxis(axis, Qt::AlignBottom);
+    // }
+    const auto range {get_chart_bounds(overlap_data->points())};
+    ui->overlap_graph->chart()->createDefaultAxes();
+    auto axis {
+      ui->overlap_graph->chart()->axes(Qt::Orientation::Horizontal)[0]};
+    axis->setTitleText("Background Scores");
+    axis->setRange(range.x(), range.y());
+    axis = ui->overlap_graph->chart()->axes(Qt::Orientation::Vertical)[0];
+    axis->setTitleText("Target Scores");
+    axis->setRange(range.x(), range.y());
   }
 
   void main_window::check_dataset_path(const QString& path_text) const
@@ -354,6 +396,7 @@ namespace analyzer::gui
       return;
     }
   }
+
   void main_window::load_tracking_data()
   {
     m_training_data = analyzer::load_training_scores(ui->results_path->text());
@@ -363,5 +406,9 @@ namespace analyzer::gui
     ui->update_frame_slider->setMaximum(
       // TODO Change this a gsl::narrow_cast<int>.
       static_cast<int>(m_training_data.update_frames.size()));
+    ui->update_frame_slider->setValue(0);
+    const auto series {new QtCharts::QScatterSeries};
+    series->append(m_training_data.score_data);
+    set_overlap_data(series);
   }
 }  // namespace analyzer::gui

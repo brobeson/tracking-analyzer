@@ -120,7 +120,10 @@ namespace analyzer
                            .toArray()[0]
                            .toObject()["background candidates"]
                            .toArray(),
-                         score_data.score_data);
+                         score_data.score_data.first);
+    fill_training_scores(
+      score_json["0"].toArray()[0].toObject()["background mined"].toArray(),
+      score_data.score_data.second);
     return score_data;
   }
 }  // namespace analyzer

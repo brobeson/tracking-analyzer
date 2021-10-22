@@ -5,6 +5,7 @@
 #include <QList>
 #include <QString>
 #include <array>
+#include <utility>
 #include <vector>
 
 namespace analyzer
@@ -35,7 +36,8 @@ namespace analyzer
     // using batch_scores = std::array<score_list, 2>;
     // using update = std::array<batch_scores, 3>;
     // std::vector<update> score_data;
-    QList<QPointF> score_data;
+    using score_list = QList<QPointF>;
+    std::pair<score_list, score_list> score_data;
   };
 
   [[nodiscard]] auto load_training_scores(const QString& path)

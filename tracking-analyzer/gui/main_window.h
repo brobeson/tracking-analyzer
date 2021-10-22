@@ -28,7 +28,8 @@ namespace analyzer::gui
     virtual ~main_window();  // NOLINT(modernize-use-override)
 
     void set_offset_data(QtCharts::QScatterSeries* data);
-    void set_overlap_data(QtCharts::QScatterSeries* data);
+    void set_overlap_data(QtCharts::QScatterSeries* data,
+                          QtCharts::QScatterSeries* bg_mined_data);
 
   public slots:  // NOLINT(readability-redundant-access-specifiers)
     void check_dataset_path(const QString& path_text) const;

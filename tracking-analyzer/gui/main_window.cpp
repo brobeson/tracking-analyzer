@@ -294,7 +294,7 @@ namespace analyzer::gui
     // }
     const auto range {get_chart_bounds(overlap_data->points())};
     ui->overlap_graph->chart()->createDefaultAxes();
-    auto axis {
+    auto* axis {
       ui->overlap_graph->chart()->axes(Qt::Orientation::Horizontal)[0]};
     axis->setTitleText("Background Scores");
     axis->setRange(range.x(), range.y());
@@ -416,7 +416,7 @@ namespace analyzer::gui
     ui->update_frame_number->setEnabled(true);
     ui->update_frame_number->setMaximum(maximum);
     ui->update_frame_number->setSuffix(" of " + QString::number(maximum));
-    const auto series {new QtCharts::QScatterSeries};
+    auto* const series {new QtCharts::QScatterSeries};
     series->append(m_training_data.score_data);
     set_overlap_data(series);
   }

@@ -174,34 +174,14 @@ namespace analyzer::gui
       display.setPixmap(QPixmap::fromImage(frame));
     }
 
-    auto get_chart_bounds(const QList<QPointF>& data)
+    void make_training_series(QChart& chart,
+                              const score_list& scores,
+                              const QString& name)
     {
-      const auto minimum_x {
-        std::min_element(
-          std::begin(data),
-          std::end(data),
-          [](const QPointF& a, const QPointF& b) { return a.x() < b.x(); })
-          ->x()};
-      const auto maximum_x {
-        std::max_element(
-          std::begin(data),
-          std::end(data),
-          [](const QPointF& a, const QPointF& b) { return a.x() < b.x(); })
-          ->x()};
-      const auto minimum_y {
-        std::min_element(
-          std::begin(data),
-          std::end(data),
-          [](const QPointF& a, const QPointF& b) { return a.y() < b.y(); })
-          ->y()};
-      const auto maximum_y {
-        std::max_element(
-          std::begin(data),
-          std::end(data),
-          [](const QPointF& a, const QPointF& b) { return a.y() < b.y(); })
-          ->y()};
-      return QPointF {std::min(minimum_x, minimum_y),
-                      std::max(maximum_x, maximum_y)};
+      auto* const series {new QtCharts::QScatterSeries};
+      series->append(scores);
+      series->setName(name);
+      chart.addSeries(series);
     }
   }  // namespace
 
@@ -277,34 +257,24 @@ namespace analyzer::gui
     }
   }
 
-  void
-  main_window::set_overlap_data(QtCharts::QScatterSeries* bg_candidate_data,
-                                QtCharts::QScatterSeries* bg_mined_data)
+  void main_window::set_training_score_data(const training_iteration& iteration)
   {
     ui->overlap_graph->chart()->removeAllSeries();
-    bg_candidate_data->setName("Background Training Candidates");
-    bg_mined_data->setName("Background Mined");
-    ui->overlap_graph->chart()->addSeries(bg_candidate_data);
-    ui->overlap_graph->chart()->addSeries(bg_mined_data);
-    // auto* const axis {
-    //   analyzer::gui::make_x_axis(overlap_data->pointsVector().size())};
-    // if (axis == nullptr)
-    // {
-    //   ui->overlap_graph->chart()->createDefaultAxes();
-    // }
-    // else
-    // {
-    //   ui->overlap_graph->chart()->addAxis(axis, Qt::AlignBottom);
-    // }
-    const auto range {get_chart_bounds(bg_candidate_data->points())};
+    auto& chart {*(ui->overlap_graph->chart())};
+    make_training_series(
+      chart, iteration.background_candidates, "Background Training Candidates");
+    make_training_series(chart, iteration.background_mined, "Background Mined");
+    make_training_series(
+      chart, iteration.target_candidates, "Target Training Candidates");
+    const auto range {get_chart_range(iteration)};
     ui->overlap_graph->chart()->createDefaultAxes();
     auto* axis {
       ui->overlap_graph->chart()->axes(Qt::Orientation::Horizontal)[0]};
     axis->setTitleText("Background Scores");
-    axis->setRange(range.x(), range.y());
+    axis->setRange(range.first, range.second);
     axis = ui->overlap_graph->chart()->axes(Qt::Orientation::Vertical)[0];
     axis->setTitleText("Target Scores");
-    axis->setRange(range.x(), range.y());
+    axis->setRange(range.first, range.second);
   }
 
   void main_window::check_dataset_path(const QString& path_text) const
@@ -420,10 +390,6 @@ namespace analyzer::gui
     ui->update_frame_number->setEnabled(true);
     ui->update_frame_number->setMaximum(maximum);
     ui->update_frame_number->setSuffix(" of " + QString::number(maximum));
-    auto* const bg_candidate_series {new QtCharts::QScatterSeries};
-    bg_candidate_series->append(m_training_data.score_data.first);
-    auto* const bg_mined_series {new QtCharts::QScatterSeries};
-    bg_mined_series->append(m_training_data.score_data.second);
-    set_overlap_data(bg_candidate_series, bg_mined_series);
+    set_training_score_data(m_training_data.iteration_scores);
   }
 }  // namespace analyzer::gui

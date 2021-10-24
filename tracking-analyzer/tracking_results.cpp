@@ -120,10 +120,66 @@ namespace analyzer
                            .toArray()[0]
                            .toObject()["background candidates"]
                            .toArray(),
-                         score_data.score_data.first);
+                         score_data.iteration_scores.background_candidates);
     fill_training_scores(
       score_json["0"].toArray()[0].toObject()["background mined"].toArray(),
-      score_data.score_data.second);
+      score_data.iteration_scores.background_mined);
+    fill_training_scores(
+      score_json["0"].toArray()[0].toObject()["target candidates"].toArray(),
+      score_data.iteration_scores.target_candidates);
+    // std::cout << std::get<2>(score_data.score_data).length() << '\n';
     return score_data;
+  }
+
+  namespace
+  {
+    auto get_chart_range(const score_list& scores)
+    {
+      if (scores.empty())
+      {
+        // TODO Change this to something better.
+        return range {0.0f, 0.0f};
+      }
+      const auto minimum_x {
+        std::min_element(
+          std::begin(scores),
+          std::end(scores),
+          [](const QPointF& a, const QPointF& b) { return a.x() < b.x(); })
+          ->x()};
+      const auto maximum_x {
+        std::max_element(
+          std::begin(scores),
+          std::end(scores),
+          [](const QPointF& a, const QPointF& b) { return a.x() < b.x(); })
+          ->x()};
+      const auto minimum_y {
+        std::min_element(
+          std::begin(scores),
+          std::end(scores),
+          [](const QPointF& a, const QPointF& b) { return a.y() < b.y(); })
+          ->y()};
+      const auto maximum_y {
+        std::max_element(
+          std::begin(scores),
+          std::end(scores),
+          [](const QPointF& a, const QPointF& b) { return a.y() < b.y(); })
+          ->y()};
+      return range {std::min(minimum_x, minimum_y),
+                    std::max(maximum_x, maximum_y)};
+    }
+  }  // namespace
+
+  auto get_chart_range(const training_iteration& iteration) -> range
+  {
+    const auto bg_candidate_range {
+      get_chart_range(iteration.background_candidates)};
+    const auto bg_mined_range {get_chart_range(iteration.background_mined)};
+    const auto tg_candidate_range {
+      get_chart_range(iteration.target_candidates)};
+    return range {
+      std::min(std::min(bg_candidate_range.first, bg_mined_range.first),
+               tg_candidate_range.first),
+      std::max(std::max(bg_candidate_range.second, bg_mined_range.second),
+               tg_candidate_range.second)};
   }
 }  // namespace analyzer

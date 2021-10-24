@@ -161,7 +161,7 @@
           <item>
            <widget class="QLineEdit" name="results_path">
             <property name="text">
-             <string>~/repositories/tracking-analyzer/tracking-analyzer/sample_data.json</string>
+             <string>~/repositories/tracking-analyzer/tracking-analyzer/sample_training_scores.json</string>
             </property>
            </widget>
           </item>

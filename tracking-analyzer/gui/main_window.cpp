@@ -263,10 +263,6 @@ namespace analyzer::gui
             qOverload<int>(&QSpinBox::valueChanged),
             this,
             &analyzer::gui::main_window::change_frame);
-    connect(ui->results_path,
-            &QLineEdit::editingFinished,
-            this,
-            qOverload<>(&analyzer::gui::main_window::load_tracking_data));
     connect(ui->load_data_button,
             &QToolButton::clicked,
             this,
@@ -462,9 +458,16 @@ namespace analyzer::gui
     }
   }
 
-  void main_window::load_tracking_data()
+  void main_window::load_tracking_data(const bool /*unused*/)
   {
-    m_training_data = analyzer::load_training_scores(ui->results_path->text());
+    const auto filepath {QFileDialog::getOpenFileName(
+      this, "Load Tracking Data", QDir::homePath(), "JSON (*.json)")};
+    if (filepath.isEmpty())
+    {
+      return;
+    }
+
+    m_training_data = analyzer::load_training_scores(filepath);
     // TODO Change this a gsl::narrow_cast<int>.
     const auto maximum {static_cast<int>(m_training_data.update_frames.size())};
     ui->sequence->setCurrentText(m_training_data.sequence_name);
@@ -476,17 +479,7 @@ namespace analyzer::gui
     ui->update_frame_number->setMaximum(maximum);
     ui->update_frame_number->setSuffix(" of " + QString::number(maximum));
     set_training_score_data(m_training_data.iteration_scores);
-  }
-
-  void main_window::load_tracking_data(const bool /*unused*/)
-  {
-    const auto filepath {QFileDialog::getOpenFileName(
-      this, "Load Tracking Data", QDir::homePath(), "JSON (*.json)")};
-    if (!filepath.isEmpty())
-    {
-      ui->results_path->setText(filepath);
-      load_tracking_data();
-    }
+    ui->results_path->setText(filepath);
   }
 
   void main_window::change_point_size(const int /*unused*/) const

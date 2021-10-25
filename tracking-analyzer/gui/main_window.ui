@@ -172,13 +172,12 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="toolButton">
+           <widget class="QToolButton" name="load_data_button">
             <property name="text">
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset theme="open">
-              <normaloff>.</normaloff>.</iconset>
+             <iconset theme="document-open"/>
             </property>
            </widget>
           </item>

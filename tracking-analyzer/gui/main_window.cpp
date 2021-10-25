@@ -266,7 +266,11 @@ namespace analyzer::gui
     connect(ui->results_path,
             &QLineEdit::editingFinished,
             this,
-            &analyzer::gui::main_window::load_tracking_data);
+            qOverload<>(&analyzer::gui::main_window::load_tracking_data));
+    connect(ui->load_data_button,
+            &QToolButton::clicked,
+            this,
+            qOverload<bool>(&analyzer::gui::main_window::load_tracking_data));
     connect(ui->update_frame_slider,
             &QSlider::sliderMoved,
             this,
@@ -472,6 +476,17 @@ namespace analyzer::gui
     ui->update_frame_number->setMaximum(maximum);
     ui->update_frame_number->setSuffix(" of " + QString::number(maximum));
     set_training_score_data(m_training_data.iteration_scores);
+  }
+
+  void main_window::load_tracking_data(const bool /*unused*/)
+  {
+    const auto filepath {QFileDialog::getOpenFileName(
+      this, "Load Tracking Data", QDir::homePath(), "JSON (*.json)")};
+    if (!filepath.isEmpty())
+    {
+      ui->results_path->setText(filepath);
+      load_tracking_data();
+    }
   }
 
   void main_window::change_point_size(const int /*unused*/) const

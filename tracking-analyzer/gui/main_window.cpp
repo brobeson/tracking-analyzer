@@ -1,6 +1,7 @@
 #include "main_window.h"
 #include "tracking_results.h"
 #include "ui_main_window.h"
+#include <QFileDialog>
 #include <QScatterSeries>
 #include <QValueAxis>
 #include <algorithm>
@@ -290,6 +291,10 @@ namespace analyzer::gui
             &QCheckBox::clicked,
             this,
             &analyzer::gui::main_window::toggle_tg_candidate_plot);
+    connect(ui->save_graph_button,
+            &QToolButton::clicked,
+            this,
+            &main_window::save_graph);
     check_dataset_path(ui->dataset_path->text());
     load_dataset();
     // load_tracking_results(ui->results_path->text());
@@ -327,7 +332,9 @@ namespace analyzer::gui
   void main_window::set_training_score_data(const training_iteration& iteration)
   {
     ui->overlap_graph->chart()->removeAllSeries();
-    auto& chart {*(ui->overlap_graph->chart())};
+    auto& chart {*ui->overlap_graph->chart()};
+    auto& legend {*chart.legend()};
+    legend.setAlignment(Qt::AlignRight);
     const auto range {get_chart_range(iteration)};
     add_decision_boundary(chart, range);
     const auto point_size {calculate_point_size(*ui->point_size_slider)};
@@ -467,7 +474,7 @@ namespace analyzer::gui
     set_training_score_data(m_training_data.iteration_scores);
   }
 
-  void main_window::change_point_size(const int /*index*/) const
+  void main_window::change_point_size(const int /*unused*/) const
   {
     const auto size {calculate_point_size(*ui->point_size_slider)};
     for (auto* const series : ui->overlap_graph->chart()->series())
@@ -492,5 +499,19 @@ namespace analyzer::gui
   void main_window::toggle_tg_candidate_plot(const bool checked) const
   {
     toggle_series(*ui, "Target Training Candidates", checked);
+  }
+
+  void main_window::save_graph(const bool /*unused*/)
+  {
+    const auto suggestion {QDir::homePath() + "/"
+                           + m_training_data.sequence_name
+                           + "_frame1_update1_scores.png"};
+    const auto filepath {QFileDialog::getSaveFileName(
+      this, "Save Plot", suggestion, "PNG (*.png)")};
+    if (!filepath.isEmpty())
+    {
+      const auto image {ui->overlap_graph->grab()};
+      image.save(filepath, "PNG");
+    }
   }
 }  // namespace analyzer::gui

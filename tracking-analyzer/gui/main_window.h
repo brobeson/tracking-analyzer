@@ -46,6 +46,7 @@ namespace analyzer::gui
     void toggle_bg_candidate_plot(bool checked) const;
     void toggle_bg_mined_plot(bool checked) const;
     void toggle_tg_candidate_plot(bool checked) const;
+    void save_graph(bool);
 
   private:
     Ui::main_window* ui;

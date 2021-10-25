@@ -42,6 +42,7 @@ namespace analyzer::gui
     void change_frame(int frame_index) const;
     void load_tracking_data();
     void change_update_frame(int update_frame_index) const;
+    void change_point_size(int index) const;
 
   private:
     Ui::main_window* ui;

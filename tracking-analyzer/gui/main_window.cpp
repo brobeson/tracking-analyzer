@@ -176,15 +176,25 @@ namespace analyzer::gui
 
     void make_training_series(QChart& chart,
                               const score_list& scores,
-                              const QString& name)
+                              const QString& name,
+                              const qreal point_size)
     {
       auto* const series {new QtCharts::QScatterSeries};
       series->append(scores);
       series->setName(name);
       // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
-      series->setMarkerSize(7.0f);
+      series->setMarkerSize(point_size);
       series->setPen(QPen {});
       chart.addSeries(series);
+    }
+
+    auto calculate_point_size(const QSlider& slider)
+    {
+      constexpr auto MINIMUM_SIZE {5.0f};
+      constexpr auto MAXIMUM_SIZE {15.0f};
+      const auto t {static_cast<float>(slider.value())
+                    / static_cast<float>(slider.maximum())};
+      return ((1.0f - t) * MINIMUM_SIZE + t * MAXIMUM_SIZE);
     }
 
     void add_decision_boundary(QChart& chart, const range graph_bounds)
@@ -235,6 +245,10 @@ namespace analyzer::gui
             qOverload<int>(&QSpinBox::valueChanged),
             this,
             &analyzer::gui::main_window::change_update_frame);
+    connect(ui->point_size_slider,
+            &QSlider::sliderMoved,
+            this,
+            &analyzer::gui::main_window::change_point_size);
     check_dataset_path(ui->dataset_path->text());
     load_dataset();
     // load_tracking_results(ui->results_path->text());
@@ -273,12 +287,19 @@ namespace analyzer::gui
   {
     ui->overlap_graph->chart()->removeAllSeries();
     auto& chart {*(ui->overlap_graph->chart())};
-    make_training_series(
-      chart, iteration.background_candidates, "Background Training Candidates");
-    make_training_series(chart, iteration.background_mined, "Background Mined");
-    make_training_series(
-      chart, iteration.target_candidates, "Target Training Candidates");
     const auto range {get_chart_range(iteration)};
+    add_decision_boundary(chart, range);
+    const auto point_size {calculate_point_size(*ui->point_size_slider)};
+    make_training_series(chart,
+                         iteration.background_candidates,
+                         "Background Training Candidates",
+                         point_size);
+    make_training_series(
+      chart, iteration.background_mined, "Background Mined", point_size);
+    make_training_series(chart,
+                         iteration.target_candidates,
+                         "Target Training Candidates",
+                         point_size);
     ui->overlap_graph->chart()->createDefaultAxes();
     auto* axis {
       ui->overlap_graph->chart()->axes(Qt::Orientation::Horizontal)[0]};
@@ -287,7 +308,6 @@ namespace analyzer::gui
     axis = ui->overlap_graph->chart()->axes(Qt::Orientation::Vertical)[0];
     axis->setTitleText("Target Scores");
     axis->setRange(range.first, range.second);
-    add_decision_boundary(*ui->overlap_graph->chart(), range);
   }
 
   void main_window::check_dataset_path(const QString& path_text) const
@@ -404,5 +424,17 @@ namespace analyzer::gui
     ui->update_frame_number->setMaximum(maximum);
     ui->update_frame_number->setSuffix(" of " + QString::number(maximum));
     set_training_score_data(m_training_data.iteration_scores);
+  }
+
+  void main_window::change_point_size(const int /*index*/) const
+  {
+    const auto size {calculate_point_size(*ui->point_size_slider)};
+    for (auto* const series : ui->overlap_graph->chart()->series())
+    {
+      if (series->type() == QAbstractSeries::SeriesType::SeriesTypeScatter)
+      {
+        dynamic_cast<QScatterSeries*>(series)->setMarkerSize(size);
+      }
+    }
   }
 }  // namespace analyzer::gui

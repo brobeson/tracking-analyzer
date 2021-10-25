@@ -43,6 +43,9 @@ namespace analyzer::gui
     void load_tracking_data();
     void change_update_frame(int update_frame_index) const;
     void change_point_size(int index) const;
+    void toggle_bg_candidate_plot(bool checked) const;
+    void toggle_bg_mined_plot(bool checked) const;
+    void toggle_tg_candidate_plot(bool checked) const;
 
   private:
     Ui::main_window* ui;

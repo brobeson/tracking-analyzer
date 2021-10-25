@@ -205,6 +205,35 @@ namespace analyzer::gui
       line->setName("Decision Boundary");
       chart.addSeries(line);
     }
+
+    auto find_data_series(const QChart& chart, const QString& name)
+      -> QAbstractSeries*
+    {
+      const auto all_series {chart.series()};
+      const auto iterator {
+        std::find_if(std::begin(all_series),
+                     std::end(all_series),
+                     [&name](const QAbstractSeries* const series) {
+                       return series->name() == name;
+                     })};
+      if (iterator == std::end(all_series))
+      {
+        return nullptr;
+      }
+      return *iterator;
+    }
+
+    void toggle_series(const Ui::main_window& ui,
+                       const QString& series_name,
+                       const bool series_visible)
+    {
+      auto* const series {
+        find_data_series(*ui.overlap_graph->chart(), series_name)};
+      if (series != nullptr)
+      {
+        series->setVisible(series_visible);
+      }
+    }
   }  // namespace
 
   main_window::main_window(QWidget* parent):
@@ -249,6 +278,18 @@ namespace analyzer::gui
             &QSlider::sliderMoved,
             this,
             &analyzer::gui::main_window::change_point_size);
+    connect(ui->bg_candidates_checkbox,
+            &QCheckBox::clicked,
+            this,
+            &analyzer::gui::main_window::toggle_bg_candidate_plot);
+    connect(ui->bg_mined_checkbox,
+            &QCheckBox::clicked,
+            this,
+            &analyzer::gui::main_window::toggle_bg_mined_plot);
+    connect(ui->tg_candidates_checkbox,
+            &QCheckBox::clicked,
+            this,
+            &analyzer::gui::main_window::toggle_tg_candidate_plot);
     check_dataset_path(ui->dataset_path->text());
     load_dataset();
     // load_tracking_results(ui->results_path->text());
@@ -436,5 +477,20 @@ namespace analyzer::gui
         dynamic_cast<QScatterSeries*>(series)->setMarkerSize(size);
       }
     }
+  }
+
+  void main_window::toggle_bg_candidate_plot(const bool checked) const
+  {
+    toggle_series(*ui, "Background Training Candidates", checked);
+  }
+
+  void main_window::toggle_bg_mined_plot(const bool checked) const
+  {
+    toggle_series(*ui, "Background Mined", checked);
+  }
+
+  void main_window::toggle_tg_candidate_plot(const bool checked) const
+  {
+    toggle_series(*ui, "Target Training Candidates", checked);
   }
 }  // namespace analyzer::gui

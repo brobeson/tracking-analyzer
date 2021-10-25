@@ -181,7 +181,19 @@ namespace analyzer::gui
       auto* const series {new QtCharts::QScatterSeries};
       series->append(scores);
       series->setName(name);
+      // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
+      series->setMarkerSize(7.0f);
+      series->setPen(QPen {});
       chart.addSeries(series);
+    }
+
+    void add_decision_boundary(QChart& chart, const range graph_bounds)
+    {
+      auto* const line {new QLineSeries};
+      line->append(graph_bounds.first, graph_bounds.first);
+      line->append(graph_bounds.second, graph_bounds.second);
+      line->setName("Decision Boundary");
+      chart.addSeries(line);
     }
   }  // namespace
 
@@ -275,6 +287,7 @@ namespace analyzer::gui
     axis = ui->overlap_graph->chart()->axes(Qt::Orientation::Vertical)[0];
     axis->setTitleText("Target Scores");
     axis->setRange(range.first, range.second);
+    add_decision_boundary(*ui->overlap_graph->chart(), range);
   }
 
   void main_window::check_dataset_path(const QString& path_text) const

@@ -1,4 +1,5 @@
 #include "dataset.h"
+#include "filesystem.h"
 #include <QDir>
 #include <filesystem>
 #include <fstream>
@@ -118,15 +119,6 @@ namespace analyzer
   auto dataset::root_path() const noexcept -> const QString&
   {
     return m_root_directory;
-  }
-
-  auto make_absolute_path(const QString& path) -> QString
-  {
-    if (path.at(0) == '~')
-    {
-      return path.right(path.length() - 1).prepend(QDir::homePath());
-    }
-    return path;
   }
 
   auto load_dataset(const QString& path) -> analyzer::dataset

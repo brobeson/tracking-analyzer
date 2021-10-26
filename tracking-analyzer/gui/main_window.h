@@ -3,6 +3,7 @@
 
 #include "dataset.h"
 #include "tracking_results.h"
+#include "training_metadata.h"
 #include <QImage>
 #include <QMainWindow>
 #include <QScatterSeries>

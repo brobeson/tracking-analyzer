@@ -358,27 +358,25 @@ namespace analyzer::gui
     }
   }
 
-  void main_window::set_training_score_data(const training_iteration& iteration)
+  void main_window::set_training_score_data(const training_batch& batch)
   {
     ui->overlap_graph->chart()->removeAllSeries();
     auto& chart {*ui->overlap_graph->chart()};
     auto& legend {*chart.legend()};
     legend.setAlignment(Qt::AlignRight);
-    const auto range {get_chart_range(iteration)};
+    const auto range {get_chart_range(batch)};
     add_decision_boundary(chart, range);
     const auto point_size {calculate_point_size(*ui->point_size_slider)};
     make_training_series(chart,
-                         iteration.background_candidates,
+                         batch.background_candidates,
                          "Background Training Candidates",
                          point_size);
     make_training_series(
-      chart, iteration.background_mined, "Background Mined", point_size);
-    make_training_series(chart,
-                         iteration.target_candidates,
-                         "Target Training Candidates",
-                         point_size);
+      chart, batch.background_mined, "Background Mined", point_size);
+    make_training_series(
+      chart, batch.target_candidates, "Target Training Candidates", point_size);
     add_score_thresholds(
-      chart, range, iteration.background_threshold, iteration.target_threshold);
+      chart, range, batch.background_threshold, batch.target_threshold);
     ui->overlap_graph->chart()->createDefaultAxes();
     auto* axis {
       ui->overlap_graph->chart()->axes(Qt::Orientation::Horizontal)[0]};
@@ -513,7 +511,7 @@ namespace analyzer::gui
     ui->update_frame_number->setEnabled(true);
     ui->update_frame_number->setMaximum(maximum);
     ui->update_frame_number->setSuffix(" of " + QString::number(maximum));
-    set_training_score_data(m_training_data.iteration_scores);
+    set_training_score_data(m_training_data.batch);
     ui->results_path->setText(filepath);
     settings.setValue(settings_keys::last_loaded_tracking_data, filepath);
     settings.sync();

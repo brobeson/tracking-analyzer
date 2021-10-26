@@ -83,40 +83,39 @@ namespace analyzer
                      &to_point);
     }
 
-    auto parse_training_iteration(const QJsonObject& json)
+    auto parse_training_batch(const QJsonObject& json)
     {
-      training_iteration iteration;
+      training_batch batch;
       fill_training_scores(json["background candidates"].toArray(),
-                           iteration.background_candidates);
+                           batch.background_candidates);
       fill_training_scores(json["background mined"].toArray(),
-                           iteration.background_mined);
+                           batch.background_mined);
       fill_training_scores(json["target candidates"].toArray(),
-                           iteration.target_candidates);
-      iteration.background_threshold
+                           batch.target_candidates);
+      batch.background_threshold
         = static_cast<float>(json["thresholds"].toArray()[0].toDouble());
-      iteration.target_threshold
+      batch.target_threshold
         = static_cast<float>(json["thresholds"].toArray()[1].toDouble());
-      return iteration;
+      return batch;
     }
   }  // namespace
 
-  auto get_chart_range(const training_iteration& iteration) -> range
+  auto get_chart_range(const training_batch& batch) -> range
   {
     const auto bg_candidate_range {
-      get_chart_range(iteration.background_candidates)};
-    const auto bg_mined_range {get_chart_range(iteration.background_mined)};
-    const auto tg_candidate_range {
-      get_chart_range(iteration.target_candidates)};
+      get_chart_range(batch.background_candidates)};
+    const auto bg_mined_range {get_chart_range(batch.background_mined)};
+    const auto tg_candidate_range {get_chart_range(batch.target_candidates)};
     return range {std::min(std::min(std::min(std::min(bg_candidate_range.first,
                                                       bg_mined_range.first),
                                              tg_candidate_range.first),
-                                    iteration.background_threshold),
-                           iteration.target_threshold),
+                                    batch.background_threshold),
+                           batch.target_threshold),
                   std::max(std::max(std::max(std::max(bg_candidate_range.second,
                                                       bg_mined_range.second),
                                              tg_candidate_range.second),
-                                    iteration.background_threshold),
-                           iteration.target_threshold)};
+                                    batch.background_threshold),
+                           batch.target_threshold)};
   }
 
   auto load_training_scores(const QString& path) -> training_scores
@@ -128,7 +127,7 @@ namespace analyzer
       json_data["sequence"].toString(),
       json_data["dataset"].toString(),
       parse_training_score_update_frames(score_json),
-      parse_training_iteration(score_json["0"].toArray()[0].toObject())};
+      parse_training_batch(score_json["0"].toArray()[0].toObject())};
     return score_data;
   }
 }  // namespace analyzer

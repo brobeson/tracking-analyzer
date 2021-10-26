@@ -2,12 +2,13 @@
 #define ANALYZER_TRAINING_METADATA_H
 
 #include <QList>
+#include <vector>
 
 namespace analyzer
 {
   using score_list = QList<QPointF>;
 
-  struct training_iteration
+  struct training_batch
   {
     score_list background_candidates;
     score_list background_mined;
@@ -16,6 +17,8 @@ namespace analyzer
     float target_threshold;
   };
 
+  using training_update = std::vector<training_batch>;
+
   struct training_scores
   {
     static constexpr int background_scores {0};
@@ -23,14 +26,15 @@ namespace analyzer
     QString sequence_name;
     QString dataset;
     std::vector<int> update_frames;
-    training_iteration iteration_scores;
+    // training_update update;
+    training_batch batch;
   };
 
   [[nodiscard]] auto load_training_scores(const QString& path)
     -> training_scores;
 
   using range = std::pair<float, float>;
-  auto get_chart_range(const training_iteration& iteration) -> range;
+  auto get_chart_range(const training_batch& batch) -> range;
 }  // namespace analyzer
 
 #endif

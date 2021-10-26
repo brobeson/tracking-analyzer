@@ -34,7 +34,8 @@ namespace analyzer::gui
                           QtCharts::QScatterSeries* bg_mined_data,
                           QtCharts::QScatterSeries* tg_candidate_data);
 
-    void set_training_score_data(const training_iteration& iteration);
+    // TODO Can this be a free function in main_window.cpp?
+    void set_training_score_data(const training_batch& batch);
 
   public slots:  // NOLINT(readability-redundant-access-specifiers)
     void check_dataset_path(const QString& path_text) const;

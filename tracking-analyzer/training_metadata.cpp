@@ -82,6 +82,22 @@ namespace analyzer
                      std::back_insert_iterator(scores),
                      &to_point);
     }
+
+    auto parse_training_iteration(const QJsonObject& json)
+    {
+      training_iteration iteration;
+      fill_training_scores(json["background candidates"].toArray(),
+                           iteration.background_candidates);
+      fill_training_scores(json["background mined"].toArray(),
+                           iteration.background_mined);
+      fill_training_scores(json["target candidates"].toArray(),
+                           iteration.target_candidates);
+      iteration.background_threshold
+        = static_cast<float>(json["thresholds"].toArray()[0].toDouble());
+      iteration.target_threshold
+        = static_cast<float>(json["thresholds"].toArray()[1].toDouble());
+      return iteration;
+    }
   }  // namespace
 
   auto get_chart_range(const training_iteration& iteration) -> range
@@ -108,33 +124,11 @@ namespace analyzer
     const auto absolute_path {make_absolute_path(path)};
     const auto json_data {read_json_data(absolute_path)};
     const auto score_json {json_data["data"].toObject()};
-    training_scores score_data {json_data["sequence"].toString(),
-                                json_data["dataset"].toString(),
-                                parse_training_score_update_frames(score_json),
-                                {}};
-    fill_training_scores(score_json["0"]
-                           .toArray()[0]
-                           .toObject()["background candidates"]
-                           .toArray(),
-                         score_data.iteration_scores.background_candidates);
-    fill_training_scores(
-      score_json["0"].toArray()[0].toObject()["background mined"].toArray(),
-      score_data.iteration_scores.background_mined);
-    fill_training_scores(
-      score_json["0"].toArray()[0].toObject()["target candidates"].toArray(),
-      score_data.iteration_scores.target_candidates);
-    score_data.iteration_scores.background_threshold
-      = static_cast<float>(score_json["0"]
-                             .toArray()[0]
-                             .toObject()["thresholds"]
-                             .toArray()[0]
-                             .toDouble());
-    score_data.iteration_scores.target_threshold
-      = static_cast<float>(score_json["0"]
-                             .toArray()[0]
-                             .toObject()["thresholds"]
-                             .toArray()[1]
-                             .toDouble());
+    training_scores score_data {
+      json_data["sequence"].toString(),
+      json_data["dataset"].toString(),
+      parse_training_score_update_frames(score_json),
+      parse_training_iteration(score_json["0"].toArray()[0].toObject())};
     return score_data;
   }
 }  // namespace analyzer

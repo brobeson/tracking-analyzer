@@ -98,6 +98,19 @@ namespace analyzer
         = static_cast<float>(json["thresholds"].toArray()[1].toDouble());
       return batch;
     }
+
+    auto parse_training_update(const QJsonArray& json)
+    {
+      training_update update;
+      update.reserve(static_cast<training_update::size_type>(json.size()));
+      std::transform(std::begin(json),
+                     std::end(json),
+                     std::back_insert_iterator {update},
+                     [](const QJsonValue& json_value) {
+                       return parse_training_batch(json_value.toObject());
+                     });
+      return update;
+    }
   }  // namespace
 
   auto get_chart_range(const training_batch& batch) -> range
@@ -127,7 +140,7 @@ namespace analyzer
       json_data["sequence"].toString(),
       json_data["dataset"].toString(),
       parse_training_score_update_frames(score_json),
-      parse_training_batch(score_json["0"].toArray()[0].toObject())};
+      parse_training_update(score_json["0"].toArray())};
     return score_data;
   }
 }  // namespace analyzer

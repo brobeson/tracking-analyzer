@@ -26,8 +26,12 @@ namespace analyzer
     QString sequence_name;
     QString dataset;
     std::vector<int> update_frames;
-    // training_update update;
-    training_batch batch;
+    training_update update;
+  };
+
+  struct training_iterator
+  {
+    training_update::size_type current_batch {0};
   };
 
   [[nodiscard]] auto load_training_scores(const QString& path)

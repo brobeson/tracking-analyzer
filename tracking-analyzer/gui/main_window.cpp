@@ -296,10 +296,10 @@ namespace analyzer::gui
             &QToolButton::clicked,
             this,
             qOverload<bool>(&analyzer::gui::main_window::load_tracking_data));
-    connect(ui->update_frame_slider,
-            &QSlider::sliderMoved,
+    connect(ui->batch_spinbox,
+            qOverload<int>(&QSpinBox::valueChanged),
             this,
-            &analyzer::gui::main_window::change_update_frame);
+            &analyzer::gui::main_window::change_training_batch);
     connect(ui->update_frame_number,
             qOverload<int>(&QSpinBox::valueChanged),
             this,
@@ -477,8 +477,6 @@ namespace analyzer::gui
       {
         return;
       }
-      ui->update_frame_slider->setValue(update_frame_index);
-      ui->update_frame_number->setValue(update_frame_index);
       change_frame(frame);
     }
     catch (...)
@@ -504,14 +502,17 @@ namespace analyzer::gui
     // TODO Change this a gsl::narrow_cast<int>.
     const auto maximum {static_cast<int>(m_training_data.update_frames.size())};
     ui->sequence->setCurrentText(m_training_data.sequence_name);
-    ui->update_frame_slider->setEnabled(true);
-    ui->update_frame_slider->setMinimum(0);
-    ui->update_frame_slider->setMaximum(maximum);
-    ui->update_frame_slider->setValue(0);
+    ui->batch_spinbox->setEnabled(true);
+    ui->batch_spinbox->setMinimum(1);
+    ui->batch_spinbox->setMaximum(
+      static_cast<int>(m_training_data.update.size()));
+    ui->batch_spinbox->setValue(1);
+    ui->batch_spinbox->setSuffix(
+      " of " + QString::number(m_training_data.update.size()));
     ui->update_frame_number->setEnabled(true);
     ui->update_frame_number->setMaximum(maximum);
     ui->update_frame_number->setSuffix(" of " + QString::number(maximum));
-    set_training_score_data(m_training_data.batch);
+    set_training_score_data(m_training_data.update.at(0));
     ui->results_path->setText(filepath);
     settings.setValue(settings_keys::last_loaded_tracking_data, filepath);
     settings.sync();
@@ -556,5 +557,13 @@ namespace analyzer::gui
       const auto image {ui->overlap_graph->grab()};
       image.save(filepath, "PNG");
     }
+  }
+
+  void main_window::change_training_batch(const int batch_number)
+  {
+    m_current_training.current_batch
+      = static_cast<training_update::size_type>(batch_number - 1);
+    set_training_score_data(
+      m_training_data.update.at(m_current_training.current_batch));
   }
 }  // namespace analyzer::gui

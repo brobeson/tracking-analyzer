@@ -50,12 +50,14 @@ namespace analyzer::gui
     void toggle_bg_mined_plot(bool checked) const;
     void toggle_tg_candidate_plot(bool checked) const;
     void save_graph(bool);
+    void change_training_batch(int batch_number);
 
   private:
     Ui::main_window* ui;
     analyzer::dataset m_dataset;
     int m_sequence_index {0};
     analyzer::training_scores m_training_data;
+    analyzer::training_iterator m_current_training;
     QSettings settings;
   };
 }  // namespace analyzer::gui

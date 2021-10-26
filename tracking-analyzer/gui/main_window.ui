@@ -143,7 +143,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset theme="document-open"/>
+             <iconset theme="document-open">
+              <normaloff>.</normaloff>.</iconset>
             </property>
            </widget>
           </item>
@@ -153,7 +154,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset theme="document-open-recent"/>
+             <iconset theme="document-open-recent">
+              <normaloff>.</normaloff>.</iconset>
             </property>
            </widget>
           </item>
@@ -173,16 +175,6 @@
           </property>
           <property name="prefix">
            <string>Update </string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QSlider" name="update_frame_slider">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
@@ -240,7 +232,21 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset theme="document-save"/>
+           <iconset theme="document-save">
+            <normaloff>.</normaloff>.</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QSpinBox" name="batch_spinbox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="prefix">
+           <string>Batch </string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
           </property>
          </widget>
         </item>

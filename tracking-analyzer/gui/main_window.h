@@ -29,7 +29,6 @@ namespace analyzer::gui
     auto operator=(main_window&&) = delete;
     virtual ~main_window();  // NOLINT(modernize-use-override)
 
-    void set_offset_data(QtCharts::QScatterSeries* data);
     void set_overlap_data(QtCharts::QScatterSeries* bg_candidate_data,
                           QtCharts::QScatterSeries* bg_mined_data,
                           QtCharts::QScatterSeries* tg_candidate_data);

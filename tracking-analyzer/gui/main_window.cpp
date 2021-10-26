@@ -54,10 +54,10 @@ namespace analyzer::gui
     // #endif
     //     }
 
-    void setup_offset_chart(QtCharts::QChart* chart)
-    {
-      chart->setTitle("Center Offset (pixels)");
-    }
+    // void setup_offset_chart(QtCharts::QChart* chart)
+    // {
+    //   chart->setTitle("Center Offset (pixels)");
+    // }
 
     // auto make_overlap_y_axis() -> QtCharts::QValueAxis*
     // {
@@ -77,44 +77,44 @@ namespace analyzer::gui
     //   }
     // }
 
-    auto make_offset_y_axis(const qreal maximum) -> QtCharts::QValueAxis*
-    {
-      QtCharts::QValueAxis* axis {nullptr};
-      try
-      {
-        axis = new QtCharts::QValueAxis();
-        axis->setRange(0.0, maximum);
-        // axis->setTickAnchor(*axis, 0.0);
-        axis->setTitleText("Center Offset (pixels)");
-        return axis;
-      }
-      catch (...)
-      {
-        delete axis;
-        return nullptr;
-      }
-    }
+    // auto make_offset_y_axis(const qreal maximum) -> QtCharts::QValueAxis*
+    // {
+    //   QtCharts::QValueAxis* axis {nullptr};
+    //   try
+    //   {
+    //     axis = new QtCharts::QValueAxis();
+    //     axis->setRange(0.0, maximum);
+    //     // axis->setTickAnchor(*axis, 0.0);
+    //     axis->setTitleText("Center Offset (pixels)");
+    //     return axis;
+    //   }
+    //   catch (...)
+    //   {
+    //     delete axis;
+    //     return nullptr;
+    //   }
+    // }
 
-    auto make_x_axis(const qreal /*maximum*/) -> QtCharts::QValueAxis*
-    {
-      QtCharts::QValueAxis* axis {nullptr};
-      try
-      {
-        axis = new QtCharts::QValueAxis();
-        // axis->setRange(0.0, maximum);
-        // axis->setTickAnchor(*axis, 0.0);
-        // axis->setTickInterval(*axis, 10.0);
-        // axis->setTickType(*axis, QtCharts::QValueAxis::TicksDynamic);
-        axis->setLabelFormat("%i");
-        axis->setTitleText("Background Scores");
-        return axis;
-      }
-      catch (...)
-      {
-        delete axis;
-        return nullptr;
-      }
-    }
+    // auto make_x_axis(const qreal /*maximum*/) -> QtCharts::QValueAxis*
+    // {
+    //   QtCharts::QValueAxis* axis {nullptr};
+    //   try
+    //   {
+    //     axis = new QtCharts::QValueAxis();
+    //     // axis->setRange(0.0, maximum);
+    //     // axis->setTickAnchor(*axis, 0.0);
+    //     // axis->setTickInterval(*axis, 10.0);
+    //     // axis->setTickType(*axis, QtCharts::QValueAxis::TicksDynamic);
+    //     axis->setLabelFormat("%i");
+    //     axis->setTitleText("Background Scores");
+    //     return axis;
+    //   }
+    //   catch (...)
+    //   {
+    //     delete axis;
+    //     return nullptr;
+    //   }
+    // }
 
     void setup_overlap_chart(QtCharts::QChart* chart)
     {
@@ -140,7 +140,6 @@ namespace analyzer::gui
 
     void clear_display(const Ui::main_window& display)
     {
-      display.offset_graph->chart()->removeAllSeries();
       display.overlap_graph->chart()->removeAllSeries();
       display.frame_display->setPixmap(QPixmap {});
       display.frame_number->setValue(0);
@@ -290,7 +289,6 @@ namespace analyzer::gui
   {
     ui->setupUi(this);
     setWindowTitle("");
-    analyzer::gui::setup_offset_chart(ui->offset_graph->chart());
     analyzer::gui::setup_overlap_chart(ui->overlap_graph->chart());
     connect(ui->dataset_path,
             &QLineEdit::textEdited,
@@ -356,27 +354,27 @@ namespace analyzer::gui
 
   main_window::~main_window() { delete ui; }
 
-  void main_window::set_offset_data(QtCharts::QScatterSeries* offset_data)
-  {
-    ui->offset_graph->chart()->addSeries(offset_data);
-    const auto offset_vector {offset_data->pointsVector()};
-    auto* const x_axis {analyzer::gui::make_x_axis(offset_vector.size())};
-    auto* const y_axis {analyzer::gui::make_offset_y_axis(
-      std::max_element(
-        std::begin(offset_vector),
-        std::end(offset_vector),
-        [](const auto& a, const auto& b) { return a.y() < b.y(); })
-        ->y())};
-    if (x_axis == nullptr || y_axis == nullptr)
-    {
-      ui->offset_graph->chart()->createDefaultAxes();
-    }
-    else
-    {
-      ui->offset_graph->chart()->addAxis(x_axis, Qt::AlignBottom);
-      ui->offset_graph->chart()->addAxis(y_axis, Qt::AlignLeft);
-    }
-  }
+  // void main_window::set_offset_data(QtCharts::QScatterSeries* offset_data)
+  // {
+  //   ui->offset_graph->chart()->addSeries(offset_data);
+  //   const auto offset_vector {offset_data->pointsVector()};
+  //   auto* const x_axis {analyzer::gui::make_x_axis(offset_vector.size())};
+  //   auto* const y_axis {analyzer::gui::make_offset_y_axis(
+  //     std::max_element(
+  //       std::begin(offset_vector),
+  //       std::end(offset_vector),
+  //       [](const auto& a, const auto& b) { return a.y() < b.y(); })
+  //       ->y())};
+  //   if (x_axis == nullptr || y_axis == nullptr)
+  //   {
+  //     ui->offset_graph->chart()->createDefaultAxes();
+  //   }
+  //   else
+  //   {
+  //     ui->offset_graph->chart()->addAxis(x_axis, Qt::AlignBottom);
+  //     ui->offset_graph->chart()->addAxis(y_axis, Qt::AlignLeft);
+  //   }
+  // }
 
   void main_window::set_training_score_data(const training_batch& batch)
   {

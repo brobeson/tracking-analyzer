@@ -10,6 +10,11 @@
 
 namespace analyzer::gui
 {
+  namespace settings_keys
+  {
+    constexpr auto last_loaded_tracking_data {"recent/tracking_data_path"};
+  }  // namespace settings_keys
+
   namespace
   {
     // NOLINTNEXTLINE(clang-diagnostic-unused-parameter)
@@ -462,7 +467,11 @@ namespace analyzer::gui
   void main_window::load_tracking_data(const bool /*unused*/)
   {
     const auto filepath {QFileDialog::getOpenFileName(
-      this, "Load Tracking Data", QDir::homePath(), "JSON (*.json)")};
+      this,
+      "Load Tracking Data",
+      settings.value(settings_keys::last_loaded_tracking_data, QDir::homePath())
+        .toString(),
+      "JSON (*.json)")};
     if (filepath.isEmpty())
     {
       return;
@@ -481,6 +490,8 @@ namespace analyzer::gui
     ui->update_frame_number->setSuffix(" of " + QString::number(maximum));
     set_training_score_data(m_training_data.iteration_scores);
     ui->results_path->setText(filepath);
+    settings.setValue(settings_keys::last_loaded_tracking_data, filepath);
+    settings.sync();
   }
 
   void main_window::change_point_size(const int /*unused*/) const

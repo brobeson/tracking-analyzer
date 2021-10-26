@@ -7,6 +7,7 @@
 #include <QImage>
 #include <QMainWindow>
 #include <QScatterSeries>
+#include <QSettings>
 
 namespace analyzer::gui
 {
@@ -54,6 +55,7 @@ namespace analyzer::gui
     analyzer::dataset m_dataset;
     int m_sequence_index {0};
     analyzer::training_scores m_training_data;
+    QSettings settings;
   };
 }  // namespace analyzer::gui
 

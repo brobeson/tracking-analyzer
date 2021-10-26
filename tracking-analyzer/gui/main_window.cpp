@@ -289,6 +289,7 @@ namespace analyzer::gui
   {
     ui->setupUi(this);
     setWindowTitle("");
+    add_graph_controls_to_toolbar();
     analyzer::gui::setup_overlap_chart(ui->overlap_graph->chart());
     connect(ui->dataset_path,
             &QLineEdit::textEdited,
@@ -310,18 +311,15 @@ namespace analyzer::gui
             qOverload<int>(&QSpinBox::valueChanged),
             this,
             &analyzer::gui::main_window::change_frame);
-    connect(ui->load_data_button,
-            &QToolButton::clicked,
-            this,
-            qOverload<bool>(&analyzer::gui::main_window::load_tracking_data));
     connect(ui->batch_spinbox,
             qOverload<int>(&QSpinBox::valueChanged),
             this,
             &analyzer::gui::main_window::change_training_batch);
-    connect(ui->update_spinbox,
-            qOverload<int>(&QSpinBox::valueChanged),
-            this,
-            &analyzer::gui::main_window::change_update);
+    connect(
+      dynamic_cast<QSpinBox*>(ui->toolBar->widgetForAction(m_update_action)),
+      qOverload<int>(&QSpinBox::valueChanged),
+      this,
+      &analyzer::gui::main_window::change_update);
     connect(ui->point_size_slider,
             &QSlider::sliderMoved,
             this,
@@ -338,10 +336,14 @@ namespace analyzer::gui
             &QCheckBox::clicked,
             this,
             &analyzer::gui::main_window::toggle_tg_candidate_plot);
-    connect(ui->save_graph_button,
-            &QToolButton::clicked,
+    connect(ui->action_save_graph,
+            &QAction::triggered,
             this,
             &main_window::save_graph);
+    connect(ui->action_open_tracking_data,
+            &QAction::triggered,
+            this,
+            &analyzer::gui::main_window::load_tracking_data);
     check_dataset_path(ui->dataset_path->text());
     load_dataset();
     // load_tracking_results(ui->results_path->text());
@@ -502,8 +504,9 @@ namespace analyzer::gui
     }
     m_training_data = analyzer::load_training_scores(filepath);
     ui->sequence->setCurrentText(m_training_data.sequence_name);
-    reset_spinbox(*ui->update_spinbox,
-                  static_cast<int>(m_training_data.update_frames.size()));
+    reset_spinbox(
+      *dynamic_cast<QSpinBox*>(ui->toolBar->widgetForAction(m_update_action)),
+      static_cast<int>(m_training_data.update_frames.size()));
     change_update(1);
     settings.setValue(settings_keys::last_loaded_tracking_data, filepath);
     settings.sync();
@@ -558,5 +561,14 @@ namespace analyzer::gui
     set_training_score_data(
       m_training_data.updates.at(m_current_training.current_update)
         .at(m_current_training.current_batch));
+  }
+
+  void main_window::add_graph_controls_to_toolbar()
+  {
+    auto* const update_spinbox {new QSpinBox};
+    update_spinbox->setMinimum(1);
+    update_spinbox->setPrefix("Update ");
+    update_spinbox->setEnabled(false);
+    m_update_action = ui->toolBar->addWidget(update_spinbox);
   }
 }  // namespace analyzer::gui

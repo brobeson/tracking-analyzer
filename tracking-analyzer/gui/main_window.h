@@ -58,6 +58,9 @@ namespace analyzer::gui
     analyzer::training_scores m_training_data;
     analyzer::training_iterator m_current_training;
     QSettings settings;
+
+    QAction* m_update_action {nullptr};
+    void add_graph_controls_to_toolbar();
   };
 }  // namespace analyzer::gui
 

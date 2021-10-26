@@ -111,6 +111,19 @@ namespace analyzer
                      });
       return update;
     }
+
+    auto parse_all_training_updates(const QJsonObject& json)
+    {
+      update_list updates;
+      updates.reserve(static_cast<update_list::size_type>(json.size()));
+      std::transform(std::begin(json),
+                     std::end(json),
+                     std::back_insert_iterator {updates},
+                     [](const QJsonValue& json_value) {
+                       return parse_training_update(json_value.toArray());
+                     });
+      return updates;
+    }
   }  // namespace
 
   auto get_chart_range(const training_batch& batch) -> range
@@ -136,11 +149,10 @@ namespace analyzer
     const auto absolute_path {make_absolute_path(path)};
     const auto json_data {read_json_data(absolute_path)};
     const auto score_json {json_data["data"].toObject()};
-    training_scores score_data {
-      json_data["sequence"].toString(),
-      json_data["dataset"].toString(),
-      parse_training_score_update_frames(score_json),
-      parse_training_update(score_json["0"].toArray())};
+    training_scores score_data {json_data["sequence"].toString(),
+                                json_data["dataset"].toString(),
+                                parse_training_score_update_frames(score_json),
+                                parse_all_training_updates(score_json)};
     return score_data;
   }
 }  // namespace analyzer

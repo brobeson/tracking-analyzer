@@ -145,7 +145,6 @@ namespace analyzer::gui
       display.frame_display->setPixmap(QPixmap {});
       display.frame_number->setValue(0);
       display.frame_slider->setValue(0);
-      display.sequence_path->setText("");
     }
 
     void set_current_frame(const Ui::main_window& display, int number)
@@ -264,12 +263,33 @@ namespace analyzer::gui
         series->setVisible(series_visible);
       }
     }
+
+    auto get_tracking_data_filepath(main_window* parent,
+                                    const QSettings& settings)
+    {
+      return QFileDialog::getOpenFileName(
+        parent,
+        "Load Tracking Data",
+        settings
+          .value(settings_keys::last_loaded_tracking_data, QDir::homePath())
+          .toString(),
+        "JSON (*.json)");
+    }
+
+    void reset_spinbox(QSpinBox& spinbox, const int maximum)
+    {
+      spinbox.setEnabled(true);
+      spinbox.setMaximum(maximum);
+      spinbox.setValue(1);
+      spinbox.setSuffix(" of " + QString::number(maximum));
+    }
   }  // namespace
 
   main_window::main_window(QWidget* parent):
     QMainWindow(parent), ui(new Ui::main_window)
   {
     ui->setupUi(this);
+    setWindowTitle("");
     analyzer::gui::setup_offset_chart(ui->offset_graph->chart());
     analyzer::gui::setup_overlap_chart(ui->overlap_graph->chart());
     connect(ui->dataset_path,
@@ -300,10 +320,10 @@ namespace analyzer::gui
             qOverload<int>(&QSpinBox::valueChanged),
             this,
             &analyzer::gui::main_window::change_training_batch);
-    connect(ui->update_frame_number,
+    connect(ui->update_spinbox,
             qOverload<int>(&QSpinBox::valueChanged),
             this,
-            &analyzer::gui::main_window::change_update_frame);
+            &analyzer::gui::main_window::change_update);
     connect(ui->point_size_slider,
             &QSlider::sliderMoved,
             this,
@@ -427,7 +447,6 @@ namespace analyzer::gui
     {
       m_sequence_index = index;
       analyzer::gui::set_current_frame(*ui, 0);
-      ui->sequence_path->setText(m_dataset.sequences()[index].path());
       analyzer::gui::load_and_display_frame(
         m_dataset.sequences()[index].frame_paths()[1],
         *(ui->frame_display),
@@ -463,59 +482,34 @@ namespace analyzer::gui
           frame_index)]);
   }
 
-  void main_window::change_update_frame(const int update_frame_index) const
+  void main_window::change_update(const int update_number)
   {
-    if (update_frame_index < 0)
-    {
-      return;
-    }
-    try
-    {
-      const auto frame {m_training_data.update_frames.at(
-        static_cast<std::vector<int>::size_type>(update_frame_index))};
-      if (ui->frame_slider->maximum() < frame)
-      {
-        return;
-      }
-      change_frame(frame);
-    }
-    catch (...)
-    {
-      return;
-    }
+    const auto update_index {
+      static_cast<update_list::size_type>(update_number - 1)};
+    const auto frame {m_training_data.update_frames.at(update_index)};
+    change_frame(frame);
+    m_current_training.current_update = update_index;
+    reset_spinbox(
+      *ui->batch_spinbox,
+      static_cast<int>(m_training_data.updates[update_index].size()));
+    change_training_batch(1);
   }
 
   void main_window::load_tracking_data(const bool /*unused*/)
   {
-    const auto filepath {QFileDialog::getOpenFileName(
-      this,
-      "Load Tracking Data",
-      settings.value(settings_keys::last_loaded_tracking_data, QDir::homePath())
-        .toString(),
-      "JSON (*.json)")};
+    const auto filepath {get_tracking_data_filepath(this, settings)};
     if (filepath.isEmpty())
     {
       return;
     }
-
     m_training_data = analyzer::load_training_scores(filepath);
-    // TODO Change this a gsl::narrow_cast<int>.
-    const auto maximum {static_cast<int>(m_training_data.update_frames.size())};
     ui->sequence->setCurrentText(m_training_data.sequence_name);
-    ui->batch_spinbox->setEnabled(true);
-    ui->batch_spinbox->setMinimum(1);
-    ui->batch_spinbox->setMaximum(
-      static_cast<int>(m_training_data.update.size()));
-    ui->batch_spinbox->setValue(1);
-    ui->batch_spinbox->setSuffix(
-      " of " + QString::number(m_training_data.update.size()));
-    ui->update_frame_number->setEnabled(true);
-    ui->update_frame_number->setMaximum(maximum);
-    ui->update_frame_number->setSuffix(" of " + QString::number(maximum));
-    set_training_score_data(m_training_data.update.at(0));
-    ui->results_path->setText(filepath);
+    reset_spinbox(*ui->update_spinbox,
+                  static_cast<int>(m_training_data.update_frames.size()));
+    change_update(1);
     settings.setValue(settings_keys::last_loaded_tracking_data, filepath);
     settings.sync();
+    setWindowTitle(basename(filepath));
   }
 
   void main_window::change_point_size(const int /*unused*/) const
@@ -564,6 +558,7 @@ namespace analyzer::gui
     m_current_training.current_batch
       = static_cast<training_update::size_type>(batch_number - 1);
     set_training_score_data(
-      m_training_data.update.at(m_current_training.current_batch));
+      m_training_data.updates.at(m_current_training.current_update)
+        .at(m_current_training.current_batch));
   }
 }  // namespace analyzer::gui

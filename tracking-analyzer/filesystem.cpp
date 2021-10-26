@@ -11,4 +11,9 @@ namespace analyzer
     }
     return path;
   }
+
+  auto basename(const QString& path) -> QString
+  {
+    return path.right(path.length() - path.lastIndexOf('/') - 1);
+  }
 }  // namespace analyzer

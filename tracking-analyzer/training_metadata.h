@@ -18,6 +18,7 @@ namespace analyzer
   };
 
   using training_update = std::vector<training_batch>;
+  using update_list = std::vector<training_update>;
 
   struct training_scores
   {
@@ -26,11 +27,12 @@ namespace analyzer
     QString sequence_name;
     QString dataset;
     std::vector<int> update_frames;
-    training_update update;
+    update_list updates;
   };
 
   struct training_iterator
   {
+    update_list::size_type current_update {0};
     training_update::size_type current_batch {0};
   };
 

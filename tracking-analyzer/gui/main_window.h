@@ -44,7 +44,7 @@ namespace analyzer::gui
     // void load_tracking_results(const QString& path);
     void change_frame(int frame_index) const;
     void load_tracking_data(bool);
-    void change_update_frame(int update_frame_index) const;
+    void change_update(int update_number);
     void change_point_size(int index) const;
     void toggle_bg_candidate_plot(bool checked) const;
     void toggle_bg_mined_plot(bool checked) const;

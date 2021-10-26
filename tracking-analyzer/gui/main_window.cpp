@@ -230,6 +230,29 @@ namespace analyzer::gui
       return *iterator;
     }
 
+    void add_score_thresholds(QChart& chart,
+                              const range graph_bounds,
+                              const float background_threshold,
+                              const float target_threshold)
+    {
+      const auto color {
+        dynamic_cast<QScatterSeries*>(
+          find_data_series(chart, "Background Training Candidates"))
+          ->color()};
+      auto* line {new QLineSeries};
+      line->append(background_threshold, graph_bounds.first);
+      line->append(background_threshold, graph_bounds.second);
+      line->setName("Cluster Thresholds");
+      line->setColor(color);
+      chart.addSeries(line);
+      line = new QLineSeries;
+      line->append(graph_bounds.first, target_threshold);
+      line->append(graph_bounds.second, target_threshold);
+      line->setColor(color);
+      chart.addSeries(line);
+      chart.legend()->markers().back()->setVisible(false);
+    }
+
     void toggle_series(const Ui::main_window& ui,
                        const QString& series_name,
                        const bool series_visible)
@@ -354,6 +377,8 @@ namespace analyzer::gui
                          iteration.target_candidates,
                          "Target Training Candidates",
                          point_size);
+    add_score_thresholds(
+      chart, range, iteration.background_threshold, iteration.target_threshold);
     ui->overlap_graph->chart()->createDefaultAxes();
     auto* axis {
       ui->overlap_graph->chart()->axes(Qt::Orientation::Horizontal)[0]};

@@ -91,11 +91,16 @@ namespace analyzer
     const auto bg_mined_range {get_chart_range(iteration.background_mined)};
     const auto tg_candidate_range {
       get_chart_range(iteration.target_candidates)};
-    return range {
-      std::min(std::min(bg_candidate_range.first, bg_mined_range.first),
-               tg_candidate_range.first),
-      std::max(std::max(bg_candidate_range.second, bg_mined_range.second),
-               tg_candidate_range.second)};
+    return range {std::min(std::min(std::min(std::min(bg_candidate_range.first,
+                                                      bg_mined_range.first),
+                                             tg_candidate_range.first),
+                                    iteration.background_threshold),
+                           iteration.target_threshold),
+                  std::max(std::max(std::max(std::max(bg_candidate_range.second,
+                                                      bg_mined_range.second),
+                                             tg_candidate_range.second),
+                                    iteration.background_threshold),
+                           iteration.target_threshold)};
   }
 
   auto load_training_scores(const QString& path) -> training_scores
@@ -118,6 +123,18 @@ namespace analyzer
     fill_training_scores(
       score_json["0"].toArray()[0].toObject()["target candidates"].toArray(),
       score_data.iteration_scores.target_candidates);
+    score_data.iteration_scores.background_threshold
+      = static_cast<float>(score_json["0"]
+                             .toArray()[0]
+                             .toObject()["thresholds"]
+                             .toArray()[0]
+                             .toDouble());
+    score_data.iteration_scores.target_threshold
+      = static_cast<float>(score_json["0"]
+                             .toArray()[0]
+                             .toObject()["thresholds"]
+                             .toArray()[1]
+                             .toDouble());
     return score_data;
   }
 }  // namespace analyzer

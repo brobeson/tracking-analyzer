@@ -12,6 +12,8 @@ namespace analyzer
     score_list background_candidates;
     score_list background_mined;
     score_list target_candidates;
+    float background_threshold;
+    float target_threshold;
   };
 
   struct training_scores

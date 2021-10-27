@@ -9,6 +9,9 @@
 #include <QScatterSeries>
 #include <QSettings>
 
+class QSpinBox;
+class QComboBox;
+
 namespace analyzer::gui
 {
   namespace Ui
@@ -37,14 +40,13 @@ namespace analyzer::gui
     void set_training_score_data(const training_batch& batch);
 
   public slots:  // NOLINT(readability-redundant-access-specifiers)
-    void check_dataset_path(const QString& path_text) const;
     void load_dataset();
     void sequence_changed(int index);
     // void load_tracking_results(const QString& path);
     void change_frame(int frame_index) const;
     void load_tracking_data(bool);
     void change_update(int update_number);
-    void change_point_size(int index) const;
+    void change_point_size(int size) const;
     void toggle_bg_candidate_plot(bool checked) const;
     void toggle_bg_mined_plot(bool checked) const;
     void toggle_tg_candidate_plot(bool checked) const;
@@ -59,8 +61,12 @@ namespace analyzer::gui
     analyzer::training_iterator m_current_training;
     QSettings settings;
 
-    QAction* m_update_action {nullptr};
+    QSpinBox* m_update_spinbox {nullptr};
+    QSpinBox* m_batch_spinbox {nullptr};
+    QComboBox* m_sequence_combobox {nullptr};
+    QSpinBox* m_point_size_spinbox {nullptr};
     void add_graph_controls_to_toolbar();
+    void load_dataset(const QString& dataset_path);
   };
 }  // namespace analyzer::gui
 

@@ -2,8 +2,10 @@
 #include "filesystem.h"
 #include "tracking_results.h"
 #include "ui_main_window.h"
+#include <QComboBox>
 #include <QFileDialog>
 #include <QScatterSeries>
+#include <QSpinBox>
 #include <QValueAxis>
 #include <algorithm>
 #include <filesystem>
@@ -13,6 +15,7 @@ namespace analyzer::gui
   namespace settings_keys
   {
     constexpr auto last_loaded_tracking_data {"recent/tracking_data_path"};
+    constexpr auto last_loaded_dataset {"recent/dataset_path"};
   }  // namespace settings_keys
 
   namespace
@@ -193,15 +196,6 @@ namespace analyzer::gui
       chart.addSeries(series);
     }
 
-    auto calculate_point_size(const QSlider& slider)
-    {
-      constexpr auto MINIMUM_SIZE {5.0f};
-      constexpr auto MAXIMUM_SIZE {15.0f};
-      const auto t {static_cast<float>(slider.value())
-                    / static_cast<float>(slider.maximum())};
-      return ((1.0f - t) * MINIMUM_SIZE + t * MAXIMUM_SIZE);
-    }
-
     void add_decision_boundary(QChart& chart, const range graph_bounds)
     {
       auto* const line {new QLineSeries};
@@ -282,27 +276,30 @@ namespace analyzer::gui
       spinbox.setValue(1);
       spinbox.setSuffix(" of " + QString::number(maximum));
     }
+
+    template <typename T>
+    auto get_toolbar_widget(const QToolBar& toolbar, QAction* action)
+    {
+      return dynamic_cast<T*>(toolbar.widgetForAction(action));
+    }
   }  // namespace
 
   main_window::main_window(QWidget* parent):
-    QMainWindow(parent), ui(new Ui::main_window)
+    QMainWindow(parent),
+    ui(new Ui::main_window),
+    m_update_spinbox {new QSpinBox},
+    m_batch_spinbox {new QSpinBox},
+    m_sequence_combobox {new QComboBox},
+    m_point_size_spinbox {new QSpinBox}
   {
     ui->setupUi(this);
     setWindowTitle("");
     add_graph_controls_to_toolbar();
     analyzer::gui::setup_overlap_chart(ui->overlap_graph->chart());
-    connect(ui->dataset_path,
-            &QLineEdit::textEdited,
+    connect(ui->action_load_dataset,
+            &QAction::triggered,
             this,
-            &analyzer::gui::main_window::check_dataset_path);
-    connect(ui->dataset_path,
-            &QLineEdit::editingFinished,
-            this,
-            &analyzer::gui::main_window::load_dataset);
-    connect(ui->sequence,
-            QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this,
-            &analyzer::gui::main_window::sequence_changed);
+            qOverload<>(&analyzer::gui::main_window::load_dataset));
     connect(ui->frame_slider,
             &QSlider::sliderMoved,
             this,
@@ -311,19 +308,6 @@ namespace analyzer::gui
             qOverload<int>(&QSpinBox::valueChanged),
             this,
             &analyzer::gui::main_window::change_frame);
-    connect(ui->batch_spinbox,
-            qOverload<int>(&QSpinBox::valueChanged),
-            this,
-            &analyzer::gui::main_window::change_training_batch);
-    connect(
-      dynamic_cast<QSpinBox*>(ui->toolBar->widgetForAction(m_update_action)),
-      qOverload<int>(&QSpinBox::valueChanged),
-      this,
-      &analyzer::gui::main_window::change_update);
-    connect(ui->point_size_slider,
-            &QSlider::sliderMoved,
-            this,
-            &analyzer::gui::main_window::change_point_size);
     connect(ui->bg_candidates_checkbox,
             &QCheckBox::clicked,
             this,
@@ -344,9 +328,11 @@ namespace analyzer::gui
             &QAction::triggered,
             this,
             &analyzer::gui::main_window::load_tracking_data);
-    check_dataset_path(ui->dataset_path->text());
-    load_dataset();
-    // load_tracking_results(ui->results_path->text());
+    if (settings.contains(settings_keys::last_loaded_dataset))
+    {
+      load_dataset(
+        settings.value(settings_keys::last_loaded_dataset).toString());
+    }
 
     // sequence_changed() is called by Qt during initialization. Reset the
     // frame slider and line edit enabled properties.
@@ -386,7 +372,7 @@ namespace analyzer::gui
     legend.setAlignment(Qt::AlignRight);
     const auto range {get_chart_range(batch)};
     add_decision_boundary(chart, range);
-    const auto point_size {calculate_point_size(*ui->point_size_slider)};
+    const auto point_size {m_point_size_spinbox->value()};
     make_training_series(chart,
                          batch.background_candidates,
                          "Background Training Candidates",
@@ -407,36 +393,29 @@ namespace analyzer::gui
     axis->setRange(range.first, range.second);
   }
 
-  void main_window::check_dataset_path(const QString& path_text) const
+  void main_window::load_dataset()
   {
-    try
+    const auto dataset_path {QFileDialog::getExistingDirectory(
+      this,
+      "Load Dataset",
+      settings.value(settings_keys::last_loaded_dataset, QDir::homePath())
+        .toString())};
+    if (!dataset_path.isEmpty())
     {
-      const auto absolute_path {analyzer::make_absolute_path(path_text)};
-      if (std::filesystem::is_directory(absolute_path.toStdString()))
-      {
-        ui->dataset_path->setStyleSheet("");
-      }
-      else
-      {
-        ui->dataset_path->setStyleSheet("QLineEdit#dataset_path{color:red}");
-      }
-    }
-    catch (...)
-    {
-      ui->dataset_path->setStyleSheet("");
+      load_dataset(dataset_path);
     }
   }
 
-  void main_window::load_dataset()
+  void main_window::load_dataset(const QString& dataset_path)
   {
-    const auto new_dataset {analyzer::load_dataset(ui->dataset_path->text())};
+    const auto new_dataset {analyzer::load_dataset(dataset_path)};
     if (!new_dataset.root_path().isEmpty())
     {
       m_dataset = new_dataset;
       analyzer::gui::update_sequence_combobox(
-        *(ui->sequence), analyzer::sequence_names(m_dataset.sequences()));
-      ui->sequence_count->setText(
-        QString::number(m_dataset.sequences().length()) + " sequences.");
+        *m_sequence_combobox, analyzer::sequence_names(m_dataset.sequences()));
+      settings.setValue(settings_keys::last_loaded_dataset, dataset_path);
+      settings.sync();
     }
   }
 
@@ -490,7 +469,7 @@ namespace analyzer::gui
     change_frame(frame);
     m_current_training.current_update = update_index;
     reset_spinbox(
-      *ui->batch_spinbox,
+      *m_batch_spinbox,
       static_cast<int>(m_training_data.updates[update_index].size()));
     change_training_batch(1);
   }
@@ -503,19 +482,18 @@ namespace analyzer::gui
       return;
     }
     m_training_data = analyzer::load_training_scores(filepath);
-    ui->sequence->setCurrentText(m_training_data.sequence_name);
-    reset_spinbox(
-      *dynamic_cast<QSpinBox*>(ui->toolBar->widgetForAction(m_update_action)),
-      static_cast<int>(m_training_data.update_frames.size()));
+    m_sequence_combobox->setCurrentText(m_training_data.sequence_name);
+    reset_spinbox(*m_update_spinbox,
+                  static_cast<int>(m_training_data.update_frames.size()));
     change_update(1);
+    m_point_size_spinbox->setEnabled(true);
     settings.setValue(settings_keys::last_loaded_tracking_data, filepath);
     settings.sync();
     setWindowTitle(basename(filepath));
   }
 
-  void main_window::change_point_size(const int /*unused*/) const
+  void main_window::change_point_size(const int size) const
   {
-    const auto size {calculate_point_size(*ui->point_size_slider)};
     for (auto* const series : ui->overlap_graph->chart()->series())
     {
       if (series->type() == QAbstractSeries::SeriesType::SeriesTypeScatter)
@@ -565,10 +543,53 @@ namespace analyzer::gui
 
   void main_window::add_graph_controls_to_toolbar()
   {
-    auto* const update_spinbox {new QSpinBox};
-    update_spinbox->setMinimum(1);
-    update_spinbox->setPrefix("Update ");
-    update_spinbox->setEnabled(false);
-    m_update_action = ui->toolBar->addWidget(update_spinbox);
+    m_update_spinbox->setMinimum(1);
+    m_update_spinbox->setPrefix("Update ");
+    m_update_spinbox->setEnabled(false);
+    m_update_spinbox->setToolTip("Iterate through the training updates.");
+    connect(m_update_spinbox,
+            qOverload<int>(&QSpinBox::valueChanged),
+            this,
+            &analyzer::gui::main_window::change_update);
+    ui->toolbar->insertWidget(ui->action_load_dataset, m_update_spinbox);
+
+    m_batch_spinbox->setMinimum(1);
+    m_batch_spinbox->setPrefix("Batch ");
+    m_batch_spinbox->setEnabled(false);
+    m_batch_spinbox->setToolTip("Iterate through the training batches.");
+    connect(m_batch_spinbox,
+            qOverload<int>(&QSpinBox::valueChanged),
+            this,
+            &analyzer::gui::main_window::change_training_batch);
+    ui->toolbar->insertWidget(ui->action_load_dataset, m_batch_spinbox);
+
+    m_point_size_spinbox->setPrefix("Point Size ");
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
+    m_point_size_spinbox->setMinimum(5);
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
+    m_point_size_spinbox->setMaximum(15);
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
+    m_point_size_spinbox->setValue(15);
+    m_point_size_spinbox->setEnabled(false);
+    m_point_size_spinbox->setToolTip(
+      "Change the size of the data points in the graph.");
+    connect(m_point_size_spinbox,
+            qOverload<int>(&QSpinBox::valueChanged),
+            this,
+            &analyzer::gui::main_window::change_point_size);
+    ui->toolbar->insertWidget(ui->action_load_dataset, m_point_size_spinbox);
+
+    auto* const widget {new QWidget};
+    widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    ui->toolbar->insertWidget(ui->action_load_dataset, widget);
+
+    m_sequence_combobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    m_sequence_combobox->setToolTip(
+      "Change the sequence displayed in the sequence view.");
+    connect(m_sequence_combobox,
+            QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this,
+            &analyzer::gui::main_window::sequence_changed);
+    ui->toolbar->insertWidget(ui->action_load_dataset, m_sequence_combobox);
   }
 }  // namespace analyzer::gui

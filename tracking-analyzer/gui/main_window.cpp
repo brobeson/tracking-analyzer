@@ -145,13 +145,13 @@ namespace analyzer::gui
     {
       display.overlap_graph->chart()->removeAllSeries();
       display.frame_display->setPixmap(QPixmap {});
-      display.frame_number->setValue(0);
+      display.frame_spinbox->setValue(0);
       display.frame_slider->setValue(0);
     }
 
     void set_current_frame(const Ui::main_window& display, int number)
     {
-      display.frame_number->setValue(number);
+      display.frame_spinbox->setValue(number);
       display.frame_slider->setValue(number);
     }
 
@@ -185,7 +185,8 @@ namespace analyzer::gui
     void make_training_series(QChart& chart,
                               const score_list& scores,
                               const QString& name,
-                              const qreal point_size)
+                              const qreal point_size,
+                              const bool isVisible)
     {
       auto* const series {new QtCharts::QScatterSeries};
       series->append(scores);
@@ -193,6 +194,7 @@ namespace analyzer::gui
       // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
       series->setMarkerSize(point_size);
       series->setPen(QPen {});
+      series->setVisible(isVisible);
       chart.addSeries(series);
     }
 
@@ -282,87 +284,43 @@ namespace analyzer::gui
     {
       return dynamic_cast<T*>(toolbar.widgetForAction(action));
     }
+
+    auto create_plots_menu(QAction* const bg_candidate_action,
+                           QAction* const bg_mined_action,
+                           QAction* const tg_candidate_action)
+    {
+      auto* const menu {new QMenu};
+      menu->addAction(bg_candidate_action);
+      bg_candidate_action->setChecked(true);
+      menu->addAction(bg_mined_action);
+      bg_mined_action->setChecked(true);
+      menu->addAction(tg_candidate_action);
+      tg_candidate_action->setChecked(false);
+      return menu;
+    }
   }  // namespace
 
   main_window::main_window(QWidget* parent):
-    QMainWindow(parent),
-    ui(new Ui::main_window),
-    m_update_spinbox {new QSpinBox},
-    m_batch_spinbox {new QSpinBox},
-    m_sequence_combobox {new QComboBox},
-    m_point_size_spinbox {new QSpinBox}
+    QMainWindow(parent), ui(new Ui::main_window)
   {
     ui->setupUi(this);
     setWindowTitle("");
-    add_graph_controls_to_toolbar();
+    ui->plots_menu->setMenu(create_plots_menu(
+      ui->bg_candidates_action, ui->bg_mined_action, ui->tg_candidates_action));
     analyzer::gui::setup_overlap_chart(ui->overlap_graph->chart());
-    connect(ui->action_load_dataset,
-            &QAction::triggered,
-            this,
-            qOverload<>(&analyzer::gui::main_window::load_dataset));
-    connect(ui->frame_slider,
-            &QSlider::sliderMoved,
-            this,
-            &analyzer::gui::main_window::change_frame);
-    connect(ui->frame_number,
-            qOverload<int>(&QSpinBox::valueChanged),
-            this,
-            &analyzer::gui::main_window::change_frame);
-    connect(ui->bg_candidates_checkbox,
-            &QCheckBox::clicked,
-            this,
-            &analyzer::gui::main_window::toggle_bg_candidate_plot);
-    connect(ui->bg_mined_checkbox,
-            &QCheckBox::clicked,
-            this,
-            &analyzer::gui::main_window::toggle_bg_mined_plot);
-    connect(ui->tg_candidates_checkbox,
-            &QCheckBox::clicked,
-            this,
-            &analyzer::gui::main_window::toggle_tg_candidate_plot);
-    connect(ui->action_save_graph,
-            &QAction::triggered,
-            this,
-            &main_window::save_graph);
-    connect(ui->action_open_tracking_data,
-            &QAction::triggered,
-            this,
-            &analyzer::gui::main_window::load_tracking_data);
     if (settings.contains(settings_keys::last_loaded_dataset))
     {
       load_dataset(
         settings.value(settings_keys::last_loaded_dataset).toString());
     }
 
-    // sequence_changed() is called by Qt during initialization. Reset the
+    // change_sequence() is called by Qt during initialization. Reset the
     // frame slider and line edit enabled properties.
-    ui->frame_number->setEnabled(false);
+    ui->frame_spinbox->setEnabled(false);
     ui->frame_slider->setEnabled(false);
   }
 
   main_window::~main_window() { delete ui; }
-
-  // void main_window::set_offset_data(QtCharts::QScatterSeries* offset_data)
-  // {
-  //   ui->offset_graph->chart()->addSeries(offset_data);
-  //   const auto offset_vector {offset_data->pointsVector()};
-  //   auto* const x_axis {analyzer::gui::make_x_axis(offset_vector.size())};
-  //   auto* const y_axis {analyzer::gui::make_offset_y_axis(
-  //     std::max_element(
-  //       std::begin(offset_vector),
-  //       std::end(offset_vector),
-  //       [](const auto& a, const auto& b) { return a.y() < b.y(); })
-  //       ->y())};
-  //   if (x_axis == nullptr || y_axis == nullptr)
-  //   {
-  //     ui->offset_graph->chart()->createDefaultAxes();
-  //   }
-  //   else
-  //   {
-  //     ui->offset_graph->chart()->addAxis(x_axis, Qt::AlignBottom);
-  //     ui->offset_graph->chart()->addAxis(y_axis, Qt::AlignLeft);
-  //   }
-  // }
 
   void main_window::set_training_score_data(const training_batch& batch)
   {
@@ -372,15 +330,22 @@ namespace analyzer::gui
     legend.setAlignment(Qt::AlignRight);
     const auto range {get_chart_range(batch)};
     add_decision_boundary(chart, range);
-    const auto point_size {m_point_size_spinbox->value()};
+    const auto point_size {ui->point_size_spinbox->value()};
     make_training_series(chart,
                          batch.background_candidates,
                          "Background Training Candidates",
-                         point_size);
-    make_training_series(
-      chart, batch.background_mined, "Background Mined", point_size);
-    make_training_series(
-      chart, batch.target_candidates, "Target Training Candidates", point_size);
+                         point_size,
+                         ui->bg_candidates_action->isChecked());
+    make_training_series(chart,
+                         batch.background_mined,
+                         "Background Mined",
+                         point_size,
+                         ui->bg_mined_action->isChecked());
+    make_training_series(chart,
+                         batch.target_candidates,
+                         "Target Training Candidates",
+                         point_size,
+                         ui->tg_candidates_action->isChecked());
     add_score_thresholds(
       chart, range, batch.background_threshold, batch.target_threshold);
     ui->overlap_graph->chart()->createDefaultAxes();
@@ -412,14 +377,21 @@ namespace analyzer::gui
     if (!new_dataset.root_path().isEmpty())
     {
       m_dataset = new_dataset;
+      ui->sequence_combobox->setEnabled(true);
       analyzer::gui::update_sequence_combobox(
-        *m_sequence_combobox, analyzer::sequence_names(m_dataset.sequences()));
+        *ui->sequence_combobox,
+        analyzer::sequence_names(m_dataset.sequences()));
       settings.setValue(settings_keys::last_loaded_dataset, dataset_path);
       settings.sync();
+      constexpr int message_timeout_ms {5000};
+      ui->statusbar->showMessage(
+        "Loaded " + QString::number(m_dataset.sequences().size())
+          + " sequences from " + dataset_path,
+        message_timeout_ms);
     }
   }
 
-  void main_window::sequence_changed(const int index)
+  void main_window::change_sequence(const int index)
   {
     analyzer::gui::clear_display(*ui);
     if (index >= 0)
@@ -432,19 +404,14 @@ namespace analyzer::gui
         m_dataset.sequences()[index].target_boxes()[1]);
       const auto maximum_frame {
         m_dataset.sequences()[index].frame_paths().length() - 1};
-      ui->frame_number->setEnabled(true);
-      ui->frame_number->setSuffix(" of " + QString::number(maximum_frame));
-      ui->frame_number->setMaximum(maximum_frame);
+      ui->frame_spinbox->setEnabled(true);
+      ui->frame_spinbox->setSuffix(" of " + QString::number(maximum_frame));
+      ui->frame_spinbox->setMaximum(maximum_frame);
       ui->frame_slider->setEnabled(true);
       ui->frame_slider->setMinimum(0);
       ui->frame_slider->setMaximum(maximum_frame);
     }
   }
-
-  // void main_window::load_tracking_results(const QString& path)  // NOLINT
-  // {
-  //   const auto new_results {analyzer::load_tracking_results(path)};
-  // }
 
   void main_window::change_frame(const int frame_index) const
   {
@@ -469,12 +436,12 @@ namespace analyzer::gui
     change_frame(frame);
     m_current_training.current_update = update_index;
     reset_spinbox(
-      *m_batch_spinbox,
+      *ui->batch_spinbox,
       static_cast<int>(m_training_data.updates[update_index].size()));
     change_training_batch(1);
   }
 
-  void main_window::load_tracking_data(const bool /*unused*/)
+  void main_window::load_tracking_data()
   {
     const auto filepath {get_tracking_data_filepath(this, settings)};
     if (filepath.isEmpty())
@@ -482,11 +449,13 @@ namespace analyzer::gui
       return;
     }
     m_training_data = analyzer::load_training_scores(filepath);
-    m_sequence_combobox->setCurrentText(m_training_data.sequence_name);
-    reset_spinbox(*m_update_spinbox,
+    ui->sequence_combobox->setCurrentText(m_training_data.sequence_name);
+    reset_spinbox(*ui->update_spinbox,
                   static_cast<int>(m_training_data.update_frames.size()));
     change_update(1);
-    m_point_size_spinbox->setEnabled(true);
+    ui->point_size_spinbox->setEnabled(true);
+    ui->save_graph_button->setEnabled(true);
+    ui->plots_menu->setEnabled(true);
     settings.setValue(settings_keys::last_loaded_tracking_data, filepath);
     settings.sync();
     setWindowTitle(basename(filepath));
@@ -518,7 +487,7 @@ namespace analyzer::gui
     toggle_series(*ui, "Target Training Candidates", checked);
   }
 
-  void main_window::save_graph(const bool /*unused*/)
+  void main_window::save_graph()
   {
     const auto suggestion {QDir::homePath() + "/"
                            + m_training_data.sequence_name
@@ -539,57 +508,5 @@ namespace analyzer::gui
     set_training_score_data(
       m_training_data.updates.at(m_current_training.current_update)
         .at(m_current_training.current_batch));
-  }
-
-  void main_window::add_graph_controls_to_toolbar()
-  {
-    m_update_spinbox->setMinimum(1);
-    m_update_spinbox->setPrefix("Update ");
-    m_update_spinbox->setEnabled(false);
-    m_update_spinbox->setToolTip("Iterate through the training updates.");
-    connect(m_update_spinbox,
-            qOverload<int>(&QSpinBox::valueChanged),
-            this,
-            &analyzer::gui::main_window::change_update);
-    ui->toolbar->insertWidget(ui->action_load_dataset, m_update_spinbox);
-
-    m_batch_spinbox->setMinimum(1);
-    m_batch_spinbox->setPrefix("Batch ");
-    m_batch_spinbox->setEnabled(false);
-    m_batch_spinbox->setToolTip("Iterate through the training batches.");
-    connect(m_batch_spinbox,
-            qOverload<int>(&QSpinBox::valueChanged),
-            this,
-            &analyzer::gui::main_window::change_training_batch);
-    ui->toolbar->insertWidget(ui->action_load_dataset, m_batch_spinbox);
-
-    m_point_size_spinbox->setPrefix("Point Size ");
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
-    m_point_size_spinbox->setMinimum(5);
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
-    m_point_size_spinbox->setMaximum(15);
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
-    m_point_size_spinbox->setValue(15);
-    m_point_size_spinbox->setEnabled(false);
-    m_point_size_spinbox->setToolTip(
-      "Change the size of the data points in the graph.");
-    connect(m_point_size_spinbox,
-            qOverload<int>(&QSpinBox::valueChanged),
-            this,
-            &analyzer::gui::main_window::change_point_size);
-    ui->toolbar->insertWidget(ui->action_load_dataset, m_point_size_spinbox);
-
-    auto* const widget {new QWidget};
-    widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    ui->toolbar->insertWidget(ui->action_load_dataset, widget);
-
-    m_sequence_combobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    m_sequence_combobox->setToolTip(
-      "Change the sequence displayed in the sequence view.");
-    connect(m_sequence_combobox,
-            QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this,
-            &analyzer::gui::main_window::sequence_changed);
-    ui->toolbar->insertWidget(ui->action_load_dataset, m_sequence_combobox);
   }
 }  // namespace analyzer::gui

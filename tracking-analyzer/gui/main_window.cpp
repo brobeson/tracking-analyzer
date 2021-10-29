@@ -297,6 +297,16 @@ namespace analyzer::gui
       tg_candidate_action->setChecked(false);
       return menu;
     }
+
+    void set_graph_title(QChart& chart,
+                         const QString& sequence_name,
+                         const int update_number,
+                         const int batch_number)
+    {
+      chart.setTitle("Training Data - " + sequence_name + " - Update "
+                     + QString::number(update_number) + " - Batch "
+                     + QString::number(batch_number));
+    }
   }  // namespace
 
   main_window::main_window(QWidget* parent):
@@ -506,5 +516,9 @@ namespace analyzer::gui
     set_training_score_data(
       m_training_data.updates.at(m_current_training.current_update)
         .at(m_current_training.current_batch));
+    set_graph_title(*ui->graph->chart(),
+                    m_training_data.sequence_name,
+                    ui->update_spinbox->value(),
+                    batch_number);
   }
 }  // namespace analyzer::gui

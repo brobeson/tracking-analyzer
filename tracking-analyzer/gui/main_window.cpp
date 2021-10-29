@@ -143,7 +143,7 @@ namespace analyzer::gui
 
     void clear_display(const Ui::main_window& display)
     {
-      display.overlap_graph->chart()->removeAllSeries();
+      display.graph->chart()->removeAllSeries();
       display.frame_display->setPixmap(QPixmap {});
       display.frame_spinbox->setValue(0);
       display.frame_slider->setValue(0);
@@ -251,8 +251,7 @@ namespace analyzer::gui
                        const QString& series_name,
                        const bool series_visible)
     {
-      auto* const series {
-        find_data_series(*ui.overlap_graph->chart(), series_name)};
+      auto* const series {find_data_series(*ui.graph->chart(), series_name)};
       if (series != nullptr)
       {
         series->setVisible(series_visible);
@@ -307,7 +306,7 @@ namespace analyzer::gui
     setWindowTitle("");
     ui->plots_menu->setMenu(create_plots_menu(
       ui->bg_candidates_action, ui->bg_mined_action, ui->tg_candidates_action));
-    analyzer::gui::setup_overlap_chart(ui->overlap_graph->chart());
+    analyzer::gui::setup_overlap_chart(ui->graph->chart());
     if (settings.contains(settings_keys::last_loaded_dataset))
     {
       load_dataset(
@@ -324,8 +323,8 @@ namespace analyzer::gui
 
   void main_window::set_training_score_data(const training_batch& batch)
   {
-    ui->overlap_graph->chart()->removeAllSeries();
-    auto& chart {*ui->overlap_graph->chart()};
+    ui->graph->chart()->removeAllSeries();
+    auto& chart {*ui->graph->chart()};
     auto& legend {*chart.legend()};
     legend.setAlignment(Qt::AlignRight);
     const auto range {get_chart_range(batch)};
@@ -348,12 +347,11 @@ namespace analyzer::gui
                          ui->tg_candidates_action->isChecked());
     add_score_thresholds(
       chart, range, batch.background_threshold, batch.target_threshold);
-    ui->overlap_graph->chart()->createDefaultAxes();
-    auto* axis {
-      ui->overlap_graph->chart()->axes(Qt::Orientation::Horizontal)[0]};
+    ui->graph->chart()->createDefaultAxes();
+    auto* axis {ui->graph->chart()->axes(Qt::Orientation::Horizontal)[0]};
     axis->setTitleText("Background Scores");
     axis->setRange(range.first, range.second);
-    axis = ui->overlap_graph->chart()->axes(Qt::Orientation::Vertical)[0];
+    axis = ui->graph->chart()->axes(Qt::Orientation::Vertical)[0];
     axis->setTitleText("Target Scores");
     axis->setRange(range.first, range.second);
   }
@@ -463,7 +461,7 @@ namespace analyzer::gui
 
   void main_window::change_point_size(const int size) const
   {
-    for (auto* const series : ui->overlap_graph->chart()->series())
+    for (auto* const series : ui->graph->chart()->series())
     {
       if (series->type() == QAbstractSeries::SeriesType::SeriesTypeScatter)
       {
@@ -496,7 +494,7 @@ namespace analyzer::gui
       this, "Save Plot", suggestion, "PNG (*.png)")};
     if (!filepath.isEmpty())
     {
-      const auto image {ui->overlap_graph->grab()};
+      const auto image {ui->graph->grab()};
       image.save(filepath, "PNG");
     }
   }

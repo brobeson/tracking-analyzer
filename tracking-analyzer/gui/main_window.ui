@@ -231,7 +231,7 @@
      </layout>
     </item>
     <item row="1" column="0">
-     <widget class="QChartView" name="overlap_graph"/>
+     <widget class="QChartView" name="graph"/>
     </item>
    </layout>
   </widget>

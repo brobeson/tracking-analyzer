@@ -19,11 +19,4 @@ endif()
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_options(${PROJECT_NAME} PRIVATE ${compiler_options})
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
-set_target_properties(
-  ${PROJECT_NAME}
-  PROPERTIES
-    AUTOUIC true
-    AUTOMOC true
-    CXX_CLANG_TIDY
-      "clang-tidy;-p;${CMAKE_BINARY_DIR};--extra-arg=-Wno-unknown-warning-option"
-)
+set_target_properties(${PROJECT_NAME} PROPERTIES AUTOUIC true AUTOMOC true)

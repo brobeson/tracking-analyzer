@@ -1,7 +1,11 @@
 {
   "cSpell.words": [
-    "Wfloat",
-    "qreal"
+    "exitcode",
+    "jurplel",
+    "qreal",
+    "qtcharts",
+    "Werror",
+    "Wfloat"
   ],
   "clang-tidy.compilerArgs": [
     "-Wno-unused-macros"

@@ -2,6 +2,7 @@
 #define ANALYZER_TRAINING_METADATA_H
 
 #include <QList>
+#include <QPointF>
 #include <vector>
 
 namespace analyzer

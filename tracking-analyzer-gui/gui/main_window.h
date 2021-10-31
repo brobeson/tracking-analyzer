@@ -1,9 +1,8 @@
 #ifndef ANALYZER_GUI_MAIN_WINDOW_H
 #define ANALYZER_GUI_MAIN_WINDOW_H
 
-#include "dataset.h"
-#include "tracking_results.h"
-#include "training_metadata.h"
+#include "tracking-analyzer/dataset.h"
+#include "tracking-analyzer/training_metadata.h"
 #include <QImage>
 #include <QMainWindow>
 #include <QScatterSeries>

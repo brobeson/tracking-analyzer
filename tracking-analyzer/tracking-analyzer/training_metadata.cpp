@@ -1,5 +1,6 @@
-#include "training_metadata.h"
-#include "filesystem.h"
+#include "tracking-analyzer/training_metadata.h"
+#include "tracking-analyzer/filesystem.h"
+#include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>

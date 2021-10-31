@@ -1,26 +1,21 @@
-find_package(Qt5 5.9 REQUIRED COMPONENTS Charts Core Gui Widgets)
-add_executable(
+add_library(
   ${PROJECT_NAME}
-  bounding_box.cpp
-  bounding_box.h
-  dataset.cpp
-  dataset.h
-  filesystem.cpp
-  filesystem.h
-  gui/main_window.cpp
-  gui/main_window.h
-  gui/main_window.ui
-  main.cpp
-  tracking_results.h
-  tracking_results.cpp
-  training_metadata.h
-  training_metadata.cpp
+  tracking-analyzer/bounding_box.cpp
+  tracking-analyzer/bounding_box.h
+  tracking-analyzer/dataset.cpp
+  tracking-analyzer/dataset.h
+  tracking-analyzer/filesystem.cpp
+  tracking-analyzer/filesystem.h
+  tracking-analyzer/tracking_results.h
+  tracking-analyzer/tracking_results.cpp
+  tracking-analyzer/training_metadata.h
+  tracking-analyzer/training_metadata.cpp
 )
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Charts Qt5::Widgets)
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
-  target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs)
-endif()
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+add_library(tracking::analyzer ALIAS tracking-analyzer)
+target_include_directories(
+  ${PROJECT_NAME}
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core)
 target_compile_options(${PROJECT_NAME} PRIVATE ${compiler_options})
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
-set_target_properties(${PROJECT_NAME} PROPERTIES AUTOUIC true AUTOMOC true)

@@ -1,6 +1,5 @@
 #include "main_window.h"
-#include "filesystem.h"
-#include "tracking_results.h"
+#include "tracking-analyzer/filesystem.h"
 #include "ui_main_window.h"
 #include <QComboBox>
 #include <QFileDialog>

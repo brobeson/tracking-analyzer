@@ -1,4 +1,3 @@
-#include "bounding_box.h"
 #include "gui/main_window.h"
 #include <QApplication>
 #include <QImageReader>

@@ -1,7 +1,7 @@
 #ifndef TRACKING_ANALYZER_DATASET_H
 #define TRACKING_ANALYZER_DATASET_H
 
-#include "bounding_box.h"
+#include "tracking-analyzer/bounding_box.h"
 #include <QStringList>
 #include <QVector>
 #include <stdexcept>

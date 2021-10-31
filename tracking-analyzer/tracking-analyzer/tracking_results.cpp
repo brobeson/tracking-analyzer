@@ -1,6 +1,5 @@
-#include "tracking_results.h"
-#include "dataset.h"
-#include "filesystem.h"
+#include "tracking-analyzer/tracking_results.h"
+#include "tracking-analyzer/filesystem.h"
 #include <QDir>
 #include <QJsonArray>
 #include <QJsonDocument>

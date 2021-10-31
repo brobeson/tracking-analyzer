@@ -1,7 +1,7 @@
 #ifndef ANALYZER_TRACKING_RESULTS_H
 #define ANALYZER_TRACKING_RESULTS_H
 
-#include "bounding_box.h"
+#include "tracking-analyzer/bounding_box.h"
 #include <QList>
 #include <QString>
 #include <array>

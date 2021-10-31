@@ -1,4 +1,4 @@
-#include "bounding_box.h"
+#include "tracking-analyzer/bounding_box.h"
 #include <QString>
 #include <QStringList>
 #include <cmath>

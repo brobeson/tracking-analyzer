@@ -1,0 +1,25 @@
+@startuml Header Dependencies
+
+skinparam linetype ortho
+package tracking-analyzer {
+  [bounding_box.cpp] --> [bounding_box.h]
+  [filesystem.cpp] --> [filesystem.h]
+  [dataset.cpp] --> [dataset.h]
+  [dataset.cpp] --> [filesystem.h]
+  [dataset.h] --> [bounding_box.h]
+  [tracking_results.cpp] --> [tracking_results.h]
+  [tracking_results.cpp] --> [filesystem.h]
+  [tracking_results.h] --> [bounding_box.h]
+  [training_metadata.cpp] --> [training_metadata.h]
+  [training_metadata.cpp] --> [filesystem.h]
+}
+
+package gui {
+  [main_window.cpp] --> [main_window.h]
+  [main_window.cpp] --> [filesystem.h]
+  [main_window.h] --> [dataset.h]
+  [main_window.h] --> [training_metadata.h]
+  [main.cpp] --> [main_window.h]
+}
+
+@enduml

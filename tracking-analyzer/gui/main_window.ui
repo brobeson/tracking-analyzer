@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1048</width>
-    <height>875</height>
+    <height>658</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,28 +15,31 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="1">
-     <widget class="QLabel" name="frame_display">
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QChartView" name="overlap_graph"/>
-    </item>
-    <item row="0" column="0">
-     <widget class="QChartView" name="offset_graph"/>
-    </item>
-    <item row="2" column="1">
-     <layout class="QVBoxLayout" name="verticalLayout">
+    <item row="1" column="1">
+     <layout class="QVBoxLayout" name="verticalLayout_1">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <widget class="QLabel" name="frame_display">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>No Sequence Loaded</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
-         <widget class="QSpinBox" name="frame_number">
+         <widget class="QSpinBox" name="frame_spinbox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="prefix">
            <string>Frame </string>
           </property>
@@ -54,152 +57,218 @@
         </item>
        </layout>
       </item>
+     </layout>
+    </item>
+    <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <layout class="QFormLayout" name="formLayout">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Dataset Path</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="dataset_path">
-          <property name="text">
-           <string>~/Videos/otb</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>Sequence</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <widget class="QComboBox" name="sequence">
-            <property name="sizeAdjustPolicy">
-             <enum>QComboBox::AdjustToContents</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="sequence_count">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="5" column="1">
-         <widget class="QComboBox" name="comboBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <item>
-           <property name="text">
-            <string>Light</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Blue Cerulean</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Dark</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Brown Sand</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Blue NCS</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>High Contrast</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Blue Icy</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Qt</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="5" column="0">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Graph Theme</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QLabel" name="sequence_path">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Tracking Results</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="results_path">
-          <property name="text">
-           <string>~/learning_rate_data/OTB2015/cosine_annealing</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QToolButton" name="open_tracking_data_button">
+        <property name="toolTip">
+         <string>Open tracking meta-data.</string>
+        </property>
+        <property name="text">
+         <string>Open</string>
+        </property>
+        <property name="icon">
+         <iconset theme="document-open">
+          <normaloff>.</normaloff>.</iconset>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+O</string>
+        </property>
+       </widget>
       </item>
       <item>
-       <spacer name="verticalSpacer">
+       <widget class="QToolButton" name="save_graph_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Save the current graph.</string>
+        </property>
+        <property name="text">
+         <string>Save</string>
+        </property>
+        <property name="icon">
+         <iconset theme="document-save">
+          <normaloff>.</normaloff>.</iconset>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+S</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="update_spinbox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Iterate through the training updates.</string>
+        </property>
+        <property name="suffix">
+         <string> of</string>
+        </property>
+        <property name="prefix">
+         <string>Update </string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="batch_spinbox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Iterate through the training batches.</string>
+        </property>
+        <property name="suffix">
+         <string> of</string>
+        </property>
+        <property name="prefix">
+         <string>Batch </string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="point_size_spinbox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Change the size of points drawn on the graph.</string>
+        </property>
+        <property name="prefix">
+         <string>Point Size </string>
+        </property>
+        <property name="minimum">
+         <number>5</number>
+        </property>
+        <property name="maximum">
+         <number>15</number>
+        </property>
+        <property name="value">
+         <number>15</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="plots_menu">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Plots</string>
+        </property>
+        <property name="popupMode">
+         <enum>QToolButton::InstantPopup</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>20</width>
-          <height>40</height>
+          <width>40</width>
+          <height>20</height>
          </size>
         </property>
        </spacer>
       </item>
      </layout>
     </item>
+    <item row="0" column="1">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QComboBox" name="sequence_combobox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Select the sequence to display.</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="load_dataset_button">
+        <property name="toolTip">
+         <string>Load a tracking dataset.</string>
+        </property>
+        <property name="text">
+         <string>Dataset</string>
+        </property>
+        <property name="icon">
+         <iconset theme="folder-open">
+          <normaloff>.</normaloff>.</iconset>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+Shift+O</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="1" column="0">
+     <widget class="QChartView" name="graph"/>
+    </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1048</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="bg_candidates_action">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Background Candidates</string>
+   </property>
+   <property name="toolTip">
+    <string>Draw background candidate data in the graph.</string>
+   </property>
+  </action>
+  <action name="bg_mined_action">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Background Mined</string>
+   </property>
+   <property name="toolTip">
+    <string>Draw mined background data in the graph.</string>
+   </property>
+  </action>
+  <action name="tg_candidates_action">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Target Candidates</string>
+   </property>
+   <property name="toolTip">
+    <string>Draw target candidate data in the graph.</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -209,5 +278,211 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>open_tracking_data_button</sender>
+   <signal>clicked()</signal>
+   <receiver>analyzer::gui::main_window</receiver>
+   <slot>load_tracking_data()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>24</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>27</x>
+     <y>607</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>save_graph_button</sender>
+   <signal>clicked()</signal>
+   <receiver>analyzer::gui::main_window</receiver>
+   <slot>save_graph()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>64</x>
+     <y>24</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>73</x>
+     <y>613</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>update_spinbox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>analyzer::gui::main_window</receiver>
+   <slot>change_update(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>138</x>
+     <y>23</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>158</x>
+     <y>611</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>batch_spinbox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>analyzer::gui::main_window</receiver>
+   <slot>change_training_batch(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>223</x>
+     <y>23</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>265</x>
+     <y>607</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sequence_combobox</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>analyzer::gui::main_window</receiver>
+   <slot>change_sequence(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>974</x>
+     <y>22</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>974</x>
+     <y>527</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>load_dataset_button</sender>
+   <signal>clicked()</signal>
+   <receiver>analyzer::gui::main_window</receiver>
+   <slot>load_dataset()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1030</x>
+     <y>27</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1031</x>
+     <y>582</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>frame_spinbox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>analyzer::gui::main_window</receiver>
+   <slot>change_frame(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>558</x>
+     <y>463</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>558</x>
+     <y>511</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>frame_slider</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>analyzer::gui::main_window</receiver>
+   <slot>change_frame(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>735</x>
+     <y>463</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>735</x>
+     <y>532</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>point_size_spinbox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>analyzer::gui::main_window</receiver>
+   <slot>change_point_size(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>332</x>
+     <y>25</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>328</x>
+     <y>624</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bg_candidates_action</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>analyzer::gui::main_window</receiver>
+   <slot>toggle_bg_candidate_plot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bg_mined_action</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>analyzer::gui::main_window</receiver>
+   <slot>toggle_bg_mined_plot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tg_candidates_action</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>analyzer::gui::main_window</receiver>
+   <slot>toggle_tg_candidate_plot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>load_tracking_data()</slot>
+  <slot>save_graph()</slot>
+  <slot>change_update(int)</slot>
+  <slot>change_training_batch(int)</slot>
+  <slot>change_sequence(int)</slot>
+  <slot>load_dataset()</slot>
+  <slot>change_frame(int)</slot>
+  <slot>change_point_size(int)</slot>
+  <slot>toggle_bg_candidate_plot(bool)</slot>
+  <slot>toggle_bg_mined_plot(bool)</slot>
+  <slot>toggle_tg_candidate_plot(bool)</slot>
+ </slots>
 </ui>

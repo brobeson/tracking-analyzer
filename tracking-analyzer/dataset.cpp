@@ -1,4 +1,5 @@
 #include "dataset.h"
+#include "filesystem.h"
 #include <QDir>
 #include <filesystem>
 #include <fstream>
@@ -15,9 +16,7 @@ namespace analyzer
 
     auto read_sequences(const QString& dataset_path)
     {
-      const QDir directory {dataset_path};
-      const auto names {
-        directory.entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name)};
+      const auto names {read_sequence_names(dataset_path)};
       QVector<analyzer::sequence> sequences;
       sequences.reserve(names.size());
       for (const auto& name : names)
@@ -122,19 +121,9 @@ namespace analyzer
     return m_root_directory;
   }
 
-  auto make_absolute_path(const QString& path) -> QString
-  {
-    if (path.at(0) == '~')
-    {
-      return path.right(path.length() - 1).prepend(QDir::homePath());
-    }
-    return path;
-  }
-
   auto load_dataset(const QString& path) -> analyzer::dataset
   {
     const auto dataset_path {analyzer::make_absolute_path(path)};
-    const auto sequences {analyzer::read_sequence_names(dataset_path)};
     return analyzer::dataset {dataset_path,
                               analyzer::read_sequences(dataset_path)};
   }

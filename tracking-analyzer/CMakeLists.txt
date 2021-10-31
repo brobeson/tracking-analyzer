@@ -5,12 +5,16 @@ add_executable(
   bounding_box.h
   dataset.cpp
   dataset.h
+  filesystem.cpp
+  filesystem.h
   gui/main_window.cpp
   gui/main_window.h
   gui/main_window.ui
   main.cpp
   tracking_results.h
   tracking_results.cpp
+  training_metadata.h
+  training_metadata.cpp
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Charts Qt5::Widgets)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)

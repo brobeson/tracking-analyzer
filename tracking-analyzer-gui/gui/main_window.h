@@ -48,6 +48,7 @@ namespace analyzer::gui
     void toggle_bg_candidate_plot(bool checked) const;
     void toggle_bg_mined_plot(bool checked) const;
     void toggle_tg_candidate_plot(bool checked) const;
+    void toggle_thresholds_plot(bool checked) const;
     void save_graph();
     void change_training_batch(int batch_number);
 

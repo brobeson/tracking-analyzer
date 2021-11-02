@@ -226,7 +226,8 @@ namespace analyzer::gui
     void add_score_thresholds(QChart& chart,
                               const range graph_bounds,
                               const float background_threshold,
-                              const float target_threshold)
+                              const float target_threshold,
+                              const bool isVisible)
     {
       const auto color {
         dynamic_cast<QScatterSeries*>(
@@ -237,11 +238,15 @@ namespace analyzer::gui
       line->append(background_threshold, graph_bounds.second);
       line->setName("Cluster Thresholds");
       line->setColor(color);
+      line->setVisible(isVisible);
       chart.addSeries(line);
       line = new QLineSeries;
       line->append(graph_bounds.first, target_threshold);
       line->append(graph_bounds.second, target_threshold);
+      // Add a name so the code can search for it later.
+      line->setName("Cluster Thresholds Hidden");
       line->setColor(color);
+      line->setVisible(isVisible);
       chart.addSeries(line);
       chart.legend()->markers().back()->setVisible(false);
     }
@@ -285,7 +290,8 @@ namespace analyzer::gui
 
     auto create_plots_menu(QAction* const bg_candidate_action,
                            QAction* const bg_mined_action,
-                           QAction* const tg_candidate_action)
+                           QAction* const tg_candidate_action,
+                           QAction* const thresholds_action)
     {
       auto* const menu {new QMenu};
       menu->addAction(bg_candidate_action);
@@ -294,6 +300,8 @@ namespace analyzer::gui
       bg_mined_action->setChecked(true);
       menu->addAction(tg_candidate_action);
       tg_candidate_action->setChecked(false);
+      menu->addAction(thresholds_action);
+      thresholds_action->setChecked(false);
       return menu;
     }
 
@@ -313,8 +321,10 @@ namespace analyzer::gui
   {
     ui->setupUi(this);
     setWindowTitle("");
-    ui->plots_menu->setMenu(create_plots_menu(
-      ui->bg_candidates_action, ui->bg_mined_action, ui->tg_candidates_action));
+    ui->plots_menu->setMenu(create_plots_menu(ui->bg_candidates_action,
+                                              ui->bg_mined_action,
+                                              ui->tg_candidates_action,
+                                              ui->thresholds_action));
     analyzer::gui::setup_overlap_chart(ui->graph->chart());
     if (settings.contains(settings_keys::last_loaded_dataset))
     {
@@ -354,8 +364,11 @@ namespace analyzer::gui
                          "Target Training Candidates",
                          point_size,
                          ui->tg_candidates_action->isChecked());
-    add_score_thresholds(
-      chart, range, batch.background_threshold, batch.target_threshold);
+    add_score_thresholds(chart,
+                         range,
+                         batch.background_threshold,
+                         batch.target_threshold,
+                         ui->thresholds_action->isChecked());
     ui->graph->chart()->createDefaultAxes();
     auto* axis {ui->graph->chart()->axes(Qt::Orientation::Horizontal)[0]};
     axis->setTitleText("Background Scores");
@@ -492,6 +505,12 @@ namespace analyzer::gui
   void main_window::toggle_tg_candidate_plot(const bool checked) const
   {
     toggle_series(*ui, "Target Training Candidates", checked);
+  }
+
+  void main_window::toggle_thresholds_plot(const bool checked) const
+  {
+    toggle_series(*ui, "Cluster Thresholds", checked);
+    toggle_series(*ui, "Cluster Thresholds Hidden", checked);
   }
 
   void main_window::save_graph()

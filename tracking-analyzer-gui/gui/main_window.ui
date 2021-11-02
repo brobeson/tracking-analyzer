@@ -269,6 +269,17 @@
     <string>Draw target candidate data in the graph.</string>
    </property>
   </action>
+  <action name="thresholds_action">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Thresholds</string>
+   </property>
+   <property name="toolTip">
+    <string>Draw the threshold lines in the graph.</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -471,6 +482,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>thresholds_action</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>analyzer::gui::main_window</receiver>
+   <slot>toggle_thresholds_plot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>load_tracking_data()</slot>
@@ -484,5 +511,6 @@
   <slot>toggle_bg_candidate_plot(bool)</slot>
   <slot>toggle_bg_mined_plot(bool)</slot>
   <slot>toggle_tg_candidate_plot(bool)</slot>
+  <slot>toggle_thresholds_plot(bool)</slot>
  </slots>
 </ui>

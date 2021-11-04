@@ -11,11 +11,11 @@ namespace analyzer
 {
   namespace
   {
-    auto read_sequence_names(const QString& results_path)
-    {
-      const QDir directory {results_path};
-      return directory.entryList({"*.txt"}, QDir::Files, QDir::Name);
-    }
+    // auto read_sequence_names(const QString& results_path)
+    // {
+    //   const QDir directory {results_path};
+    //   return directory.entryList({"*.txt"}, QDir::Files, QDir::Name);
+    // }
 
     // auto parse_training_scores(
     //   const QJsonArray& score_data,
@@ -60,11 +60,11 @@ namespace analyzer
     // }
   }  // namespace
 
-  auto load_tracking_results(const QString& path)
-    -> std::vector<tracking_results>
-  {
-    const auto absolute_path {make_absolute_path(path)};
-    const auto sequences {analyzer::read_sequence_names(absolute_path)};
-    return std::vector<tracking_results> {};
-  }
+  // auto load_tracking_results(const QString& path)
+  //   -> std::vector<tracking_results>
+  // {
+  //   const auto absolute_path {make_absolute_path(path)};
+  //   const auto sequences {analyzer::read_sequence_names(absolute_path)};
+  //   return std::vector<tracking_results> {};
+  // }
 }  // namespace analyzer

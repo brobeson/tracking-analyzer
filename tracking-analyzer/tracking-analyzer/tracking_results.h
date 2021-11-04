@@ -16,8 +16,8 @@ namespace analyzer
     std::vector<analyzer::bounding_box> bounding_boxes;
   };
 
-  [[nodiscard]] auto load_tracking_results(const QString& path)
-    -> std::vector<tracking_results>;
+  // [[nodiscard]] auto load_tracking_results(const QString& path)
+  //   -> std::vector<tracking_results>;
 }  // namespace analyzer
 
 #endif

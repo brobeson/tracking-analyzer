@@ -132,14 +132,10 @@ namespace analyzer
     -> QStringList
   {
     QStringList names;
-    for (const auto& sequence : sequences)
-    {
-      // There is no straight forward way to use std::transform here. QList does
-      // not provide a constructor that creates a list with N default
-      // constructed elements.
-      // cppcheck-suppress useStlAlgorithm
-      names.push_back(sequence.name());
-    }
+    std::transform(std::begin(sequences),
+                   std::end(sequences),
+                   std::back_insert_iterator {names},
+                   [](const analyzer::sequence& s) { return s.name(); });
     return names;
   }
 }  // namespace analyzer

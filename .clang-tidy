@@ -10,6 +10,7 @@ Checks: >
   -hicpp-uppercase-literal-suffix,
   -hicpp-use-override,
   -llvm-header-guard,
+  -llvmlibc-*,
   -modernize-pass-by-value,
   -readability-magic-numbers,
   -readability-uppercase-literal-suffix

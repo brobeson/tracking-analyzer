@@ -26,21 +26,21 @@ namespace analyzer
   [[nodiscard]] auto read_bounding_boxes(std::istream& stream)
     -> analyzer::bounding_box_list;
 
-  [[nodiscard]] auto calculate_overlap(const analyzer::bounding_box& a,
-                                       const analyzer::bounding_box& b)
-    -> analyzer::overlap;
+  // [[nodiscard]] auto calculate_overlap(const analyzer::bounding_box& a,
+  //                                      const analyzer::bounding_box& b)
+  //   -> analyzer::overlap;
 
-  [[nodiscard]] auto calculate_overlaps(const analyzer::bounding_box_list& a,
-                                        const analyzer::bounding_box_list& b)
-    -> analyzer::overlap_list;
+  // [[nodiscard]] auto calculate_overlaps(const analyzer::bounding_box_list& a,
+  //                                       const analyzer::bounding_box_list& b)
+  //   -> analyzer::overlap_list;
 
-  [[nodiscard]] auto calculate_offset(const analyzer::bounding_box& a,
-                                      const analyzer::bounding_box& b)
-    -> analyzer::offset;
+  // [[nodiscard]] auto calculate_offset(const analyzer::bounding_box& a,
+  //                                     const analyzer::bounding_box& b)
+  //   -> analyzer::offset;
 
-  [[nodiscard]] auto calculate_offsets(const analyzer::bounding_box_list& a,
-                                       const analyzer::bounding_box_list& b)
-    -> analyzer::offset_list;
+  // [[nodiscard]] auto calculate_offsets(const analyzer::bounding_box_list& a,
+  //                                      const analyzer::bounding_box_list& b)
+  //   -> analyzer::offset_list;
 }  // namespace analyzer
 
 #endif

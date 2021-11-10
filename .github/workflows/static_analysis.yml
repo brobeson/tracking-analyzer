@@ -64,7 +64,6 @@ jobs:
         ${SOURCE_DIRECTORY}
     - name: Clang Tidy
       if: always()  # Run this step, even if previous steps fail.
-      # TODO https://github.com/brobeson/tracking-analyzer/issues/10
       run: >
         clang-tidy-12
         -p ${BUILD_DIRECTORY}

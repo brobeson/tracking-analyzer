@@ -147,6 +147,11 @@ namespace analyzer
 
   auto load_training_scores(const QString& path) -> training_scores
   {
+    if (path.isEmpty())
+    {
+      throw std::invalid_argument {
+        "The path to the training score data is empty."};
+    }
     const auto absolute_path {make_absolute_path(path)};
     const auto json_data {read_json_data(absolute_path)};
     const auto score_json {json_data["data"].toObject()};

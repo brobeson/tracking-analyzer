@@ -2,7 +2,8 @@
 #include <QDebug>
 #include <QTest>
 
-Q_DECLARE_METATYPE(analyzer::dataset)  // NOLINT
+Q_DECLARE_METATYPE(analyzer::dataset)   // NOLINT
+Q_DECLARE_METATYPE(analyzer::sequence)  // NOLINT
 
 namespace analyzer
 {
@@ -28,36 +29,25 @@ namespace analyzer_test
 {
   class dataset_test final: public QObject
   {
-    Q_OBJECT  // NOLINT
+    // NOLINTNEXTLINE(modernize-use-trailing-return-type)
+    Q_OBJECT
 
-      // clang-format off
   private slots:
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    void make_absolute_path_data() const
-    // clang-format on
+    void construct_invalid_sequence_exception() const
     {
-      QTest::addColumn<QString>("path");
-      QTest::addColumn<QString>("absolute_path");
-      QTest::newRow("Linux relative path") << "Videos/"
-                                           << "Videos/";
-      QTest::newRow("Linux with tilde") << "~/Videos/"
-                                        << "/home/user/Videos/";
-      QTest::newRow("Linux absolute path") << "/home/user/Videos/"
-                                           << "/home/user/Videos/";
-      QTest::newRow("Windows relative path") << "\\Videos\\"
-                                             << "\\Videos\\";
-      QTest::newRow("Windows path") << "C:\\Users\\user\\Videos\\"
-                                    << "C:\\Users\\user\\Videos\\";
+      const analyzer::invalid_sequence e {"name", "path", "what"};
+      QCOMPARE(e.name(), QString {"name"});
+      QCOMPARE(e.path(), QString {"path"});
+      QCOMPARE(e.what(), "what");
     }
 
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    void make_absolute_path() const
+    void construct_default_dataset() const
     {
-      QFETCH(const QString, path);
-      QTEST(analyzer::make_absolute_path(path), "absolute_path");
+      const analyzer::dataset d;
+      QVERIFY(d.sequences().isEmpty());
+      QVERIFY(d.root_path().isEmpty());
     }
 
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     void load_dataset_data() const
     {
       QTest::addColumn<QString>("path");
@@ -74,14 +64,12 @@ namespace analyzer_test
                               {{"Biker", "test_dataset/Biker"}}};
     }
 
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     void load_dataset() const
     {
       QFETCH(const QString, path);
       QTEST(analyzer::load_dataset(path), "dataset");
     }
 
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     void construct_invalid_sequence_data() const
     {
       QTest::addColumn<QString>("path");
@@ -90,7 +78,6 @@ namespace analyzer_test
       QTest::newRow("path has no data") << "test_dataset/Basketball";
     }
 
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     void construct_invalid_sequence() const
     {
       QFETCH(const QString, path);
@@ -98,7 +85,15 @@ namespace analyzer_test
                                analyzer::invalid_sequence);
     }
 
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+    void construct_default_sequence() const
+    {
+      const analyzer::sequence s;
+      QVERIFY(s.name().isEmpty());
+      QVERIFY(s.frame_paths().isEmpty());
+      QVERIFY(s.path().isEmpty());
+      QVERIFY(s.target_boxes().empty());
+    }
+
     void construct_sequence() const
     {
       const analyzer::sequence biker {"Biker", "test_dataset/Biker"};
@@ -110,8 +105,30 @@ namespace analyzer_test
         current_working_directory + "/test_dataset/Biker/img/0003.jpg"};
       QCOMPARE(biker.frame_paths(), expected_paths);
     }
+
+    void sequence_names_data() const
+    {
+      using sequence_list = QVector<analyzer::sequence>;
+      QTest::addColumn<sequence_list>("sequences");
+      QTest::addColumn<QStringList>("expected_names");
+      QTest::newRow("empty list") << sequence_list {} << QStringList {};
+      QTest::newRow("one sequence")
+        << sequence_list {{"Biker", "test_dataset/Biker"}}
+        << QStringList {"Biker"};
+      QTest::newRow("two sequences")
+        << sequence_list {{"Biker", "test_dataset/Biker"},
+                          {"Dancer", "test_dataset/Biker"}}
+        << QStringList {"Biker", "Dancer"};
+    }
+
+    void sequence_names() const
+    {
+      QFETCH(const QVector<analyzer::sequence>, sequences);
+      QTEST(analyzer::sequence_names(sequences), "expected_names");
+    }
   };
 }  // namespace analyzer_test
 
-QTEST_APPLESS_MAIN(analyzer_test::dataset_test)  // NOLINT
+// NOLINTNEXTLINE(modernize-use-trailing-return-type)
+QTEST_APPLESS_MAIN(analyzer_test::dataset_test)
 #include "dataset_test.moc"

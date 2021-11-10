@@ -39,9 +39,7 @@ namespace analyzer
       QDir directory {sequence_path};
       if (!directory.cd("img"))
       {
-        throw std::invalid_argument {
-          sequence_path.toStdString()
-          + " does not contain the img subdirectory."};
+        return QStringList {};
       }
       auto frame_paths {
         directory.entryList({"*.jpg"}, QDir::Files, QDir::Name)};

@@ -2,9 +2,9 @@
 #include <QTest>
 #include <sstream>
 
-Q_DECLARE_METATYPE(std::string)
-Q_DECLARE_METATYPE(analyzer::bounding_box)
-Q_DECLARE_METATYPE(analyzer::bounding_box_list)
+Q_DECLARE_METATYPE(std::string)                  // NOLINT
+Q_DECLARE_METATYPE(analyzer::bounding_box)       // NOLINT
+Q_DECLARE_METATYPE(analyzer::bounding_box_list)  // NOLINT
 
 namespace analyzer
 {
@@ -14,7 +14,7 @@ namespace analyzer
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
 #pragma GCC diagnostic ignored "-Wfloat-equal"
-  [[nodiscard]] bool operator==(const analyzer::bounding_box& a,
+  [[nodiscard]] auto operator==(const analyzer::bounding_box& a,
                                 const analyzer::bounding_box& b)
   {
     return a.x == b.x && a.y == b.y && a.width == b.width
@@ -50,6 +50,7 @@ namespace analyzer_test
 
   class bounding_box_test final: public QObject
   {
+    // NOLINTNEXTLINE(modernize-use-trailing-return-type)
     Q_OBJECT
 
   private slots:
@@ -93,8 +94,9 @@ namespace analyzer_test
     {
       QFETCH(const std::string, data);
       std::istringstream stream {data};
-      QVERIFY_EXCEPTION_THROWN(analyzer::read_bounding_boxes(stream),
-                               analyzer::invalid_data);
+      QVERIFY_EXCEPTION_THROWN(
+        const auto unused {analyzer::read_bounding_boxes(stream)},
+        analyzer::invalid_data);
     }
 
     void calculate_overlaps_data() const { analyzer_test::create_list_data(); }
@@ -106,6 +108,16 @@ namespace analyzer_test
       QTEST(analyzer::calculate_overlaps(a, b), "overlaps");
     }
 
+    void calculate_overlaps_throw() const
+    {
+      const analyzer::bounding_box_list a {{0.0f, 0.0f, 0.0f, 0.0f},
+                                           {0.0f, 0.0f, 10.0f, 10.0f}};
+      const analyzer::bounding_box_list b {{0.0f, 0.0f, 100.0f, 100.0f}};
+      QVERIFY_EXCEPTION_THROWN(
+        const auto overlaps {analyzer::calculate_overlaps(a, b)},
+        std::invalid_argument);
+    }
+
     void calculate_offsets_data() const { analyzer_test::create_list_data(); }
 
     void calculate_offsets() const
@@ -115,35 +127,34 @@ namespace analyzer_test
       QTEST(analyzer::calculate_offsets(a, b), "offsets");
     }
 
+    void calculate_offsets_throw() const
+    {
+      const analyzer::bounding_box_list a {{0.0f, 0.0f, 0.0f, 0.0f},
+                                           {0.0f, 0.0f, 10.0f, 10.0f}};
+      const analyzer::bounding_box_list b {{0.0f, 0.0f, 100.0f, 100.0f}};
+      QVERIFY_EXCEPTION_THROWN(
+        const auto offsets {analyzer::calculate_offsets(a, b)},
+        std::invalid_argument);
+    }
+
     void calculate_overlap_data() const
     {
       QTest::addColumn<analyzer::bounding_box>("a");
       QTest::addColumn<analyzer::bounding_box>("b");
       QTest::addColumn<analyzer::offset>("expected_overlap");
-      QTest::newRow("a left of b")
-        << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {25.0f, 5.0f, 20.0f, 30.0f} << 0.0f;
-      QTest::newRow("a above b")
-        << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f} << 0.0f;
-      QTest::newRow("a right of b")
-        << analyzer::bounding_box {25.0f, 5.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f} << 0.0f;
-      QTest::newRow("a below b")
-        << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f} << 0.0f;
-      QTest::newRow("coincident boxes")
-        << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f} << 1.0f;
-      QTest::newRow("half overlap")
-        << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {13.0f, 5.0f, 10.0f, 30.0f} << 0.5f;
-      QTest::newRow("one seventh overlap")
-        << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {13.0f, 20.0f, 20.0f, 30.0f} << 1.0f / 7.0f;
-      QTest::newRow("zero overlap")
-        << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {13.0f, 20.0f, 0.0f, 0.0f} << 0.0f;
+      // clang-format off
+      // I don't know why, but coverage measuring tools skip some lines if
+      // these statements are split onto multiple lines. So I need to keep them
+      // all on one line.
+      QTest::newRow("a left of b")         << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}  << analyzer::bounding_box {25.0f, 5.0f, 20.0f, 30.0f}  << 0.0f;
+      QTest::newRow("a above b")           << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}  << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f}  << 0.0f;
+      QTest::newRow("a right of b")        << analyzer::bounding_box {25.0f, 5.0f, 20.0f, 30.0f} << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}   << 0.0f;
+      QTest::newRow("a below b")           << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f} << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}   << 0.0f;
+      QTest::newRow("coincident boxes")    << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f} << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f}  << 1.0f;
+      QTest::newRow("half overlap")        << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}  << analyzer::bounding_box {13.0f, 5.0f, 10.0f, 30.0f}  << 0.5f;
+      QTest::newRow("one seventh overlap") << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}  << analyzer::bounding_box {13.0f, 20.0f, 20.0f, 30.0f} << 1.0f / 7.0f;
+      QTest::newRow("zero overlap")        << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}  << analyzer::bounding_box {13.0f, 20.0f, 0.0f, 0.0f}   << 0.0f;
+      // clang-format on
     }
 
     void calculate_overlap() const
@@ -158,25 +169,17 @@ namespace analyzer_test
       QTest::addColumn<analyzer::bounding_box>("a");
       QTest::addColumn<analyzer::bounding_box>("b");
       QTest::addColumn<analyzer::offset>("expected_offset");
-      QTest::newRow("a left of b")
-        << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {25.0f, 5.0f, 20.0f, 30.0f} << 22.0f;
-      QTest::newRow("a above b")
-        << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f} << 30.0f;
-      QTest::newRow("a right of b")
-        << analyzer::bounding_box {25.0f, 5.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f} << 22.0f;
-      QTest::newRow("a below b")
-        << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f} << 30.0f;
-      QTest::newRow("coincident boxes")
-        << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {8.0f, 45.0f, 10.0f, 10.0f} << 0.0f;
-      QTest::newRow("one seventh overlap")
-        << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}
-        << analyzer::bounding_box {13.0f, 20.0f, 34.0f, 29.0f}
-        << 22.34390297150433f;
+      // clang-format off
+      // I don't know why, but coverage measuring tools skip some lines if
+      // these statements are split onto multiple lines. So I need to keep them
+      // all on one line.
+      QTest::newRow("a left of b")         << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}  << analyzer::bounding_box {25.0f, 5.0f, 20.0f, 30.0f}  << 22.0f;
+      QTest::newRow("a above b")           << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}  << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f}  << 30.0f;
+      QTest::newRow("a right of b")        << analyzer::bounding_box {25.0f, 5.0f, 20.0f, 30.0f} << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}   << 22.0f;
+      QTest::newRow("a below b")           << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f} << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}   << 30.0f;
+      QTest::newRow("coincident boxes")    << analyzer::bounding_box {3.0f, 35.0f, 20.0f, 30.0f} << analyzer::bounding_box {8.0f, 45.0f, 10.0f, 10.0f}  << 0.0f;
+      QTest::newRow("one seventh overlap") << analyzer::bounding_box {3.0f, 5.0f, 20.0f, 30.0f}  << analyzer::bounding_box {13.0f, 20.0f, 34.0f, 29.0f} << 22.34390297150433f;
+      // clang-format on
     }
 
     void calculate_offset() const
@@ -188,5 +191,6 @@ namespace analyzer_test
   };
 }  // namespace analyzer_test
 
+// NOLINTNEXTLINE(modernize-use-trailing-return-type)
 QTEST_APPLESS_MAIN(analyzer_test::bounding_box_test)
 #include "bounding_box_test.moc"

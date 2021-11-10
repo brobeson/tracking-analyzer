@@ -1,0 +1,51 @@
+{
+  "sequence": "Deer",
+  "dataset": "OTB-100",
+  "data": {
+    "0": [
+      {
+        "thresholds": [
+          20,
+          -103
+        ],
+        "background mined": [
+          [
+            12,
+            -11
+          ],
+          [
+            13,
+            -11
+          ],
+          [
+            13,
+            -12
+          ]
+        ]
+      }
+    ],
+    "20": [
+      {
+        "thresholds": [
+          54,
+          -109
+        ],
+        "background mined": [
+          [
+            17,
+            -15
+          ],
+          [
+            29,
+            -26
+          ],
+          [
+            42,
+            -37
+          ]
+        ]
+      }
+    ]
+  },
+  "current_update_frame": 70
+}

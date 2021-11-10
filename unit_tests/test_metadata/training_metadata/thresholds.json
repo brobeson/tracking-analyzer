@@ -1,0 +1,23 @@
+{
+  "sequence": "Deer",
+  "dataset": "OTB-100",
+  "data": {
+    "0": [
+      {
+        "thresholds": [
+          20,
+          -103
+        ]
+      }
+    ],
+    "20": [
+      {
+        "thresholds": [
+          54,
+          -109
+        ]
+      }
+    ]
+  },
+  "current_update_frame": 70
+}

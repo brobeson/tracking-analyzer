@@ -50,6 +50,11 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         -Wextra-semi
     )
   endif()
+  list(
+    APPEND compiler_options
+    "$<$<CONFIG:Debug>:--coverage>"
+    "$<$<CONFIG:Debug>:-fno-inline>"
+  )
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   set(
     compiler_options

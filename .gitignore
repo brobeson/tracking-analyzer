@@ -1,1 +1,2 @@
-CMakeLists.txt.user
+# CMake configures this clang-tidy configuration file. No need to keep track of it.
+unit_tests/.clang-tidy

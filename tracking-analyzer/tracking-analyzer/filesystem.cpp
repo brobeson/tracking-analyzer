@@ -14,6 +14,15 @@ namespace analyzer
 
   auto basename(const QString& path) -> QString
   {
-    return path.right(path.length() - path.lastIndexOf('/') - 1);
+    if (path.isEmpty())
+    {
+      return path;
+    }
+    auto base {path.right(path.length() - path.lastIndexOf('/', -2) - 1)};
+    if (*base.crbegin() == '/')
+    {
+      base.remove(base.length() - 1, 1);
+    }
+    return base;
   }
 }  // namespace analyzer

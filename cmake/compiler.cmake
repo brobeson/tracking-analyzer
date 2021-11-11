@@ -44,6 +44,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     $<$<CONFIG:Debug>:-fsanitize=float-divide-by-zero>
     $<$<CONFIG:Debug>:-fsanitize=float-cast-overflow>
     $<$<CONFIG:Debug>:-fno-sanitize-recover=all>
+    $<$<CONFIG:Debug>:-fsanitize=address>
+    $<$<CONFIG:Debug>:-fsanitize=pointer-compare>
+    $<$<CONFIG:Debug>:-fsanitize=pointer-subtract>
   )
   if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
     list(
@@ -81,6 +84,9 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     $<$<CONFIG:Debug>:-fsanitize=float-divide-by-zero>
     $<$<CONFIG:Debug>:-fsanitize=float-cast-overflow>
     $<$<CONFIG:Debug>:-fno-sanitize-recover=all>
+    $<$<CONFIG:Debug>:-fsanitize=address>
+    $<$<CONFIG:Debug>:-fsanitize=pointer-compare>
+    $<$<CONFIG:Debug>:-fsanitize=pointer-subtract>
   )
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   set(compiler_options /analyze /Wall /WX)

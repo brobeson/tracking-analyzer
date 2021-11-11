@@ -11,6 +11,7 @@ foreach(test_name IN LISTS tests)
   target_link_libraries(
     ${test_name}
     PRIVATE
+      $<$<CONFIG:Debug>:asan>
       Qt5::Test
       tracking::analyzer
       $<$<CONFIG:Debug>:gcov>

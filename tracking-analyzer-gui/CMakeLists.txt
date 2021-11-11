@@ -9,6 +9,7 @@ add_executable(
 target_link_libraries(
   ${PROJECT_NAME}
   PRIVATE
+    $<$<CONFIG:Debug>:asan>
     Qt5::Charts
     Qt5::Widgets
     tracking::analyzer

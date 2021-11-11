@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: Researchers who use this software must cite the software in all publications.
+abstract: Allows researchers to plot and interact with metadata gathered during object tracking experiments.
+authors:
+  - family-names: Robeson
+    given-names: Brendan
+    affiliation: Utah State University (USU)
+    website: https://brobeson.github.io
+commit: 95de2d0386d84ef1bb71369ea1b7b7ba0d2bdd58
+identifiers:
+  - type: url
+    value: https://github.com/brobeson/tracking-analyzer
+    description: The software repository.
+keywords:
+  - tracking
+  - metadata
+  - machine learning
+license: GPL-3.0
+references:
+  - authors:
+    - address: Bertel Jungin aukio D3A
+      city: Espoo
+      country: FI
+      name: Qt Group
+      post-code: 02600
+      website: https://www.qt.io
+    copyright: © 2021 The Qt Company Ltd.
+    license: GPL-3.0
+    title: Qt
+    type: software-code
+    url: https://www.qt.io
+    version: 5.9
+    notes: The version listed is the minimum version tested.
+repository-code: https://github.com/brobeson/tracking-analyzer
+title: tracking-analyzer
+type: software
+url: https://github.com/brobeson/tracking-analyzer
+version: 0.0.0

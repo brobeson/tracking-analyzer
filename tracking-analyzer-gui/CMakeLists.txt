@@ -13,6 +13,7 @@ target_link_libraries(
     Qt5::Widgets
     tracking::analyzer
     $<$<CONFIG:Debug>:gcov>
+    $<$<CONFIG:Debug>:ubsan>
 )
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
   target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs)

@@ -37,9 +37,13 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     -Wzero-as-null-pointer-constant
     -Wall
     -Wextra
-    "$<$<CONFIG:Debug>:-fstack-protector-strong>"
-    "$<$<CONFIG:Debug>:-Wstack-protector>"
-    "$<$<CONFIG:Debug>:-ggdb>"
+    $<$<CONFIG:Debug>:-fstack-protector-strong>
+    $<$<CONFIG:Debug>:-Wstack-protector>
+    $<$<CONFIG:Debug>:-ggdb>
+    $<$<CONFIG:Debug>:-fsanitize=undefined>
+    $<$<CONFIG:Debug>:-fsanitize=float-divide-by-zero>
+    $<$<CONFIG:Debug>:-fsanitize=float-cast-overflow>
+    $<$<CONFIG:Debug>:-fno-sanitize-recover=all>
   )
   if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
     list(
@@ -70,9 +74,13 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     -Wno-documentation-unknown-command
     -Wno-padded
     -Wno-weak-vtables
-    "$<$<CONFIG:Debug>:-fstack-protector-strong>"
-    "$<$<CONFIG:Debug>:-Wstack-protector>"
-    "$<$<CONFIG:Debug>:-ggdb>"
+    $<$<CONFIG:Debug>:-fstack-protector-strong>
+    $<$<CONFIG:Debug>:-Wstack-protector>
+    $<$<CONFIG:Debug>:-ggdb>
+    $<$<CONFIG:Debug>:-fsanitize=undefined>
+    $<$<CONFIG:Debug>:-fsanitize=float-divide-by-zero>
+    $<$<CONFIG:Debug>:-fsanitize=float-cast-overflow>
+    $<$<CONFIG:Debug>:-fno-sanitize-recover=all>
   )
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   set(compiler_options /analyze /Wall /WX)

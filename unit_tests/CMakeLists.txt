@@ -14,6 +14,7 @@ foreach(test_name IN LISTS tests)
       Qt5::Test
       tracking::analyzer
       $<$<CONFIG:Debug>:gcov>
+      $<$<CONFIG:Debug>:ubsan>
   )
   target_compile_options(${test_name} PRIVATE ${compiler_options})
   target_compile_features(${test_name} PRIVATE cxx_std_20)

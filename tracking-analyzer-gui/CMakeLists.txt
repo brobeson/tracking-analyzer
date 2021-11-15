@@ -9,17 +9,15 @@ add_executable(
 target_link_libraries(
   ${PROJECT_NAME}
   PRIVATE
-    $<$<CONFIG:Debug>:asan>
+    ${CMAKE_TOOLS_LINK_LIBRARIES}
     Qt5::Charts
     Qt5::Widgets
     tracking::analyzer
-    $<$<CONFIG:Debug>:gcov>
-    $<$<CONFIG:Debug>:ubsan>
 )
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
   target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs)
 endif()
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
-target_compile_options(${PROJECT_NAME} PRIVATE ${compiler_options})
+target_compile_options(${PROJECT_NAME} PRIVATE ${CMAKE_TOOLS_COMPILE_OPTIONS})
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 set_target_properties(${PROJECT_NAME} PROPERTIES AUTOUIC true AUTOMOC true)

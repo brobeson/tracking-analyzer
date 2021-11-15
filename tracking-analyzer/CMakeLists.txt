@@ -17,5 +17,5 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core)
-target_compile_options(${PROJECT_NAME} PRIVATE ${compiler_options})
+target_compile_options(${PROJECT_NAME} PRIVATE ${CMAKE_TOOLS_COMPILE_OPTIONS})
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)

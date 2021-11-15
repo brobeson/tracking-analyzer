@@ -11,13 +11,11 @@ foreach(test_name IN LISTS tests)
   target_link_libraries(
     ${test_name}
     PRIVATE
-      $<$<CONFIG:Debug>:asan>
+      ${CMAKE_TOOLS_LINK_LIBRARIES}
       Qt5::Test
       tracking::analyzer
-      $<$<CONFIG:Debug>:gcov>
-      $<$<CONFIG:Debug>:ubsan>
   )
-  target_compile_options(${test_name} PRIVATE ${compiler_options})
+  target_compile_options(${test_name} PRIVATE ${CMAKE_TOOLS_COMPILE_OPTIONS})
   target_compile_features(${test_name} PRIVATE cxx_std_20)
   set_target_properties(${test_name} PROPERTIES AUTOMOC on)
   add_test(NAME ${test_name} COMMAND ${test_name})

@@ -1,5 +1,14 @@
 cmake_minimum_required(VERSION 3.12)
 
+include(FetchContent)
+FetchContent_Declare(
+  cmake-tools
+  GIT_REPOSITORY https://github.com/brobeson/cmake-tools.git
+  GIT_TAG main
+)
+FetchContent_MakeAvailable(cmake-tools)
+list(APPEND CMAKE_MODULE_PATH "${cmake-tools_SOURCE_DIR}")
+
 project(
   tracking-analyzer
   DESCRIPTION "A tool for real-time analysis of visual tracking results."
@@ -8,7 +17,10 @@ project(
 )
 
 find_package(Qt5 5.9 REQUIRED COMPONENTS Charts Core Gui Widgets)
-include(cmake/compiler.cmake)
+set(CMAKE_TOOLS_UB_SANITIZER on)
+set(CMAKE_TOOLS_ADDRESS_SANITIZER on)
+set(CMAKE_TOOLS_COVERAGE on)
+include(CMakeToolsCompileOptions)
 add_subdirectory(tracking-analyzer)
 add_subdirectory(tracking-analyzer-gui)
 

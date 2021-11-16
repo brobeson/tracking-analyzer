@@ -21,26 +21,40 @@ foreach(test_name IN LISTS tests)
   add_test(NAME ${test_name} COMMAND ${test_name})
 endforeach()
 set_tests_properties(filesystem_test PROPERTIES ENVIRONMENT "HOME=/home/user")
-execute_process(
+
+function(setup_test_data)
+  cmake_parse_arguments(analyzer "" "" COMMAND ${ARGN})
+  if(NOT analyzer_COMMAND)
+    message(FATAL_ERROR "setup_test_data() requires a command to execute.")
+  endif()
+  execute_process(
+    COMMAND ${analyzer_COMMAND}
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    OUTPUT_VARIABLE command_output
+    ERROR_VARIABLE command_output
+    RESULT_VARIABLE command_result
+  )
+  if(NOT command_result EQUAL 0)
+    message(FATAL_ERROR ${command_output})
+  endif()
+endfunction()
+setup_test_data(
   COMMAND ${CMAKE_COMMAND} -E make_directory
     "test_dataset/Basketball"
     "test_dataset/Biker/img"
     "test_dataset/Bird1"
     "test_dataset/Bird2"
+)
+setup_test_data(
   COMMAND ${CMAKE_COMMAND} -E touch
     "test_dataset/Biker/img/0001.jpg"
     "test_dataset/Biker/img/0002.jpg"
     "test_dataset/Biker/img/0003.jpg"
-  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-  COMMAND_ERROR_IS_FATAL ANY
 )
-
-execute_process(
-  COMMAND
-    ${CMAKE_COMMAND} -E copy_directory
+setup_test_data(
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_CURRENT_SOURCE_DIR}/test_metadata" 
     "${PROJECT_BINARY_DIR}/test_metadata"
-  COMMAND_ERROR_IS_FATAL ANY
 )
 
 # There are some clang-tidy checks that I want to disable in the unit test code,

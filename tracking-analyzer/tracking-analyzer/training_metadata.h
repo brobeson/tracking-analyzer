@@ -9,6 +9,11 @@ namespace analyzer
 {
   using score_list = QList<QPointF>;
 
+  struct parse_error: std::runtime_error
+  {
+    explicit parse_error(const std::string& what): std::runtime_error {what} {}
+  };
+
   struct training_batch
   {
     score_list background_candidates;

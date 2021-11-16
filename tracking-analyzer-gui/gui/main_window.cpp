@@ -8,6 +8,7 @@
 #include <QValueAxis>
 #include <algorithm>
 #include <filesystem>
+#include <gsl/gsl_util>
 
 namespace analyzer::gui
 {
@@ -435,29 +436,25 @@ namespace analyzer::gui
 
   void main_window::change_frame(const int frame_index) const
   {
-    if (frame_index < 0)
-    {
-      return;
-    }
+    const auto vector_index {
+      gsl::narrow<analyzer::bounding_box_list::size_type>(frame_index)};
     analyzer::gui::set_current_frame(*ui, frame_index);
     analyzer::gui::load_and_display_frame(
       m_dataset.sequences()[m_sequence_index].frame_paths()[frame_index],
       *(ui->frame_display),
-      m_dataset.sequences()[m_sequence_index]
-        .target_boxes()[static_cast<analyzer::bounding_box_list::size_type>(
-          frame_index)]);
+      m_dataset.sequences()[m_sequence_index].target_boxes().at(vector_index));
   }
 
   void main_window::change_update(const int update_number)
   {
     const auto update_index {
-      static_cast<update_list::size_type>(update_number - 1)};
+      gsl::narrow<update_list::size_type>(update_number - 1)};
     const auto frame {m_training_data.update_frames.at(update_index)};
     change_frame(frame);
     m_current_training.current_update = update_index;
     reset_spinbox(
       *ui->batch_spinbox,
-      static_cast<int>(m_training_data.updates[update_index].size()));
+      gsl::narrow<int>(m_training_data.updates[update_index].size()));
     change_training_batch(1);
   }
 
@@ -471,7 +468,7 @@ namespace analyzer::gui
     m_training_data = analyzer::load_training_scores(filepath);
     ui->sequence_combobox->setCurrentText(m_training_data.sequence_name);
     reset_spinbox(*ui->update_spinbox,
-                  static_cast<int>(m_training_data.update_frames.size()));
+                  gsl::narrow_cast<int>(m_training_data.update_frames.size()));
     change_update(1);
     ui->point_size_spinbox->setEnabled(true);
     ui->save_graph_button->setEnabled(true);
@@ -530,7 +527,7 @@ namespace analyzer::gui
   void main_window::change_training_batch(const int batch_number)
   {
     m_current_training.current_batch
-      = static_cast<training_update::size_type>(batch_number - 1);
+      = gsl::narrow<training_update::size_type>(batch_number - 1);
     set_training_score_data(
       m_training_data.updates.at(m_current_training.current_update)
         .at(m_current_training.current_batch));

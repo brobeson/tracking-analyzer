@@ -10,6 +10,7 @@ target_link_libraries(
   ${PROJECT_NAME}
   PRIVATE
     ${CMAKE_TOOLS_LINK_LIBRARIES}
+    GSL
     Qt5::Charts
     Qt5::Widgets
     tracking::analyzer

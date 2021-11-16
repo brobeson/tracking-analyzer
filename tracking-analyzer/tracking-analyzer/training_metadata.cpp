@@ -5,6 +5,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <algorithm>
+#include <gsl/gsl_util>
 
 namespace analyzer
 {
@@ -94,16 +95,25 @@ namespace analyzer
       fill_training_scores(json["target candidates"].toArray(),
                            batch.target_candidates);
       batch.background_threshold
-        = static_cast<float>(json["thresholds"].toArray()[0].toDouble());
+        = gsl::narrow_cast<float>(json["thresholds"].toArray()[0].toDouble());
       batch.target_threshold
-        = static_cast<float>(json["thresholds"].toArray()[1].toDouble());
+        = gsl::narrow_cast<float>(json["thresholds"].toArray()[1].toDouble());
       return batch;
     }
 
     auto parse_training_update(const QJsonArray& json)
     {
       training_update update;
-      update.reserve(static_cast<training_update::size_type>(json.size()));
+      try
+      {
+        update.reserve(gsl::narrow<training_update::size_type>(json.size()));
+      }
+      catch (const gsl::narrowing_error&)
+      {
+        throw analyzer::parse_error {
+          "Cannot reserve " + std::to_string(json.size())
+          + " training batches in analyzer::parse_training_update()."};
+      }
       std::transform(std::begin(json),
                      std::end(json),
                      std::back_insert_iterator {update},
@@ -116,7 +126,16 @@ namespace analyzer
     auto parse_all_training_updates(const QJsonObject& json)
     {
       update_list updates;
-      updates.reserve(static_cast<update_list::size_type>(json.size()));
+      try
+      {
+        updates.reserve(gsl::narrow<update_list::size_type>(json.size()));
+      }
+      catch (const gsl::narrowing_error&)
+      {
+        throw analyzer::parse_error {
+          "Cannot reserve " + std::to_string(json.size())
+          + " training updates in analyzer::parse_training_updates()."};
+      }
       std::transform(std::begin(json),
                      std::end(json),
                      std::back_insert_iterator {updates},

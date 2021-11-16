@@ -6,7 +6,12 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/brobeson/cmake-tools.git
   GIT_TAG main
 )
-FetchContent_MakeAvailable(cmake-tools)
+FetchContent_Declare(
+  gsl
+  GIT_REPOSITORY https://github.com/microsoft/GSL
+  GIT_TAG v3.1.0
+)
+FetchContent_MakeAvailable(cmake-tools gsl)
 list(APPEND CMAKE_MODULE_PATH "${cmake-tools_SOURCE_DIR}")
 
 project(

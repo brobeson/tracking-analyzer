@@ -17,16 +17,29 @@ keywords:
   - machine learning
 license: GPL-3.0
 references:
-  - authors:
-    - address: Bertel Jungin aukio D3A
-      city: Espoo
-      country: FI
-      name: Qt Group
-      post-code: 02600
-      website: https://www.qt.io
-    copyright: © 2021 The Qt Company Ltd.
+  - title: Guideline Support Library
+    authors:
+      - address: One Microsoft Way
+        city: Redmond
+        post-code: 98052-7329
+        country: US
+        name: Microsoft Corporation
+        website: https://www.microsoft.com
+    commit: 0f6dbc9e2915ef5c16830f3fa3565738de2a9230
+    copyright: 2015 Microsoft Corporation
+    license: MIT
+    repository-code: https://github.com/microsoft/GSL
+    version: 3.1.0
+  - title: Qt
+    authors:
+      - address: Bertel Jungin aukio D3A
+        city: Espoo
+        country: FI
+        name: Qt Group
+        post-code: 02600
+        website: https://www.qt.io
+    copyright: 2021 The Qt Company Ltd.
     license: GPL-3.0
-    title: Qt
     type: software-code
     url: https://www.qt.io
     version: 5.9

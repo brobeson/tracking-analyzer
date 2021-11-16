@@ -72,4 +72,6 @@ jobs:
         ${SOURCE_DIRECTORY}/tracking-analyzer*/**/*.cpp
     - name: Check Markdown
       if: always()  # Run this step, even if previous steps fail.
-      uses: articulate/actions-markdownlint@v1
+      uses: articulate/actions-markdownlint@v1.1.0
+      with:
+        files: ${{env.SOURCE_DIRECTORY}}/**/*.md

@@ -2,7 +2,7 @@
 
 A tool for real-time analysis of visual tracking results.
 
-[![Release Build and Test](https://github.com/brobeson/tracking-analyzer/actions/workflows/build.yml/badge.svg)](https://github.com/brobeson/tracking-analyzer/actions/workflows/build.yml)
+[![Code Quality](https://github.com/brobeson/tracking-analyzer/actions/workflows/code_quality.yml/badge.svg)](https://github.com/brobeson/tracking-analyzer/actions/workflows/code_quality.yml)
 [![Coverage Status](https://coveralls.io/repos/github/brobeson/tracking-analyzer/badge.svg)](https://coveralls.io/github/brobeson/tracking-analyzer)
 
 ## Copyright

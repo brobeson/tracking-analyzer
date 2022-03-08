@@ -1,0 +1,125 @@
+name: Code Quality
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+    branches: [ main ]
+
+env:
+  SOURCE_DIRECTORY: source
+  BUILD_DIRECTORY: build
+
+jobs:
+  build:
+    name: Build and Test
+    strategy:
+      matrix:
+        build_type: ["Debug", "Release"]
+        qt_version: ["5.14.2", "5.15.2"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: ${{env.SOURCE_DIRECTORY}}
+      - name: Install Qt5
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: ${{matrix.qt_version}}
+          modules: qtcharts
+          setup-python: false
+      - name: Generate a Build System
+        run: >
+          cmake
+          -S ${SOURCE_DIRECTORY}
+          -B ${BUILD_DIRECTORY}
+          -D CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=on
+          -D CMAKE_BUILD_TYPE:STRING=${{matrix.build_type}}
+      - name: Build the Software
+        run: cmake --build ${BUILD_DIRECTORY} --parallel $(nproc)
+      - name: Initialize Coverage Data
+        if: ${{matrix.build_type == 'Debug'}}
+        run: |
+          sudo apt install lcov
+          lcov --capture --initial --directory ${BUILD_DIRECTORY} --output-file ../baseline.info
+      - name: Run Unit Tests
+        working-directory: ${{env.BUILD_DIRECTORY}}
+        run: ctest --build-config ${{matrix.build_type}} --output-on-failure
+      - name: Generate Coverage Data
+        if: ${{matrix.build_type == 'Debug'}}
+        run: |
+          lcov --capture --directory ${BUILD_DIRECTORY} --base-directory . --output-file ../coverage.info
+          lcov --add-tracefile ../baseline.info --add-tracefile ../coverage.info --output-file ../combined.info
+          lcov --remove ../combined.info '*Qt*' '*usr*' '*build*' --output-file ../final.info
+      - name: Send Coverage Data to Coveralls
+        if: ${{matrix.build_type == 'Debug'}}
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          path-to-lcov: ../final.info
+  static_analysis:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: ${{env.SOURCE_DIRECTORY}}
+      # These analyses don't require a build system, so run them first.
+      - name: Clang Format
+        uses: jidicula/clang-format-action@v4.6.1
+        with:
+          clang-format-version: 10
+          check-path: ${{env.SOURCE_DIRECTORY}}
+      - name: Lizard Complexity Analysis
+        run: |
+          pip install lizard
+          lizard \
+            --CCN 10 \
+            --length 40 \
+            --arguments 6 \
+            --warnings_only \
+            --working_threads $(nproc) \
+            --modified \
+            ${SOURCE_DIRECTORY}
+      - name: Markdown Lint
+        uses: articulate/actions-markdownlint@v1.1.0
+        with:
+          files: ${{env.SOURCE_DIRECTORY}}/**/*.md
+      # The remaining analyses require the build system and Qt-generated files.
+      # Run CMake and build, then run the analysis tools.
+      - name: Install Qt5
+        uses: jurplel/install-qt-action@v2
+        with:
+          modules: qtcharts
+          setup-python: false
+      - name: Generate a Build System
+        run: >
+          cmake
+          -S ${SOURCE_DIRECTORY}
+          -B ${BUILD_DIRECTORY}
+          -D CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=on
+          -D CMAKE_BUILD_TYPE:STRING=Debug
+      - name: Build the Software
+        run: cmake --build ${BUILD_DIRECTORY} --parallel $(nproc)
+      - name: Cppcheck
+        # TODO https://github.com/brobeson/tracking-analyzer/issues/11
+        run: |
+          sudo apt install cppcheck
+          cppcheck \
+            --enable=all \
+            --error-exitcode=2 \
+            --project=${BUILD_DIRECTORY}/compile_commands.json \
+            --quiet \
+            --suppress=unusedFunction \
+            --suppress=unmatchedSuppression \
+            --suppress=missingIncludeSystem \
+            -DQ_MOC_OUTPUT_REVISION=67 \
+            ${SOURCE_DIRECTORY}
+      - name: Clang Tidy
+        run: |
+          sudo apt install clang-tidy-12
+          clang-tidy-12 \
+            -p ${BUILD_DIRECTORY} \
+            --quiet \
+            --extra-arg=-Wno-unknown-warning-option \
+            ${SOURCE_DIRECTORY}/tracking-analyzer*/**/*.cpp

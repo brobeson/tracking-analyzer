@@ -6,6 +6,7 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/brobeson/cmake-tools.git
   GIT_TAG main
 )
+set(GSL_CXX_STANDARD 17)
 FetchContent_Declare(
   gsl
   GIT_REPOSITORY https://github.com/microsoft/GSL

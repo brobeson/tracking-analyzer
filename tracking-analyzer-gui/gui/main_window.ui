@@ -108,6 +108,16 @@
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="info_label">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QToolButton" name="load_dataset_button">
         <property name="toolTip">
          <string>Load a tracking dataset.</string>

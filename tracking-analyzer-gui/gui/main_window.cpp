@@ -124,6 +124,14 @@ namespace analyzer::gui
         tag_label->setVisible(shouldShow);
       }
     }
+
+    auto create_dataset_info()
+    {
+      const auto ds {application::dataset()};
+      return QString {"OTB-100\n" + ds.root_path() + "\n"
+                      + QString::number(ds.sequences().length())
+                      + " sequences"};
+    }
   }  // namespace
 
   main_window::main_window(QWidget* parent):
@@ -142,6 +150,10 @@ namespace analyzer::gui
     // frame slider and line edit enabled properties.
     ui->frame_spinbox->setEnabled(false);
     ui->frame_slider->setEnabled(false);
+
+    constexpr QSize icon_size(16, 16);
+    ui->info_label->setPixmap(
+      QIcon::fromTheme("dialog-information").pixmap(icon_size));
   }
 
   main_window::~main_window() { delete ui; }
@@ -204,6 +216,8 @@ namespace analyzer::gui
           + " sequences from " + dataset_path,
         status_bar_message_timeout.count());
       m_tag_labels = create_tag_labels(this, *ui->tag_layout);
+      ui->info_label->setEnabled(true);
+      ui->info_label->setToolTip(create_dataset_info());
     }
   }
 }  // namespace analyzer::gui

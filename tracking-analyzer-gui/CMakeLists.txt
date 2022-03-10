@@ -1,6 +1,8 @@
 project(tracking-analyzer-gui LANGUAGES CXX)
 add_executable(
   ${PROJECT_NAME}
+  application.cpp
+  application.h
   gui/main_window.cpp
   gui/main_window.h
   gui/main_window.ui

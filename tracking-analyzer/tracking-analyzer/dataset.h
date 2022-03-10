@@ -4,6 +4,7 @@
 #include "tracking-analyzer/bounding_box.h"
 #include <QStringList>
 #include <QVector>
+#include <gsl/gsl_util>
 #include <stdexcept>
 
 namespace analyzer
@@ -22,15 +23,23 @@ namespace analyzer
     QString m_path;
   };
 
+  struct frame final
+  {
+    std::string image_path;
+    analyzer::bounding_box ground_truth_bounding_box;
+  };
+
   class sequence final
   {
   public:
+    using size_type = analyzer::bounding_box_list::size_type;
     sequence() = default;
     sequence(const QString& name, const QString& path);
     [[nodiscard]] auto name() const -> QString;
     [[nodiscard]] auto frame_paths() const -> QStringList;
     [[nodiscard]] auto path() const -> QString;
     [[nodiscard]] auto target_boxes() const -> analyzer::bounding_box_list;
+    [[nodiscard]] auto operator[](gsl::index index) const -> analyzer::frame;
 
   private:
     QString m_name;
@@ -48,6 +57,8 @@ namespace analyzer
     [[nodiscard]] auto root_path() const noexcept -> const QString&;
     [[nodiscard]] auto sequences() const noexcept
       -> const QVector<analyzer::sequence>&;
+    [[nodiscard]] auto operator[](gsl::index index) const
+      -> const analyzer::sequence&;
 
   private:
     QString m_root_directory;

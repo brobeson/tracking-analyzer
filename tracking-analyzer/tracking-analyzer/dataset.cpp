@@ -3,6 +3,7 @@
 #include <QDir>
 #include <filesystem>
 #include <fstream>
+#include <gsl/gsl_assert>
 
 namespace analyzer
 {
@@ -103,6 +104,15 @@ namespace analyzer
     return m_target_boxes;
   }
 
+  auto sequence::operator[](gsl::index index) const -> analyzer::frame
+  {
+    Expects(index >= 0
+            && index < gsl::narrow_cast<gsl::index>(m_target_boxes.size()));
+    return analyzer::frame {
+      m_frame_paths[gsl::narrow_cast<int>(index)].toStdString(),
+      m_target_boxes[gsl::narrow_cast<sequence::size_type>(index)]};
+  }
+
   dataset::dataset(const QString& root_path,
                    const QVector<sequence>& sequences):
     m_root_directory {root_path}, m_sequences {sequences}
@@ -117,6 +127,13 @@ namespace analyzer
   auto dataset::root_path() const noexcept -> const QString&
   {
     return m_root_directory;
+  }
+
+  auto dataset::operator[](const gsl::index index) const
+    -> const analyzer::sequence&
+  {
+    Expects(index >= 0 && index < m_sequences.length());
+    return m_sequences[gsl::narrow_cast<int>(index)];
   }
 
   auto load_dataset(const QString& path) -> analyzer::dataset

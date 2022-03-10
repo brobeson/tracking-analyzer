@@ -39,6 +39,7 @@ namespace analyzer
     [[nodiscard]] auto frame_paths() const -> QStringList;
     [[nodiscard]] auto path() const -> QString;
     [[nodiscard]] auto target_boxes() const -> analyzer::bounding_box_list;
+    [[nodiscard]] auto tags() const -> QStringList;
     [[nodiscard]] auto operator[](gsl::index index) const -> analyzer::frame;
 
   private:
@@ -46,6 +47,7 @@ namespace analyzer
     QString m_root_path;
     QStringList m_frame_paths;
     analyzer::bounding_box_list m_target_boxes;
+    QStringList m_tags;
   };
 
   class dataset final
@@ -59,6 +61,7 @@ namespace analyzer
       -> const QVector<analyzer::sequence>&;
     [[nodiscard]] auto operator[](gsl::index index) const
       -> const analyzer::sequence&;
+    [[nodiscard]] static auto all_tags() -> QStringList;
 
   private:
     QString m_root_directory;

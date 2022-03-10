@@ -4,6 +4,7 @@
 #include <QComboBox>
 #include <QDir>
 #include <QFileDialog>
+#include <QLabel>
 #include <QPainter>
 
 namespace analyzer::gui
@@ -16,26 +17,6 @@ namespace analyzer::gui
       combobox.clear();
       combobox.addItems(new_entries);
       combobox.setCurrentIndex(-1);  // Ensure no item is selected.
-    }
-
-    void load_dataset(const QString& dataset_path, Ui::main_window& main_window)
-    {
-      // BUG Why am I loading the dataset twice?
-      const auto new_dataset {analyzer::load_dataset(dataset_path)};
-      if (!new_dataset.root_path().isEmpty())
-      {
-        application::load_dataset(dataset_path);
-        main_window.sequence_combobox->setEnabled(true);
-        reinitialize_combobox(
-          *main_window.sequence_combobox,
-          analyzer::sequence_names(
-            application::instance()->dataset().sequences()));
-        constexpr std::chrono::milliseconds status_bar_message_timeout {5000};
-        main_window.statusbar->showMessage(
-          "Loaded " + QString::number(application::dataset().sequences().size())
-            + " sequences from " + dataset_path,
-          status_bar_message_timeout.count());
-      }
     }
 
     void clear_display(const Ui::main_window& display)
@@ -92,6 +73,57 @@ namespace analyzer::gui
         main_window.frame_display->setPixmap(QPixmap::fromImage(frame_image));
       }
     }
+
+    auto create_tag_label_stylesheet(const int font_lightness)
+    {
+      constexpr int mid_lightness {128};
+      return QString {"QLabel{border-radius: 10px; background-color: "}
+             + (font_lightness < mid_lightness
+                  ? QString {"rgb(200, 200, 200)}"}
+                  : QString {"rgb(100, 100, 100)}"});
+    }
+
+    auto create_tag_label(main_window* parent,
+                          const QString& tag,
+                          QHBoxLayout& tag_layout)
+    {
+      auto* const label {new QLabel {tag, parent}};
+      label->setFrameShape(QFrame::Panel);
+      label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+      label->setVisible(false);
+      label->setMargin(4);
+      label->setStyleSheet(create_tag_label_stylesheet(
+        label->palette().color(QPalette::WindowText).lightness()));
+      tag_layout.addWidget(label);
+      return label;
+    }
+
+    auto create_tag_labels(main_window* parent, QHBoxLayout& tag_layout)
+    {
+      std::vector<QLabel*> tag_labels;
+      const auto tags {analyzer::dataset::all_tags()};
+      std::transform(std::begin(tags),
+                     std::end(tags),
+                     std::back_inserter(tag_labels),
+                     [parent, &tag_layout](const QString& tag) {
+                       return create_tag_label(parent, tag, tag_layout);
+                     });
+      return tag_labels;
+    }
+
+    void reset_tags(const std::vector<QLabel*>& tag_labels,
+                    const QStringList& sequence_tags)
+    {
+      for (const auto& tag_label : tag_labels)
+      {
+        const auto shouldShow {std::any_of(std::begin(sequence_tags),
+                                           std::end(sequence_tags),
+                                           [tag_label](const QString& tag) {
+                                             return tag == tag_label->text();
+                                           })};
+        tag_label->setVisible(shouldShow);
+      }
+    }
   }  // namespace
 
   main_window::main_window(QWidget* parent):
@@ -101,10 +133,9 @@ namespace analyzer::gui
     setWindowTitle("");
     if (application::settings().contains(settings_keys::last_loaded_dataset))
     {
-      analyzer::gui::load_dataset(application::settings()
-                                    .value(settings_keys::last_loaded_dataset)
-                                    .toString(),
-                                  *ui);
+      load_dataset(application::settings()
+                     .value(settings_keys::last_loaded_dataset)
+                     .toString());
     }
 
     // change_sequence() is called by Qt during initialization. Reset the
@@ -126,7 +157,7 @@ namespace analyzer::gui
     if (!dataset_path.isEmpty())
     {
       setCursor(Qt::WaitCursor);
-      analyzer::gui::load_dataset(dataset_path, *ui);
+      load_dataset(dataset_path);
       setCursor(Qt::ArrowCursor);
     }
   }
@@ -136,6 +167,7 @@ namespace analyzer::gui
     analyzer::gui::clear_display(*ui);
     if (index >= 0)
     {
+      reset_tags(m_tag_labels, application::dataset()[index].tags());
       analyzer::gui::synchronize_frame_controls(*ui, 0);
       draw_current_frame(*ui, m_box_colors);
       const auto maximum_frame {
@@ -153,5 +185,25 @@ namespace analyzer::gui
   {
     analyzer::gui::synchronize_frame_controls(*ui, frame_index);
     draw_current_frame(*ui, m_box_colors);
+  }
+
+  void main_window::load_dataset(const QString& dataset_path)
+  {
+    // BUG Why am I loading the dataset twice?
+    const auto new_dataset {analyzer::load_dataset(dataset_path)};
+    if (!new_dataset.root_path().isEmpty())
+    {
+      application::load_dataset(dataset_path);
+      ui->sequence_combobox->setEnabled(true);
+      reinitialize_combobox(*ui->sequence_combobox,
+                            analyzer::sequence_names(
+                              application::instance()->dataset().sequences()));
+      constexpr std::chrono::milliseconds status_bar_message_timeout {5000};
+      ui->statusbar->showMessage(
+        "Loaded " + QString::number(application::dataset().sequences().size())
+          + " sequences from " + dataset_path,
+        status_bar_message_timeout.count());
+      m_tag_labels = create_tag_labels(this, *ui->tag_layout);
+    }
   }
 }  // namespace analyzer::gui

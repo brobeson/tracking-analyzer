@@ -56,6 +56,80 @@ namespace analyzer
       std::ifstream s {path + "/groundtruth_rect.txt"};
       return analyzer::read_bounding_boxes(s);
     }
+
+    auto abbreviation_to_tag(const std::string& abbreviation)
+    {
+      // #lizard forgives
+      // The other option is to use something like a map for a look up table.
+      // This seems the easier choice.
+      if (abbreviation == "IV")
+      {
+        return "illumination variation";
+      }
+      if (abbreviation == "SV")
+      {
+        return "scale variation";
+      }
+      if (abbreviation == "OCC")
+      {
+        return "occlusion";
+      }
+      if (abbreviation == "DEF")
+      {
+        return "deformation";
+      }
+      if (abbreviation == "MB")
+      {
+        return "motion blur";
+      }
+      if (abbreviation == "FM")
+      {
+        return "fast motion";
+      }
+      if (abbreviation == "IPR")
+      {
+        return "in-plane rotation";
+      }
+      if (abbreviation == "OPR")
+      {
+        return "out-of-plane rotation";
+      }
+      if (abbreviation == "OV")
+      {
+        return "out-of-view";
+      }
+      if (abbreviation == "BC")
+      {
+        return "background clutters";
+      }
+      if (abbreviation == "LR")
+      {
+        return "low resolution";
+      }
+      return "";
+    }
+
+    auto read_sequence_tags(const std::string& sequence_path)
+    {
+      std::ifstream s {sequence_path + "/attrs.txt"};
+      std::string abbreviation;
+      QStringList tags;
+      while (s)
+      {
+        s >> abbreviation;
+        if (abbreviation.back() == ',')
+        {
+          abbreviation.pop_back();
+        }
+        const QString tag {abbreviation_to_tag(abbreviation)};
+        if (!tag.isEmpty())
+        {
+          tags << tag;
+        }
+      }
+      tags.sort();
+      return tags;
+    }
   }  // namespace
 
   invalid_sequence::invalid_sequence(const QString& name,
@@ -72,7 +146,8 @@ namespace analyzer
     m_name {name},
     m_root_path {path},
     m_frame_paths {analyzer::make_sequence_frame_paths(path)},
-    m_target_boxes {analyzer::read_ground_truth_boxes(path.toStdString())}
+    m_target_boxes {analyzer::read_ground_truth_boxes(path.toStdString())},
+    m_tags {analyzer::read_sequence_tags(path.toStdString())}
   {
     if (m_root_path.isEmpty())
     {
@@ -103,6 +178,7 @@ namespace analyzer
   {
     return m_target_boxes;
   }
+  auto sequence::tags() const -> QStringList { return m_tags; }
 
   auto sequence::operator[](gsl::index index) const -> analyzer::frame
   {
@@ -127,6 +203,23 @@ namespace analyzer
   auto dataset::root_path() const noexcept -> const QString&
   {
     return m_root_directory;
+  }
+
+  auto dataset::all_tags() -> QStringList
+  {
+    return {"illumination variation",
+            "scale variation",
+            "occlusion",
+            "deformation",
+            "motion blur",
+            "fast motion",
+            "in-plane rotation",
+            "out-of-plane rotation",
+            "out-of-view",
+            "background clutters",
+            "low resolution"
+
+    };
   }
 
   auto dataset::operator[](const gsl::index index) const

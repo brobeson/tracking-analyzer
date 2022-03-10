@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <array>
+#include <vector>
+
+class QLabel;
 
 namespace analyzer::gui
 {
@@ -32,6 +35,8 @@ namespace analyzer::gui
   private:
     Ui::main_window* ui;
     std::array<QColor, 3> m_box_colors {Qt::red, Qt::green, Qt::blue};
+    std::vector<QLabel*> m_tag_labels;
+    void load_dataset(const QString& dataset_path);
   };
 }  // namespace analyzer::gui
 

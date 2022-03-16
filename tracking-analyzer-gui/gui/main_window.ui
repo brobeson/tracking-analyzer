@@ -14,8 +14,8 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="0">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
      <layout class="QVBoxLayout" name="verticalLayout_1">
       <item>
        <layout class="QHBoxLayout" name="tag_layout">
@@ -24,6 +24,23 @@
         </property>
         <item>
          <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="tracker_name_layout">
+        <item>
+         <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -79,142 +96,123 @@
       </item>
      </layout>
     </item>
-    <item row="0" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QComboBox" name="sequence_combobox">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Select the sequence to display.</string>
-        </property>
-        <property name="sizeAdjustPolicy">
-         <enum>QComboBox::AdjustToContents</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="info_label">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="load_dataset_button">
-        <property name="toolTip">
-         <string>Load a tracking dataset.</string>
-        </property>
-        <property name="text">
-         <string>Dataset</string>
-        </property>
-        <property name="icon">
-         <iconset theme="folder-open">
-          <normaloff>.</normaloff>.</iconset>
-        </property>
-        <property name="shortcut">
-         <string>Ctrl+Shift+O</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="bg_candidates_action">
-   <property name="checkable">
-    <bool>true</bool>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QToolBar{spacing: 3px;}</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_quit"/>
+   <addaction name="separator"/>
+   <addaction name="action_open"/>
+  </widget>
+  <action name="action_open_dataset">
+   <property name="icon">
+    <iconset theme="emblem-photos">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Background Candidates</string>
+    <string>Open Dataset</string>
    </property>
    <property name="toolTip">
-    <string>Draw background candidate data in the graph.</string>
+    <string>Open a Tracking Benchmark Dataset</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+O</string>
    </property>
   </action>
-  <action name="bg_mined_action">
-   <property name="checkable">
-    <bool>true</bool>
+  <action name="action_open_tracking_results">
+   <property name="icon">
+    <iconset theme="folder-open">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Background Mined</string>
+    <string>Open Tracking Results</string>
    </property>
-   <property name="toolTip">
-    <string>Draw mined background data in the graph.</string>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="tg_candidates_action">
-   <property name="checkable">
-    <bool>true</bool>
+  <action name="action_open">
+   <property name="icon">
+    <iconset theme="document-open">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Target Candidates</string>
+    <string>Open</string>
    </property>
    <property name="toolTip">
-    <string>Draw target candidate data in the graph.</string>
+    <string>Open tracking data</string>
    </property>
   </action>
-  <action name="thresholds_action">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
+  <action name="action_tracker_selection">
    <property name="text">
-    <string>Thresholds</string>
+    <string>Trackers</string>
    </property>
    <property name="toolTip">
-    <string>Draw the threshold lines in the graph.</string>
+    <string>Select trackers to display.</string>
+   </property>
+  </action>
+  <action name="action_quit">
+   <property name="icon">
+    <iconset theme="application-exit">
+     <normaloff>.</normaloff>.</iconset>
+   </property>
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="toolTip">
+    <string>Exit the application</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
  </widget>
  <resources/>
  <connections>
   <connection>
-   <sender>sequence_combobox</sender>
-   <signal>currentIndexChanged(int)</signal>
+   <sender>action_open_dataset</sender>
+   <signal>triggered()</signal>
    <receiver>analyzer::gui::main_window</receiver>
-   <slot>change_sequence(int)</slot>
+   <slot>open_dataset()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>974</x>
-     <y>22</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>974</x>
-     <y>527</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>load_dataset_button</sender>
-   <signal>clicked()</signal>
-   <receiver>analyzer::gui::main_window</receiver>
-   <slot>load_dataset()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1030</x>
-     <y>27</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>1031</x>
      <y>582</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>action_open_tracking_results</sender>
+   <signal>triggered()</signal>
+   <receiver>analyzer::gui::main_window</receiver>
+   <slot>open_tracking_results()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
     </hint>
    </hints>
   </connection>
@@ -250,83 +248,11 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>bg_candidates_action</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>analyzer::gui::main_window</receiver>
-   <slot>toggle_bg_candidate_plot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>bg_mined_action</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>analyzer::gui::main_window</receiver>
-   <slot>toggle_bg_mined_plot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tg_candidates_action</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>analyzer::gui::main_window</receiver>
-   <slot>toggle_tg_candidate_plot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>thresholds_action</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>analyzer::gui::main_window</receiver>
-   <slot>toggle_thresholds_plot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
  <slots>
-  <slot>load_tracking_data()</slot>
-  <slot>save_graph()</slot>
-  <slot>change_update(int)</slot>
-  <slot>change_training_batch(int)</slot>
+  <slot>open_tracking_results()</slot>
   <slot>change_sequence(int)</slot>
-  <slot>load_dataset()</slot>
+  <slot>open_dataset()</slot>
   <slot>change_frame(int)</slot>
-  <slot>change_point_size(int)</slot>
-  <slot>toggle_bg_candidate_plot(bool)</slot>
-  <slot>toggle_bg_mined_plot(bool)</slot>
-  <slot>toggle_tg_candidate_plot(bool)</slot>
-  <slot>toggle_thresholds_plot(bool)</slot>
  </slots>
 </ui>

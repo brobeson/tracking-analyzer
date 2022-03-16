@@ -50,4 +50,37 @@ namespace analyzer::gui
     return application::dataset()[sequence_index][frame_index]
       .ground_truth_bounding_box;
   }
+
+  auto application::dataset_loaded() -> bool
+  {
+    return !dataset().sequences().isEmpty();
+  }
+
+  auto application::tracking_results() -> analyzer::results_database&
+  {
+    return instance()->m_tracking_results;
+  }
+
+  void application::load_tracking_results(const QString& results_path)
+  {
+    const auto app {application::instance()};
+    app->tracking_results()
+      = analyzer::load_tracking_results_directory(results_path);
+    app->settings().setValue(settings_keys::last_loaded_results_directory,
+                             results_path);
+  }
+
+  auto
+  application::tracking_result_bounding_box(const std::string& tracker_name,
+                                            const std::string& sequence_name,
+                                            const gsl::index frame_index)
+    -> analyzer::bounding_box
+  {
+    return analyzer::get_sequence_results(
+             analyzer::get_tracker_results(application::tracking_results(),
+                                           tracker_name),
+             sequence_name)
+      .bounding_boxes[gsl::narrow_cast<analyzer::bounding_box_list::size_type>(
+        frame_index)];
+  }
 }  // namespace analyzer::gui

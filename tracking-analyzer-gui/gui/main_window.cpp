@@ -1,16 +1,21 @@
 #include "main_window.h"
 #include "application.h"
+#include "qtag.h"
 #include "ui_main_window.h"
 #include <QComboBox>
 #include <QDir>
 #include <QFileDialog>
 #include <QLabel>
+#include <QMenu>
 #include <QPainter>
+#include <QToolButton>
 
 namespace analyzer::gui
 {
   namespace
   {
+    constexpr std::chrono::milliseconds status_bar_message_timeout {5000};
+
     void reinitialize_combobox(QComboBox& combobox,
                                const QStringList& new_entries)
     {
@@ -32,28 +37,45 @@ namespace analyzer::gui
       display.frame_slider->setValue(number);
     }
 
-    auto get_bounding_boxes_to_draw(const Ui::main_window& main_window)
+    auto get_bounding_boxes_to_draw(const Ui::main_window& main_window,
+                                    const QComboBox& sequence_combobox,
+                                    const QList<QAction*>& tracker_actions)
     {
       analyzer::bounding_box_list boxes;
       boxes.emplace_back(application::ground_truth_bounding_box(
-        main_window.sequence_combobox->currentIndex(),
-        main_window.frame_spinbox->value()));
-      return boxes;
+        sequence_combobox.currentIndex(), main_window.frame_spinbox->value()));
+      std::vector<color_map::size_type> color_indices(1, 0);
+      color_map::size_type current_index {0};
+      for (const auto* action : tracker_actions)
+      {
+        ++current_index;
+        if (action->isChecked())
+        {
+          boxes.emplace_back(application::tracking_result_bounding_box(
+            action->text().toStdString(),
+            sequence_combobox.currentText().toStdString(),
+            main_window.frame_spinbox->value()));
+          color_indices.push_back(current_index);
+        }
+      }
+      return std::make_pair(boxes, color_indices);
     }
 
-    void draw_boxes_on_image(QImage& image,
-                             const analyzer::bounding_box_list& boxes,
-                             const std::array<QColor, 3>& colors)
+    void
+    draw_boxes_on_image(QImage& image,
+                        const analyzer::bounding_box_list& boxes,
+                        const color_map& colors,
+                        const std::vector<color_map::size_type>& color_indices)
     {
       QPainter painter {&image};
       painter.setBrush(Qt::NoBrush);
       QPen pen {Qt::red};
-      pen.setWidth(1);
+      pen.setWidth(2);
       for (std::array<QColor, 3>::size_type i {0};
            i < std::min(colors.size(), boxes.size());
            ++i)
       {
-        pen.setColor(colors.at(i));
+        pen.setColor(colors[color_indices[i]]);
         painter.setPen(pen);
         const auto box {boxes.at(i)};
         painter.drawRect(QRectF {box.x, box.y, box.width, box.height});
@@ -61,46 +83,35 @@ namespace analyzer::gui
     }
 
     void draw_current_frame(const Ui::main_window& main_window,
-                            const std::array<QColor, 3>& colors)
+                            const color_map& colors,
+                            const QComboBox& sequence_combobox,
+                            const QList<QAction*>& tracker_actions)
     {
-      if (main_window.sequence_combobox->currentIndex() >= 0)
+      if (sequence_combobox.currentIndex() >= 0)
       {
-        auto frame_image {application::frame_image(
-          main_window.sequence_combobox->currentIndex(),
-          main_window.frame_spinbox->value())};
-        const auto boxes {get_bounding_boxes_to_draw(main_window)};
-        draw_boxes_on_image(frame_image, boxes, colors);
+        auto frame_image {
+          application::frame_image(sequence_combobox.currentIndex(),
+                                   main_window.frame_spinbox->value())};
+        const auto [boxes, color_indices] = get_bounding_boxes_to_draw(
+          main_window, sequence_combobox, tracker_actions);
+        draw_boxes_on_image(frame_image, boxes, colors, color_indices);
         main_window.frame_display->setPixmap(QPixmap::fromImage(frame_image));
       }
-    }
-
-    auto create_tag_label_stylesheet(const int font_lightness)
-    {
-      constexpr int mid_lightness {128};
-      return QString {"QLabel{border-radius: 10px; background-color: "}
-             + (font_lightness < mid_lightness
-                  ? QString {"rgb(200, 200, 200)}"}
-                  : QString {"rgb(100, 100, 100)}"});
     }
 
     auto create_tag_label(main_window* parent,
                           const QString& tag,
                           QHBoxLayout& tag_layout)
     {
-      auto* const label {new QLabel {tag, parent}};
-      label->setFrameShape(QFrame::Panel);
-      label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+      auto* const label {new qtag {tag, parent}};
       label->setVisible(false);
-      label->setMargin(4);
-      label->setStyleSheet(create_tag_label_stylesheet(
-        label->palette().color(QPalette::WindowText).lightness()));
       tag_layout.addWidget(label);
       return label;
     }
 
     auto create_tag_labels(main_window* parent, QHBoxLayout& tag_layout)
     {
-      std::vector<QLabel*> tag_labels;
+      std::vector<qtag*> tag_labels;
       const auto tags {analyzer::dataset::all_tags()};
       std::transform(std::begin(tags),
                      std::end(tags),
@@ -111,7 +122,7 @@ namespace analyzer::gui
       return tag_labels;
     }
 
-    void reset_tags(const std::vector<QLabel*>& tag_labels,
+    void reset_tags(const std::vector<qtag*>& tag_labels,
                     const QStringList& sequence_tags)
     {
       for (const auto& tag_label : tag_labels)
@@ -132,33 +143,88 @@ namespace analyzer::gui
                       + QString::number(ds.sequences().length())
                       + " sequences"};
     }
+
+    auto make_color_map()
+    {
+      if (application::dataset_loaded())
+      {
+        return color_map {1
+                          + application::tracking_results().m_trackers.size()};
+      }
+      return color_map {0};
+    }
   }  // namespace
 
   main_window::main_window(QWidget* parent):
-    QMainWindow(parent), ui(new Ui::main_window)
+    QMainWindow(parent),
+    ui(new Ui::main_window),
+    m_dataset_info_label {new QLabel {this}},
+    m_sequence_combobox {new QComboBox {this}}
   {
     ui->setupUi(this);
+    setup_toolbar();
     setWindowTitle("");
-    if (application::settings().contains(settings_keys::last_loaded_dataset))
-    {
-      load_dataset(application::settings()
-                     .value(settings_keys::last_loaded_dataset)
-                     .toString());
-    }
 
     // change_sequence() is called by Qt during initialization. Reset the
     // frame slider and line edit enabled properties.
     ui->frame_spinbox->setEnabled(false);
     ui->frame_slider->setEnabled(false);
-
-    constexpr QSize icon_size(16, 16);
-    ui->info_label->setPixmap(
-      QIcon::fromTheme("dialog-information").pixmap(icon_size));
   }
 
   main_window::~main_window() { delete ui; }
 
-  void main_window::load_dataset()
+  void main_window::setup_toolbar()
+  {
+    m_dataset_info_label->setPixmap(
+      QIcon::fromTheme("dialog-information").pixmap(ui->toolBar->iconSize()));
+    m_dataset_info_label->setToolTip("No dataset loaded.");
+    ui->toolBar->addWidget(m_dataset_info_label);
+    m_sequence_combobox->setEnabled(false);
+    m_sequence_combobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    m_sequence_combobox->setToolTip("Select the sequence to display.");
+    connect(m_sequence_combobox,
+            qOverload<int>(&QComboBox::currentIndexChanged),
+            this,
+            &main_window::change_sequence);
+    ui->toolBar->addWidget(m_sequence_combobox);
+    ui->toolBar->addSeparator();
+    ui->toolBar->addAction(ui->action_tracker_selection);
+    ui->action_tracker_selection->setEnabled(false);
+
+    auto* const open_menu {new QMenu("")};
+    open_menu->addAction(ui->action_open_tracking_results);
+    open_menu->addAction(ui->action_open_dataset);
+    ui->action_open->setMenu(open_menu);
+    dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->action_open))
+      ->setPopupMode(QToolButton::InstantPopup);
+
+    auto* const tracker_menu {new QMenu("")};
+    ui->action_tracker_selection->setMenu(tracker_menu);
+    dynamic_cast<QToolButton*>(
+      ui->toolBar->widgetForAction(ui->action_tracker_selection))
+      ->setPopupMode(QToolButton::InstantPopup);
+
+    connect(ui->action_quit,
+            &QAction::triggered,
+            application::instance(),
+            &application::quit);
+  }
+
+  void main_window::open_tracking_results()
+  {
+    const auto results_path {QFileDialog::getExistingDirectory(
+      this,
+      "Load Tracking Results",
+      application::settings()
+        .value(settings_keys::last_loaded_results_directory, QDir::homePath())
+        .toString())};
+    if (!results_path.isEmpty())
+    {
+      load_tracking_results_directory(results_path);
+    }
+  }
+
+  void main_window::open_dataset()
   {
     const auto dataset_path {QFileDialog::getExistingDirectory(
       this,
@@ -168,9 +234,7 @@ namespace analyzer::gui
         .toString())};
     if (!dataset_path.isEmpty())
     {
-      setCursor(Qt::WaitCursor);
       load_dataset(dataset_path);
-      setCursor(Qt::ArrowCursor);
     }
   }
 
@@ -181,7 +245,10 @@ namespace analyzer::gui
     {
       reset_tags(m_tag_labels, application::dataset()[index].tags());
       analyzer::gui::synchronize_frame_controls(*ui, 0);
-      draw_current_frame(*ui, m_box_colors);
+      draw_current_frame(*ui,
+                         m_box_colors,
+                         *m_sequence_combobox,
+                         ui->action_tracker_selection->menu()->actions());
       const auto maximum_frame {
         application::dataset().sequences()[index].frame_paths().length() - 1};
       ui->frame_spinbox->setEnabled(true);
@@ -196,28 +263,83 @@ namespace analyzer::gui
   void main_window::change_frame(const int frame_index) const
   {
     analyzer::gui::synchronize_frame_controls(*ui, frame_index);
-    draw_current_frame(*ui, m_box_colors);
+    draw_current_frame(*ui,
+                       m_box_colors,
+                       *m_sequence_combobox,
+                       ui->action_tracker_selection->menu()->actions());
+  }
+
+  void main_window::toggle_tracker([[maybe_unused]] const bool checked)
+  {
+    const auto tracker_actions {
+      ui->action_tracker_selection->menu()->actions()};
+    for (int i {0}; i < tracker_actions.length(); ++i)
+    {
+      m_tracker_labels[gsl::narrow<std::vector<qtag*>::size_type>(i)]
+        ->setVisible(tracker_actions[i]->isChecked());
+    }
+    draw_current_frame(*ui,
+                       m_box_colors,
+                       *m_sequence_combobox,
+                       ui->action_tracker_selection->menu()->actions());
+  }
+
+  void main_window::load_tracking_results_directory(const QString& filepath)
+  {
+    setCursor(Qt::WaitCursor);
+    const auto cursor_reverter {
+      gsl::finally([this]() { setCursor(Qt::ArrowCursor); })};
+    application::load_tracking_results(filepath);
+    auto* const tracker_menu {ui->action_tracker_selection->menu()};
+    tracker_menu->clear();
+    m_box_colors = make_color_map();
+    const auto trackers {
+      analyzer::get_trackers_in_database(application::tracking_results())};
+    for (QStringList::size_type i {0}; i < trackers.length(); ++i)
+    {
+      auto* const action {tracker_menu->addAction(trackers[i])};
+      action->setCheckable(true);
+      connect(action, &QAction::toggled, this, &main_window::toggle_tracker);
+      auto* const tag {
+        new qtag {trackers[i],
+                  m_box_colors[gsl::narrow<color_map::size_type>(i + 1)],
+                  this}};
+      tag->setVisible(false);
+      ui->tracker_name_layout->addWidget(tag);
+      m_tracker_labels.push_back(tag);
+    }
+    ui->action_tracker_selection->setEnabled(true);
+    ui->statusbar->showMessage(
+      "Loaded "
+        + QString::number(application::tracking_results().m_trackers.size())
+        + " trackers from " + filepath,
+      status_bar_message_timeout.count());
   }
 
   void main_window::load_dataset(const QString& dataset_path)
   {
+    setCursor(Qt::WaitCursor);
+    const auto cursor_reverter {
+      gsl::finally([this]() { setCursor(Qt::ArrowCursor); })};
     // BUG Why am I loading the dataset twice?
     const auto new_dataset {analyzer::load_dataset(dataset_path)};
     if (!new_dataset.root_path().isEmpty())
     {
       application::load_dataset(dataset_path);
-      ui->sequence_combobox->setEnabled(true);
-      reinitialize_combobox(*ui->sequence_combobox,
+      m_box_colors = make_color_map();
+      ui->action_open_dataset->setEnabled(false);
+      m_sequence_combobox->setEnabled(true);
+      reinitialize_combobox(*m_sequence_combobox,
                             analyzer::sequence_names(
                               application::instance()->dataset().sequences()));
-      constexpr std::chrono::milliseconds status_bar_message_timeout {5000};
       ui->statusbar->showMessage(
         "Loaded " + QString::number(application::dataset().sequences().size())
           + " sequences from " + dataset_path,
         status_bar_message_timeout.count());
       m_tag_labels = create_tag_labels(this, *ui->tag_layout);
-      ui->info_label->setEnabled(true);
-      ui->info_label->setToolTip(create_dataset_info());
+      auto* const gt_tag {new qtag {"Ground Truth", m_box_colors[0], this}};
+      ui->tracker_name_layout->addWidget(gt_tag);
+      m_dataset_info_label->setToolTip(create_dataset_info());
     }
   }
 }  // namespace analyzer::gui

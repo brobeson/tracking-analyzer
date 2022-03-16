@@ -25,4 +25,10 @@ namespace analyzer
     }
     return base;
   }
+
+  auto get_subdirectories(const QString& path) -> QStringList
+  {
+    const QDir directory {path};
+    return directory.entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+  }
 }  // namespace analyzer

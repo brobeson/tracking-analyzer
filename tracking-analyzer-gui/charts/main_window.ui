@@ -381,7 +381,7 @@
    <sender>load_dataset_button</sender>
    <signal>clicked()</signal>
    <receiver>analyzer::gui::main_window</receiver>
-   <slot>load_dataset()</slot>
+   <slot>open_dataset()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>1030</x>
@@ -512,7 +512,7 @@
   <slot>change_update(int)</slot>
   <slot>change_training_batch(int)</slot>
   <slot>change_sequence(int)</slot>
-  <slot>load_dataset()</slot>
+  <slot>open_dataset()</slot>
   <slot>change_frame(int)</slot>
   <slot>change_point_size(int)</slot>
   <slot>toggle_bg_candidate_plot(bool)</slot>

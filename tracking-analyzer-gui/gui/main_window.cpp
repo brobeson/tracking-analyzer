@@ -9,6 +9,7 @@
 #include <QMenu>
 #include <QPainter>
 #include <QToolButton>
+#include <iostream>
 
 namespace analyzer::gui
 {
@@ -218,10 +219,13 @@ namespace analyzer::gui
     ui->toolBar->addSeparator();
     ui->toolBar->addAction(ui->action_tracker_selection);
     ui->action_tracker_selection->setEnabled(false);
+    ui->toolBar->addAction(ui->action_training_selection);
+    ui->action_training_selection->setEnabled(false);
 
     auto* const open_menu {new QMenu("")};
     open_menu->addAction(ui->action_open_tracking_results);
     open_menu->addAction(ui->action_open_dataset);
+    open_menu->addAction(ui->action_open_training_metadata);
     ui->action_open->setMenu(open_menu);
     dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->action_open))
       ->setPopupMode(QToolButton::InstantPopup);
@@ -230,6 +234,12 @@ namespace analyzer::gui
     ui->action_tracker_selection->setMenu(tracker_menu);
     dynamic_cast<QToolButton*>(
       ui->toolBar->widgetForAction(ui->action_tracker_selection))
+      ->setPopupMode(QToolButton::InstantPopup);
+
+    auto* const training_menu {new QMenu("")};
+    ui->action_training_selection->setMenu(training_menu);
+    dynamic_cast<QToolButton*>(
+      ui->toolBar->widgetForAction(ui->action_training_selection))
       ->setPopupMode(QToolButton::InstantPopup);
 
     connect(ui->action_quit,
@@ -249,6 +259,20 @@ namespace analyzer::gui
     if (!results_path.isEmpty())
     {
       load_tracking_results_directory(results_path);
+    }
+  }
+
+  void main_window::open_training_metadata()
+  {
+    const auto metadata_path {QFileDialog::getExistingDirectory(
+      this,
+      "Load Training Metadata",
+      application::settings()
+        .value(settings_keys::last_loaded_training_directory, QDir::homePath())
+        .toString())};
+    if (!metadata_path.isEmpty())
+    {
+      load_training_samples(metadata_path);
     }
   }
 
@@ -310,6 +334,53 @@ namespace analyzer::gui
                        m_box_colors,
                        *m_sequence_combobox,
                        ui->action_tracker_selection->menu()->actions());
+  }
+
+  void main_window::toggle_training_sample([[maybe_unused]] bool checked)
+  {
+    const auto tracker_actions {
+      ui->action_training_selection->menu()->actions()};
+    const auto db {application::training_samples()};
+    for (const auto& action : tracker_actions)
+    {
+      const auto tracker_db {analyzer::get_tracker_results(db, action->text())};
+      std::cout << tracker_db.name.toStdString() << '\n';
+      for (const auto& sequence : tracker_db.sequences)
+      {
+        std::cout << "  " << sequence.name.toStdString() << "  "
+                  << sequence.frames.size() << '\n';
+        for (const auto& frame : sequence.frames)
+        {
+          std::cout << "  " << frame.frame_number;
+        }
+        std::cout << '\n';
+      }
+    }
+  }
+
+  void main_window::load_training_samples(const QString& filepath)
+  {
+    setCursor(Qt::WaitCursor);
+    const auto cursor_reverter {
+      gsl::finally([this]() { setCursor(Qt::ArrowCursor); })};
+    application::load_training_metadata(filepath);
+    auto* const tracker_menu {ui->action_training_selection->menu()};
+    tracker_menu->clear();
+    const auto trackers {
+      analyzer::get_trackers_in_database(application::training_samples())};
+    for (QStringList::size_type i {0}; i < trackers.length(); ++i)
+    {
+      auto* const action {tracker_menu->addAction(trackers[i])};
+      action->setCheckable(true);
+      connect(
+        action, &QAction::toggled, this, &main_window::toggle_training_sample);
+    }
+    ui->action_training_selection->setEnabled(true);
+    ui->statusbar->showMessage(
+      "Loaded "
+        + QString::number(application::training_samples().m_trackers.size())
+        + " trackers from " + filepath,
+      status_bar_message_timeout.count());
   }
 
   void main_window::load_tracking_results_directory(const QString& filepath)

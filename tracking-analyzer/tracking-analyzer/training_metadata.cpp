@@ -2,7 +2,6 @@
 #include "tracking-analyzer/filesystem.h"
 #include <QFile>
 #include <QJsonArray>
-#include <QJsonDocument>
 #include <QJsonObject>
 #include <algorithm>
 #include <gsl/gsl_util>
@@ -20,16 +19,6 @@ namespace analyzer
                      std::back_insert_iterator {update_frames},
                      [](const QString& key) { return key.toInt(); });
       return update_frames;
-    }
-
-    auto read_json_data(const QString& filepath)
-    {
-      QFile file {filepath};
-      if (!file.open(QIODevice::ReadOnly))
-      {
-        throw std::runtime_error {"cannot open file"};
-      }
-      return QJsonDocument::fromJson(file.readAll()).object();
     }
 
     auto get_chart_range(const score_list& scores)
@@ -172,7 +161,7 @@ namespace analyzer
         "The path to the training score data is empty."};
     }
     const auto absolute_path {make_absolute_path(path)};
-    const auto json_data {read_json_data(absolute_path)};
+    const auto json_data {read_json_data(absolute_path).object()};
     const auto score_json {json_data["data"].toObject()};
     training_scores score_data {json_data["sequence"].toString(),
                                 json_data["dataset"].toString(),

@@ -10,6 +10,8 @@ add_library(
   tracking-analyzer/tracking_results.cpp
   tracking-analyzer/training_metadata.h
   tracking-analyzer/training_metadata.cpp
+  tracking-analyzer/training_samples.cpp
+  tracking-analyzer/training_samples.h
 )
 add_library(tracking::analyzer ALIAS tracking-analyzer)
 target_include_directories(

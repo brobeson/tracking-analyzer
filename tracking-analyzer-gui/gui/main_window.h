@@ -34,9 +34,11 @@ namespace analyzer::gui
   public slots:  // NOLINT(readability-redundant-access-specifiers)
     void open_dataset();
     void open_tracking_results();
+    void open_training_metadata();
     void change_sequence(int index);
     void change_frame(int frame_index) const;
     void toggle_tracker(bool);
+    void toggle_training_sample(bool);
 
   protected:
     void closeEvent(QCloseEvent* event) override;
@@ -53,6 +55,7 @@ namespace analyzer::gui
     void setup_toolbar();
 
     void load_tracking_results_directory(const QString& filepath);
+    void load_training_samples(const QString& filepath);
     std::vector<qtag*> m_tag_labels;
     std::vector<qtag*> m_tracker_labels;
   };

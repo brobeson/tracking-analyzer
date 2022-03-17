@@ -31,4 +31,29 @@ namespace analyzer
     const QDir directory {path};
     return directory.entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
   }
+
+  auto read_json_data(const QString& filepath) -> QJsonDocument
+  {
+    QFile file {filepath};
+    if (!file.open(QIODevice::ReadOnly))
+    {
+      throw std::runtime_error {"cannot open file"};
+    }
+    return QJsonDocument::fromJson(file.readAll());
+  }
+
+  auto get_sequence_file_paths(const QString& path, const QString& file_suffix)
+    -> QStringList
+  {
+    const QDir directory {path};
+    auto sequences {directory.entryList(
+      QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDir::Name)};
+    sequences.erase(std::remove_if(std::begin(sequences),
+                                   std::end(sequences),
+                                   [&file_suffix](const QString& sequence) {
+                                     return !sequence.endsWith(file_suffix);
+                                   }),
+                    sequences.end());
+    return sequences;
+  }
 }  // namespace analyzer

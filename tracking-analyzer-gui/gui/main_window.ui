@@ -181,6 +181,26 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
+  <action name="action_open_training_metadata">
+   <property name="icon">
+    <iconset theme="folder-open">
+     <normaloff>.</normaloff>.</iconset>
+   </property>
+   <property name="text">
+    <string>Open Training Metadata</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Training Metadata</string>
+   </property>
+  </action>
+  <action name="action_training_selection">
+   <property name="text">
+    <string>Training Samples</string>
+   </property>
+   <property name="toolTip">
+    <string>Select trackers to display training samples.</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
@@ -248,11 +268,28 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>action_open_training_metadata</sender>
+   <signal>triggered()</signal>
+   <receiver>analyzer::gui::main_window</receiver>
+   <slot>open_training_metadata()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>523</x>
+     <y>328</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>open_tracking_results()</slot>
   <slot>change_sequence(int)</slot>
   <slot>open_dataset()</slot>
   <slot>change_frame(int)</slot>
+  <slot>open_training_metadata()</slot>
  </slots>
 </ui>

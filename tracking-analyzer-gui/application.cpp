@@ -83,4 +83,17 @@ namespace analyzer::gui
       .bounding_boxes[gsl::narrow_cast<analyzer::bounding_box_list::size_type>(
         frame_index)];
   }
+
+  void application::load_training_metadata(const QString& metadata_path)
+  {
+    const auto app {application::instance()};
+    app->m_training_samples = analyzer::load_training_samples(metadata_path);
+    app->settings().setValue(settings_keys::last_loaded_training_directory,
+                             metadata_path);
+  }
+
+  auto application::training_samples() -> analyzer::training_sample_database
+  {
+    return instance()->m_training_samples;
+  }
 }  // namespace analyzer::gui

@@ -45,25 +45,12 @@ namespace analyzer
       return boxes;
     }
 
-    [[nodiscard]] auto get_sequence_file_paths(const QString& path)
-    {
-      const QDir directory {path};
-      auto sequences {directory.entryList(
-        QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDir::Name)};
-      sequences.erase(std::remove_if(std::begin(sequences),
-                                     std::end(sequences),
-                                     [](const QString& sequence) {
-                                       return !sequence.endsWith(".txt");
-                                     }),
-                      sequences.end());
-      return sequences;
-    }
-
     [[nodiscard]] auto
     load_tracking_results_for_tracker(const QString& path,
                                       const QString& tracker_name)
     {
-      const auto sequences {get_sequence_file_paths(path + '/' + tracker_name)};
+      const auto sequences {
+        get_sequence_file_paths(path + '/' + tracker_name, ".txt")};
       tracker_results r {tracker_name.toStdString()};
       std::transform(std::begin(sequences),
                      std::end(sequences),

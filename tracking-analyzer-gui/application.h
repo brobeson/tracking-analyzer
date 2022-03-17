@@ -14,6 +14,8 @@ namespace analyzer::gui
   {
     constexpr auto last_loaded_dataset {"recent/dataset_path"};
     constexpr auto last_loaded_results_directory {"recent/results_directory"};
+    constexpr auto window_geometry {"window/geometry"};
+    constexpr auto window_state {"window/state"};
   }  // namespace settings_keys
 
   class application final: public QApplication

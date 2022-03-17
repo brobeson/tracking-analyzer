@@ -153,6 +153,32 @@ namespace analyzer::gui
       }
       return color_map {0};
     }
+
+    void restore_window(main_window& window)
+    {
+      const auto& settings {application::settings()};
+      if (const auto geometry {
+            settings.value(settings_keys::window_geometry, QByteArray {})
+              .toByteArray()};
+          !geometry.isEmpty())
+      {
+        window.restoreGeometry(geometry);
+      }
+      if (const auto state {
+            settings.value(settings_keys::window_state, QByteArray {})
+              .toByteArray()};
+          !state.isEmpty())
+      {
+        window.restoreState(state);
+      }
+    }
+
+    void save_window(main_window& window)
+    {
+      auto& settings {application::settings()};
+      settings.setValue(settings_keys::window_geometry, window.saveGeometry());
+      settings.setValue(settings_keys::window_state, window.saveState());
+    }
   }  // namespace
 
   main_window::main_window(QWidget* parent):
@@ -169,6 +195,8 @@ namespace analyzer::gui
     // frame slider and line edit enabled properties.
     ui->frame_spinbox->setEnabled(false);
     ui->frame_slider->setEnabled(false);
+
+    restore_window(*this);
   }
 
   main_window::~main_window() { delete ui; }
@@ -341,5 +369,11 @@ namespace analyzer::gui
       ui->tracker_name_layout->addWidget(gt_tag);
       m_dataset_info_label->setToolTip(create_dataset_info());
     }
+  }
+
+  void main_window::closeEvent(QCloseEvent* event)
+  {
+    save_window(*this);
+    QMainWindow::closeEvent(event);
   }
 }  // namespace analyzer::gui

@@ -38,6 +38,9 @@ namespace analyzer::gui
     void change_frame(int frame_index) const;
     void toggle_tracker(bool);
 
+  protected:
+    void closeEvent(QCloseEvent* event) override;
+
   private:
     Ui::main_window* ui;
     color_map m_box_colors {0};

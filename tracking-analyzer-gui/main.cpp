@@ -5,6 +5,8 @@ auto main(int argc, char* argv[]) -> int
 {
   analyzer::gui::application application {argc, argv};
   analyzer::gui::main_window window;
+  QObject::connect(
+    &application, &QApplication::aboutToQuit, &window, &QMainWindow::close);
   window.show();
   // if (analyzer::gui::application::settings().contains(
   //       analyzer::gui::settings_keys::last_loaded_dataset))

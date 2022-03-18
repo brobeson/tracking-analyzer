@@ -115,9 +115,26 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_quit"/>
-   <addaction name="separator"/>
-   <addaction name="action_open"/>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1048</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="action_open_dataset"/>
+    <addaction name="action_open_tracking_results"/>
+    <addaction name="separator"/>
+    <addaction name="action_quit"/>
+   </widget>
+   <addaction name="menu_File"/>
   </widget>
   <action name="action_open_dataset">
    <property name="icon">
@@ -144,18 +161,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
-   </property>
-  </action>
-  <action name="action_open">
-   <property name="icon">
-    <iconset theme="document-open">
-     <normaloff>.</normaloff>.</iconset>
-   </property>
-   <property name="text">
-    <string>Open</string>
-   </property>
-   <property name="toolTip">
-    <string>Open tracking data</string>
    </property>
   </action>
   <action name="action_tracker_selection">

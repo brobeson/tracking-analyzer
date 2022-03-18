@@ -27,6 +27,7 @@ namespace analyzer::gui
     void clear_display(const Ui::main_window& display)
     {
       display.frame_display->setPixmap(QPixmap {});
+      display.frame_display->setText("No Sequence Loaded");
       display.frame_spinbox->setValue(0);
       display.frame_slider->setValue(0);
     }
@@ -184,7 +185,7 @@ namespace analyzer::gui
   main_window::main_window(QWidget* parent):
     QMainWindow(parent),
     ui(new Ui::main_window),
-    m_dataset_info_label {new QLabel {this}},
+    m_dataset_info_label {new QLabel {"No dataset", this}},
     m_sequence_combobox {new QComboBox {this}}
   {
     ui->setupUi(this);
@@ -196,6 +197,8 @@ namespace analyzer::gui
     ui->frame_spinbox->setEnabled(false);
     ui->frame_slider->setEnabled(false);
 
+    ui->statusbar->addPermanentWidget(m_dataset_info_label);
+
     restore_window(*this);
   }
 
@@ -203,10 +206,7 @@ namespace analyzer::gui
 
   void main_window::setup_toolbar()
   {
-    m_dataset_info_label->setPixmap(
-      QIcon::fromTheme("dialog-information").pixmap(ui->toolBar->iconSize()));
-    m_dataset_info_label->setToolTip("No dataset loaded.");
-    ui->toolBar->addWidget(m_dataset_info_label);
+    m_sequence_combobox->addItem("Sequence");
     m_sequence_combobox->setEnabled(false);
     m_sequence_combobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     m_sequence_combobox->setToolTip("Select the sequence to display.");
@@ -218,13 +218,6 @@ namespace analyzer::gui
     ui->toolBar->addSeparator();
     ui->toolBar->addAction(ui->action_tracker_selection);
     ui->action_tracker_selection->setEnabled(false);
-
-    auto* const open_menu {new QMenu("")};
-    open_menu->addAction(ui->action_open_tracking_results);
-    open_menu->addAction(ui->action_open_dataset);
-    ui->action_open->setMenu(open_menu);
-    dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->action_open))
-      ->setPopupMode(QToolButton::InstantPopup);
 
     auto* const tracker_menu {new QMenu("")};
     ui->action_tracker_selection->setMenu(tracker_menu);
@@ -360,14 +353,11 @@ namespace analyzer::gui
       reinitialize_combobox(*m_sequence_combobox,
                             analyzer::sequence_names(
                               application::instance()->dataset().sequences()));
-      ui->statusbar->showMessage(
-        "Loaded " + QString::number(application::dataset().sequences().size())
-          + " sequences from " + dataset_path,
-        status_bar_message_timeout.count());
       m_tag_labels = create_tag_labels(this, *ui->tag_layout);
       auto* const gt_tag {new qtag {"Ground Truth", m_box_colors[0], this}};
       ui->tracker_name_layout->addWidget(gt_tag);
       m_dataset_info_label->setToolTip(create_dataset_info());
+      m_dataset_info_label->setText("OTB-100");
     }
   }
 

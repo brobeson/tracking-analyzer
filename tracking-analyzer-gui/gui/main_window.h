@@ -37,6 +37,7 @@ namespace analyzer::gui
     void change_sequence(int index);
     void change_frame(int frame_index) const;
     void toggle_tracker(bool);
+    void change_draw(int index);
 
   protected:
     void closeEvent(QCloseEvent* event) override;
@@ -50,11 +51,14 @@ namespace analyzer::gui
     // pointers to them.
     QLabel* m_dataset_info_label;
     QComboBox* m_sequence_combobox;
+    QComboBox* m_draw_combobox;
     void setup_toolbar();
 
     void load_tracking_results_directory(const QString& filepath);
     std::vector<qtag*> m_tag_labels;
     std::vector<qtag*> m_tracker_labels;
+
+    void draw_current_frame() const;
   };
 }  // namespace analyzer::gui
 

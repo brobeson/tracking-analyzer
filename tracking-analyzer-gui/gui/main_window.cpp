@@ -38,6 +38,45 @@ namespace analyzer::gui
       display.frame_slider->setValue(number);
     }
 
+    auto get_tracking_path_to_draw(const bounding_box_list& boxes)
+    {
+      QVector<QPointF> points;
+      std::transform(
+        std::begin(boxes),
+        std::end(boxes),
+        std::back_inserter(points),
+        [](const bounding_box& box) { return calculate_center<QPointF>(box); });
+      return QPolygonF(points);
+    }
+
+    auto get_tracking_paths_to_draw(
+      [[maybe_unused]] const Ui::main_window& main_window,
+      const QComboBox& sequence_combobox,
+      [[maybe_unused]] const QList<QAction*>& tracker_actions)
+    {
+      std::vector<QPolygonF> paths;
+      paths.emplace_back(get_tracking_path_to_draw(
+        application::dataset()[sequence_combobox.currentIndex()]
+          .target_boxes()));
+      std::vector<color_map::size_type> color_indices(1, 0);
+      color_map::size_type current_index {0};
+      for (const auto* action : tracker_actions)
+      {
+        ++current_index;
+        if (action->isChecked())
+        {
+          paths.emplace_back(
+            get_tracking_path_to_draw(application::tracking_results()
+                                        .m_trackers[current_index - 1]
+                                        .sequence_results[static_cast<uint64_t>(
+                                          sequence_combobox.currentIndex())]
+                                        .bounding_boxes));
+          color_indices.push_back(current_index);
+        }
+      }
+      return std::make_pair(paths, color_indices);
+    }
+
     auto get_bounding_boxes_to_draw(const Ui::main_window& main_window,
                                     const QComboBox& sequence_combobox,
                                     const QList<QAction*>& tracker_actions)
@@ -83,20 +122,45 @@ namespace analyzer::gui
       }
     }
 
-    void draw_current_frame(const Ui::main_window& main_window,
-                            const color_map& colors,
-                            const QComboBox& sequence_combobox,
-                            const QList<QAction*>& tracker_actions)
+    void
+    draw_paths_on_image(QImage& image,
+                        const std::vector<QPolygonF>& paths,
+                        const color_map& colors,
+                        const std::vector<color_map::size_type>& color_indices,
+                        const int current_frame)
     {
-      if (sequence_combobox.currentIndex() >= 0)
+      QPainter painter {&image};
+      painter.setBrush(Qt::NoBrush);
+      QPen pen {Qt::red};
+      pen.setWidth(3);
+      QVector<QPointF> current_points;
+      constexpr int quarter_alpha {64};
+      for (std::array<QColor, 3>::size_type i {0};
+           i < std::min(colors.size(), paths.size());
+           ++i)
       {
-        auto frame_image {
-          application::frame_image(sequence_combobox.currentIndex(),
-                                   main_window.frame_spinbox->value())};
-        const auto [boxes, color_indices] = get_bounding_boxes_to_draw(
-          main_window, sequence_combobox, tracker_actions);
-        draw_boxes_on_image(frame_image, boxes, colors, color_indices);
-        main_window.frame_display->setPixmap(QPixmap::fromImage(frame_image));
+        auto color {colors[color_indices[i]]};
+        pen.setColor(color);
+        painter.setPen(pen);
+        painter.drawPolyline(paths.at(i).data(), current_frame);
+        pen.setColor(
+          QColor {color.red(), color.green(), color.blue(), quarter_alpha});
+        painter.setPen(pen);
+        painter.drawPolyline(&paths.at(i)[current_frame],
+                             paths[i].size() - current_frame);
+        current_points.push_back(paths.at(i)[current_frame]);
+      }
+      // I found 12 for the pen width by trial and error.
+      // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
+      pen.setWidth(12);
+      pen.setCapStyle(Qt::RoundCap);
+      for (std::array<QColor, 3>::size_type i {0};
+           i < std::min(colors.size(), paths.size());
+           ++i)
+      {
+        pen.setColor(colors[color_indices[i]]);
+        painter.setPen(pen);
+        painter.drawPoint(current_points[static_cast<int>(i)]);
       }
     }
 
@@ -186,7 +250,8 @@ namespace analyzer::gui
     QMainWindow(parent),
     ui(new Ui::main_window),
     m_dataset_info_label {new QLabel {"No dataset", this}},
-    m_sequence_combobox {new QComboBox {this}}
+    m_sequence_combobox {new QComboBox {this}},
+    m_draw_combobox {new QComboBox {this}}
   {
     ui->setupUi(this);
     setup_toolbar();
@@ -199,6 +264,10 @@ namespace analyzer::gui
 
     ui->statusbar->addPermanentWidget(m_dataset_info_label);
 
+    connect(ui->action_quit,
+            &QAction::triggered,
+            application::instance(),
+            &application::quit);
     restore_window(*this);
   }
 
@@ -225,10 +294,13 @@ namespace analyzer::gui
       ui->toolBar->widgetForAction(ui->action_tracker_selection))
       ->setPopupMode(QToolButton::InstantPopup);
 
-    connect(ui->action_quit,
-            &QAction::triggered,
-            application::instance(),
-            &application::quit);
+    ui->toolBar->addWidget(m_draw_combobox);
+    m_draw_combobox->addItems({"Bounding Boxes", "Tracking Path"});
+    m_draw_combobox->setEnabled(false);
+    connect(m_draw_combobox,
+            qOverload<int>(&QComboBox::currentIndexChanged),
+            this,
+            &main_window::change_draw);
   }
 
   void main_window::open_tracking_results()
@@ -266,10 +338,7 @@ namespace analyzer::gui
     {
       reset_tags(m_tag_labels, application::dataset()[index].tags());
       analyzer::gui::synchronize_frame_controls(*ui, 0);
-      draw_current_frame(*ui,
-                         m_box_colors,
-                         *m_sequence_combobox,
-                         ui->action_tracker_selection->menu()->actions());
+      draw_current_frame();
       const auto maximum_frame {
         application::dataset().sequences()[index].frame_paths().length() - 1};
       ui->frame_spinbox->setEnabled(true);
@@ -278,16 +347,19 @@ namespace analyzer::gui
       ui->frame_slider->setEnabled(true);
       ui->frame_slider->setMinimum(0);
       ui->frame_slider->setMaximum(maximum_frame);
+      m_draw_combobox->setEnabled(true);
     }
+  }
+
+  void main_window::change_draw([[maybe_unused]] const int index)
+  {
+    draw_current_frame();
   }
 
   void main_window::change_frame(const int frame_index) const
   {
     analyzer::gui::synchronize_frame_controls(*ui, frame_index);
-    draw_current_frame(*ui,
-                       m_box_colors,
-                       *m_sequence_combobox,
-                       ui->action_tracker_selection->menu()->actions());
+    draw_current_frame();
   }
 
   void main_window::toggle_tracker([[maybe_unused]] const bool checked)
@@ -299,10 +371,7 @@ namespace analyzer::gui
       m_tracker_labels[gsl::narrow<std::vector<qtag*>::size_type>(i)]
         ->setVisible(tracker_actions[i]->isChecked());
     }
-    draw_current_frame(*ui,
-                       m_box_colors,
-                       *m_sequence_combobox,
-                       ui->action_tracker_selection->menu()->actions());
+    draw_current_frame();
   }
 
   void main_window::load_tracking_results_directory(const QString& filepath)
@@ -365,5 +434,35 @@ namespace analyzer::gui
   {
     save_window(*this);
     QMainWindow::closeEvent(event);
+  }
+
+  void main_window::draw_current_frame() const
+  {
+    if (m_sequence_combobox->currentIndex() >= 0)
+    {
+      auto frame_image {application::frame_image(
+        m_sequence_combobox->currentIndex(), ui->frame_spinbox->value())};
+      if (m_draw_combobox->currentIndex() == 0)
+      {
+        const auto [boxes, color_indices] = get_bounding_boxes_to_draw(
+          *ui,
+          *m_sequence_combobox,
+          ui->action_tracker_selection->menu()->actions());
+        draw_boxes_on_image(frame_image, boxes, m_box_colors, color_indices);
+      }
+      else
+      {
+        const auto [paths, color_indices] = get_tracking_paths_to_draw(
+          *ui,
+          *m_sequence_combobox,
+          ui->action_tracker_selection->menu()->actions());
+        draw_paths_on_image(frame_image,
+                            paths,
+                            m_box_colors,
+                            color_indices,
+                            ui->frame_spinbox->value());
+      }
+      ui->frame_display->setPixmap(QPixmap::fromImage(frame_image));
+    }
   }
 }  // namespace analyzer::gui

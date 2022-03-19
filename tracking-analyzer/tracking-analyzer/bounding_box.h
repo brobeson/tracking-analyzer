@@ -15,6 +15,13 @@ namespace analyzer
     value_type height {0.0f};
   };
 
+  struct point final
+  {
+    using value_type = float;
+    value_type x {0.0f};
+    value_type y {0.0f};
+  };
+
   using invalid_data = std::runtime_error;
 
   using bounding_box_list = std::vector<analyzer::bounding_box>;
@@ -41,6 +48,14 @@ namespace analyzer
   [[nodiscard]] auto calculate_offsets(const analyzer::bounding_box_list& a,
                                        const analyzer::bounding_box_list& b)
     -> analyzer::offset_list;
+
+  template <typename Point = point>
+  [[nodiscard]] auto calculate_center(const analyzer::bounding_box& box)
+  {
+    // I think taking 1/2 of the box dimensions is self explanatory.
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
+    return Point {box.x + 0.5f * box.width, box.y + 0.5f * box.height};
+  }
 }  // namespace analyzer
 
 #endif

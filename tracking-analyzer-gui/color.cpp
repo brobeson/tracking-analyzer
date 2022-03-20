@@ -13,12 +13,12 @@ namespace analyzer::gui
       {
         return std::vector<QColor> {};
       }
-      constexpr auto maximum_hue {359};
+      static constexpr auto maximum_hue {359};
       const auto stride {maximum_hue / gsl::narrow_cast<int>(n)};
       auto hue {0};
       std::vector<QColor> colors(n);
       std::generate(std::begin(colors), std::end(colors), [&hue, stride]() {
-        constexpr auto maximum_sl {255};
+        static constexpr auto maximum_sl {255};
         auto c {QColor::fromHsv(hue, maximum_sl, maximum_sl).toRgb()};
         hue += stride;
         return c;

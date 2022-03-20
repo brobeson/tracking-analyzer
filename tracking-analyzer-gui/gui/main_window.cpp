@@ -134,7 +134,7 @@ namespace analyzer::gui
       QPen pen {Qt::red};
       pen.setWidth(3);
       QVector<QPointF> current_points;
-      constexpr int quarter_alpha {64};
+      static constexpr int quarter_alpha {64};
       for (std::array<QColor, 3>::size_type i {0};
            i < std::min(colors.size(), paths.size());
            ++i)

@@ -22,10 +22,10 @@ namespace analyzer::gui
     // differently from QColor.
     auto make_colors_dark_theme(const QColor& requested_color)
     {
-      constexpr qreal lightness_threshold {0.6};
-      constexpr qreal background_alpha {0.18};
-      constexpr qreal border_alpha {0.3};
-      constexpr int maximum_component {255};
+      static constexpr qreal lightness_threshold {0.6};
+      static constexpr qreal background_alpha {0.18};
+      static constexpr qreal border_alpha {0.3};
+      static constexpr int maximum_component {255};
       QColor background {
         requested_color.red(),
         requested_color.green(),
@@ -38,7 +38,7 @@ namespace analyzer::gui
         (perceived_lightness - lightness_threshold) * -1000, 0.0, 1.0)};
       const auto lighten_by {(lightness_threshold - perceived_lightness) * 100.0
                              * lightness_switch};
-      constexpr qreal one_percent {0.01};
+      static constexpr qreal one_percent {0.01};
       QColor foreground {QColor::fromHslF(requested_color.hueF(),
                                           requested_color.hslSaturationF(),
                                           requested_color.lightnessF()
@@ -52,8 +52,8 @@ namespace analyzer::gui
 
     auto make_colors_light_theme(const QColor& requested_color)
     {
-      constexpr qreal lightness_threshold {0.453};
-      constexpr qreal border_threshold {0.96};
+      static constexpr qreal lightness_threshold {0.453};
+      static constexpr qreal border_threshold {0.96};
       const auto perceived_lightness {requested_color.redF() * 0.2126
                                       + requested_color.greenF() * 0.7152
                                       + requested_color.blueF() * 0.0722};
@@ -94,7 +94,7 @@ namespace analyzer::gui
     {
       const auto lightness {
         QApplication::palette().color(QPalette::Window).lightnessF()};
-      constexpr qreal mid_lightness {0.5};
+      static constexpr qreal mid_lightness {0.5};
       return QString {"QLabel{border-radius: 10px; "}
              + make_color_styles(lightness < mid_lightness
                                    ? make_colors_dark_theme(text_color)

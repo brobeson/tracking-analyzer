@@ -11,7 +11,9 @@ set(
   dataset_test
   exceptions_test
   filesystem_test
+  frame_record_test
   results_database_test
+  sequence_record_test
   sequence_results_test
   tracker_results_test
   training_metadata_test

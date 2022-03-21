@@ -10,6 +10,51 @@
 
 namespace analyzer
 {
+  class frame_record final
+  {
+  public:
+    frame_record() = default;
+    frame_record(const std::string& img_path, bounding_box tgt_box);
+    [[nodiscard]] auto image_path() const -> std::string;
+    [[nodiscard]] auto target_box() const -> bounding_box;
+
+  private:
+    std::string m_image_path;
+    bounding_box m_box;
+  };
+
+  class sequence_record final
+  {
+  public:
+    [[nodiscard]] auto name() const -> std::string;
+    [[nodiscard]] auto root_path() const -> std::string;
+    [[nodiscard]] auto challenge_tags() const
+      -> const std::vector<std::string>&;
+    [[nodiscard]] auto frames() const noexcept
+      -> const std::vector<frame_record>&;
+    [[nodiscard]] auto frames() noexcept -> std::vector<frame_record>&;
+
+  private:
+    std::string m_name;
+    std::string m_root_path;
+    std::vector<std::string> m_challenge_tags;
+    std::vector<frame_record> m_frames;
+  };
+
+  [[nodiscard]] inline auto begin(const sequence_record& s)
+  {
+    return std::begin(s.frames());
+  }
+
+  [[nodiscard]] inline auto end(const sequence_record& s)
+  {
+    return std::end(s.frames());
+  }
+
+  //----------------------------------------------------------------------------
+  //                                              old code - not refactored yet
+  //                see https://github.com/brobeson/tracking-analyzer/issues/41
+  //----------------------------------------------------------------------------
   struct frame final
   {
     std::string image_path;

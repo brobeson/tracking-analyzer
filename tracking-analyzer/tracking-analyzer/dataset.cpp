@@ -7,6 +7,34 @@
 
 namespace analyzer
 {
+  frame_record::frame_record(const std::string& img_path, bounding_box tgt_box):
+    m_image_path {img_path}, m_box {tgt_box}
+  {
+  }
+  auto frame_record::image_path() const -> std::string { return m_image_path; }
+  auto frame_record::target_box() const -> bounding_box { return m_box; }
+
+  auto sequence_record::name() const -> std::string { return m_name; }
+  auto sequence_record::root_path() const -> std::string { return m_root_path; }
+  auto sequence_record::challenge_tags() const
+    -> const std::vector<std::string>&
+  {
+    return m_challenge_tags;
+  }
+  auto sequence_record::frames() const noexcept
+    -> const std::vector<frame_record>&
+  {
+    return m_frames;
+  }
+  auto sequence_record::frames() noexcept -> std::vector<frame_record>&
+  {
+    return m_frames;
+  }
+
+  //----------------------------------------------------------------------------
+  //                                              old code - not refactored yet
+  //                see https://github.com/brobeson/tracking-analyzer/issues/41
+  //----------------------------------------------------------------------------
   namespace
   {
     auto read_sequence_names(const QString& dataset_path)

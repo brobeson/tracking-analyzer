@@ -5,7 +5,17 @@ project(tracking_analyzer_unit_tests LANGUAGES CXX)
 # To create a new unit test, add the test name to this list. Then write the
 # test in the file <your_new_test>.cpp. If you need to set any test-specific
 # properties, do so after the loop.
-set(tests bounding_box_test dataset_test filesystem_test training_metadata_test)
+set(
+  tests
+  bounding_box_test
+  dataset_test
+  exceptions_test
+  filesystem_test
+  results_database_test
+  sequence_results_test
+  tracker_results_test
+  training_metadata_test
+)
 foreach(test_name IN LISTS tests)
   add_executable(${test_name} ${test_name}.cpp)
   target_link_libraries(

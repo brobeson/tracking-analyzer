@@ -5,6 +5,8 @@
 Q_DECLARE_METATYPE(analyzer::dataset)   // NOLINT
 Q_DECLARE_METATYPE(analyzer::sequence)  // NOLINT
 
+using namespace std::literals::string_literals;
+
 namespace analyzer
 {
   // This operator must not be in an unnamed namespace, or the compiler can't
@@ -36,8 +38,8 @@ namespace analyzer_test
     void construct_invalid_sequence_exception() const
     {
       const analyzer::invalid_sequence e {"name", "path", "what"};
-      QCOMPARE(e.name(), QString {"name"});
-      QCOMPARE(e.path(), QString {"path"});
+      QCOMPARE(e.name(), "name"s);
+      QCOMPARE(e.path(), "path"s);
       QCOMPARE(e.what(), "what");
     }
 

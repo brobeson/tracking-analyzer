@@ -1,4 +1,5 @@
 #include "application.h"
+#include "tracking-analyzer/filesystem.h"
 
 namespace analyzer::gui
 {
@@ -64,23 +65,18 @@ namespace analyzer::gui
   void application::load_tracking_results(const QString& results_path)
   {
     const auto app {application::instance()};
-    app->tracking_results()
-      = analyzer::load_tracking_results_directory(results_path);
+    app->tracking_results() = analyzer::load_tracking_results_directory(
+      analyzer::make_absolute_path(results_path).toStdString());
     app->settings().setValue(settings_keys::last_loaded_results_directory,
                              results_path);
   }
 
-  auto
-  application::tracking_result_bounding_box(const std::string& tracker_name,
-                                            const std::string& sequence_name,
-                                            const gsl::index frame_index)
-    -> analyzer::bounding_box
+  auto application::tracking_result_bounding_box(
+    const std::string& tracker_name,
+    const std::string& sequence_name,
+    const bounding_box_list::size_type frame_index) -> analyzer::bounding_box
   {
-    return analyzer::get_sequence_results(
-             analyzer::get_tracker_results(application::tracking_results(),
-                                           tracker_name),
-             sequence_name)
-      .bounding_boxes[gsl::narrow_cast<analyzer::bounding_box_list::size_type>(
-        frame_index)];
+    return application::tracking_results()[tracker_name][sequence_name]
+                                          [frame_index];
   }
 }  // namespace analyzer::gui

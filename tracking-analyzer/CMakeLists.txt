@@ -4,6 +4,7 @@ add_library(
   tracking-analyzer/bounding_box.h
   tracking-analyzer/dataset.cpp
   tracking-analyzer/dataset.h
+  tracking-analyzer/exceptions.h
   tracking-analyzer/filesystem.cpp
   tracking-analyzer/filesystem.h
   tracking-analyzer/tracking_results.h

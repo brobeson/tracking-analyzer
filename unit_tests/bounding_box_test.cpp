@@ -1,27 +1,11 @@
 #include "tracking-analyzer/bounding_box.h"
+#include "test_utilities.h"
 #include <QTest>
 #include <sstream>
 
 Q_DECLARE_METATYPE(std::string)                  // NOLINT
 Q_DECLARE_METATYPE(analyzer::bounding_box)       // NOLINT
 Q_DECLARE_METATYPE(analyzer::bounding_box_list)  // NOLINT
-
-namespace analyzer
-{
-  // This operator must not be in an unnamed namespace, or the compiler can't
-  // find it for later operations. Also, I know comparing floating point data
-  // like this is generally unsafe, but it works for this unit test.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-declarations"
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-  [[nodiscard]] auto operator==(const analyzer::bounding_box& a,
-                                const analyzer::bounding_box& b)
-  {
-    return a.x == b.x && a.y == b.y && a.width == b.width
-           && a.height == b.height;
-  }
-#pragma GCC diagnostic pop
-}  // namespace analyzer
 
 namespace analyzer_test
 {

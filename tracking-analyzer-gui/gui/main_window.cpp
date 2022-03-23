@@ -65,12 +65,11 @@ namespace analyzer::gui
         ++current_index;
         if (action->isChecked())
         {
-          paths.emplace_back(
-            get_tracking_path_to_draw(application::tracking_results()
-                                        .m_trackers[current_index - 1]
-                                        .sequence_results[static_cast<uint64_t>(
-                                          sequence_combobox.currentIndex())]
-                                        .bounding_boxes));
+          paths.emplace_back(get_tracking_path_to_draw(
+            application::tracking_results()[action->text().toStdString()]
+                                           [sequence_combobox.currentText()
+                                              .toStdString()]
+                                             .bounding_boxes()));
           color_indices.push_back(current_index);
         }
       }
@@ -94,7 +93,8 @@ namespace analyzer::gui
           boxes.emplace_back(application::tracking_result_bounding_box(
             action->text().toStdString(),
             sequence_combobox.currentText().toStdString(),
-            main_window.frame_spinbox->value()));
+            static_cast<bounding_box_list::size_type>(
+              main_window.frame_spinbox->value())));
           color_indices.push_back(current_index);
         }
       }
@@ -213,8 +213,7 @@ namespace analyzer::gui
     {
       if (application::dataset_loaded())
       {
-        return color_map {1
-                          + application::tracking_results().m_trackers.size()};
+        return color_map {1 + analyzer::size(application::tracking_results())};
       }
       return color_map {0};
     }
@@ -384,14 +383,15 @@ namespace analyzer::gui
     tracker_menu->clear();
     m_box_colors = make_color_map();
     const auto trackers {
-      analyzer::get_trackers_in_database(application::tracking_results())};
-    for (QStringList::size_type i {0}; i < trackers.length(); ++i)
+      analyzer::list_all_trackers(application::tracking_results())};
+    for (std::vector<std::string>::size_type i {0}; i < trackers.size(); ++i)
     {
-      auto* const action {tracker_menu->addAction(trackers[i])};
+      const auto tracker_name {QString::fromStdString(trackers[i])};
+      auto* const action {tracker_menu->addAction(tracker_name)};
       action->setCheckable(true);
       connect(action, &QAction::toggled, this, &main_window::toggle_tracker);
       auto* const tag {
-        new qtag {trackers[i],
+        new qtag {tracker_name,
                   m_box_colors[gsl::narrow<color_map::size_type>(i + 1)],
                   this}};
       tag->setVisible(false);
@@ -401,7 +401,7 @@ namespace analyzer::gui
     ui->action_tracker_selection->setEnabled(true);
     ui->statusbar->showMessage(
       "Loaded "
-        + QString::number(application::tracking_results().m_trackers.size())
+        + QString::number(analyzer::size(application::tracking_results()))
         + " trackers from " + filepath,
       status_bar_message_timeout.count());
   }

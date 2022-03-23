@@ -41,7 +41,7 @@ namespace analyzer::gui
     [[nodiscard]] static auto
     tracking_result_bounding_box(const std::string& tracker_name,
                                  const std::string& sequence_name,
-                                 gsl::index frame_index)
+                                 bounding_box_list::size_type frame_index)
       -> analyzer::bounding_box;
 
   private:

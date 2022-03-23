@@ -132,16 +132,6 @@ namespace analyzer
     }
   }  // namespace
 
-  invalid_sequence::invalid_sequence(const QString& name,
-                                     const QString& path,
-                                     const std::string& what):
-    std::runtime_error {what}, m_name {name}, m_path {path}
-  {
-  }
-
-  auto invalid_sequence::name() const -> QString { return m_name; }
-  auto invalid_sequence::path() const -> QString { return m_path; }
-
   sequence::sequence(const QString& name, const QString& path):
     m_name {name},
     m_root_path {path},
@@ -152,20 +142,22 @@ namespace analyzer
     if (m_root_path.isEmpty())
     {
       throw analyzer::invalid_sequence {
-        m_name, m_root_path, "A sequence cannot have an empty root path."};
+        m_name.toStdString(),
+        m_root_path.toStdString(),
+        "A sequence cannot have an empty root path."};
     }
     if (!QDir {m_root_path}.exists())
     {
       throw analyzer::invalid_sequence {
-        m_name,
-        m_root_path,
+        m_name.toStdString(),
+        m_root_path.toStdString(),
         "The sequence path " + m_root_path.toStdString() + " does not exist."};
     }
     if (m_frame_paths.isEmpty())
     {
       throw analyzer::invalid_sequence {
-        m_name,
-        m_root_path,
+        m_name.toStdString(),
+        m_root_path.toStdString(),
         "The sequence " + m_name.toStdString() + " at path "
           + m_root_path.toStdString() + " does not have frame images."};
     }

@@ -26,6 +26,11 @@ namespace analyzer
     return base;
   }
 
+  auto get_subdirectories(const std::string& path) -> QStringList
+  {
+    return get_subdirectories(QString::fromStdString(path));
+  }
+
   auto get_subdirectories(const QString& path) -> QStringList
   {
     const QDir directory {path};

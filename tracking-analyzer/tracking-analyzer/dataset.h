@@ -2,6 +2,7 @@
 #define TRACKING_ANALYZER_DATASET_H
 
 #include "tracking-analyzer/bounding_box.h"
+#include "tracking-analyzer/exceptions.h"
 #include <QStringList>
 #include <QVector>
 #include <gsl/gsl_util>
@@ -9,20 +10,6 @@
 
 namespace analyzer
 {
-  class invalid_sequence final: public std::runtime_error
-  {
-  public:
-    invalid_sequence(const QString& name,
-                     const QString& path,
-                     const std::string& what);
-    [[nodiscard]] auto name() const -> QString;
-    [[nodiscard]] auto path() const -> QString;
-
-  private:
-    QString m_name;
-    QString m_path;
-  };
-
   struct frame final
   {
     std::string image_path;

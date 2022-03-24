@@ -1,5 +1,6 @@
 #include "tracking-analyzer/dataset.h"
 #include "tracking-analyzer/filesystem.h"
+#include "tracking-analyzer/tracking_results.h"
 #include <QDir>
 #include <filesystem>
 #include <fstream>
@@ -83,6 +84,12 @@ namespace analyzer
     {
       std::ifstream s {path + "/groundtruth_rect.txt"};
       return analyzer::read_bounding_boxes(s);
+    }
+
+    auto read_ground_truth_boxes(const std::string& dataset_path,
+                                 const std::string& sequence_name)
+    {
+      return read_ground_truth_boxes(dataset_path + '/' + sequence_name);
     }
 
     auto abbreviation_to_tag(const std::string& abbreviation)
@@ -248,6 +255,26 @@ namespace analyzer
     Expects(index >= 0 && index < m_sequences.length());
     return m_sequences[gsl::narrow_cast<int>(index)];
   }
+
+  namespace
+  {
+    auto load_ground_truth_boxes(const std::string& dataset_path)
+    {
+      const auto names {
+        read_sequence_names(QString::fromStdString(dataset_path))};
+      tracker_results gt_results {"Ground Truth", {}};
+      std::transform(
+        std::begin(names),
+        std::end(names),
+        std::back_inserter(gt_results.sequences()),
+        [&dataset_path](const QString& sequence_name) {
+          return sequence_results {
+            sequence_name.toStdString(),
+            read_ground_truth_boxes(dataset_path, sequence_name.toStdString())};
+        });
+      return gt_results;
+    }
+  }  // namespace
 
   auto load_dataset(const QString& path) -> analyzer::dataset
   {

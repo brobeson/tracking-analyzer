@@ -368,6 +368,8 @@ namespace analyzer
    */
   [[nodiscard]] auto load_tracking_results_directory(const std::string& path)
     -> results_database;
+
+  void push_front(results_database& db, const tracker_results& tracker);
 }  // namespace analyzer
 
 #endif

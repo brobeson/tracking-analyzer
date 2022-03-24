@@ -317,4 +317,9 @@ namespace analyzer
                    });
     return db;
   }
+
+  void push_front(results_database& db, const tracker_results& tracker)
+  {
+    db.trackers().insert(std::begin(db.trackers()), tracker);
+  }
 }  // namespace analyzer

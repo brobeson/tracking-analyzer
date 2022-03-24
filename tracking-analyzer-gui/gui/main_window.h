@@ -59,6 +59,8 @@ namespace analyzer::gui
     std::vector<qtag*> m_tracker_labels;
 
     void draw_current_frame() const;
+    void update_tracker_ui();
+    auto make_tracker_action(const std::string& tracker_name);
   };
 }  // namespace analyzer::gui
 

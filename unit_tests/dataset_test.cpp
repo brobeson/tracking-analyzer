@@ -93,7 +93,6 @@ namespace analyzer_test
       QVERIFY(s.name().isEmpty());
       QVERIFY(s.frame_paths().isEmpty());
       QVERIFY(s.path().isEmpty());
-      QVERIFY(s.target_boxes().empty());
     }
 
     void construct_sequence() const

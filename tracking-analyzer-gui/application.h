@@ -29,9 +29,6 @@ namespace analyzer::gui
     static void load_dataset(const QString& dataset_path);
     [[nodiscard]] static auto frame_image(int sequence_index, int frame_index)
       -> QImage;
-    [[nodiscard]] static auto ground_truth_bounding_box(int sequence_index,
-                                                        int frame_index)
-      -> analyzer::bounding_box;
     [[nodiscard]] static auto dataset_loaded() -> bool;
 
     [[nodiscard]] static auto settings() -> QSettings&;

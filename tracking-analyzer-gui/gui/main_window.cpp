@@ -55,9 +55,6 @@ namespace analyzer::gui
       [[maybe_unused]] const QList<QAction*>& tracker_actions)
     {
       std::vector<QPolygonF> paths;
-      paths.emplace_back(get_tracking_path_to_draw(
-        application::dataset()[sequence_combobox.currentIndex()]
-          .target_boxes()));
       std::vector<color_map::size_type> color_indices(1, 0);
       color_map::size_type current_index {0};
       for (const auto* action : tracker_actions)
@@ -81,8 +78,6 @@ namespace analyzer::gui
                                     const QList<QAction*>& tracker_actions)
     {
       analyzer::bounding_box_list boxes;
-      boxes.emplace_back(application::ground_truth_bounding_box(
-        sequence_combobox.currentIndex(), main_window.frame_spinbox->value()));
       std::vector<color_map::size_type> color_indices(1, 0);
       color_map::size_type current_index {0};
       for (const auto* action : tracker_actions)
@@ -211,11 +206,7 @@ namespace analyzer::gui
 
     auto make_color_map()
     {
-      if (application::dataset_loaded())
-      {
-        return color_map {1 + analyzer::size(application::tracking_results())};
-      }
-      return color_map {0};
+      return color_map {analyzer::size(application::tracking_results())};
     }
 
     void restore_window(main_window& window)
@@ -406,6 +397,41 @@ namespace analyzer::gui
       status_bar_message_timeout.count());
   }
 
+  namespace
+  {
+    auto make_tracker_tag(const std::string& tracker_name,
+                          const QColor& color,
+                          QLayout& layout)
+    {
+      auto* tag {
+        new qtag {QString::fromStdString(tracker_name), color, nullptr}};
+      tag->setVisible(false);
+      layout.addWidget(tag);
+      return tag;
+    }
+  }  // namespace
+
+  auto main_window::make_tracker_action(const std::string& tracker_name)
+  {
+    auto* const action {ui->action_tracker_selection->menu()->addAction(
+      QString::fromStdString(tracker_name))};
+    action->setCheckable(true);
+    connect(action, &QAction::toggled, this, &main_window::toggle_tracker);
+  }
+
+  void main_window::update_tracker_ui()
+  {
+    for (color_map::size_type i {0}; i < m_box_colors.size(); ++i)
+    {
+      m_tracker_labels.push_back(
+        make_tracker_tag(application::tracking_results()[i].name(),
+                         m_box_colors[i],
+                         *ui->tracker_name_layout));
+      make_tracker_action(application::tracking_results()[i].name());
+    }
+    ui->action_tracker_selection->setEnabled(true);
+  }
+
   void main_window::load_dataset(const QString& dataset_path)
   {
     setCursor(Qt::WaitCursor);
@@ -419,12 +445,11 @@ namespace analyzer::gui
       m_box_colors = make_color_map();
       ui->action_open_dataset->setEnabled(false);
       m_sequence_combobox->setEnabled(true);
-      reinitialize_combobox(*m_sequence_combobox,
-                            analyzer::sequence_names(
-                              application::instance()->dataset().sequences()));
+      reinitialize_combobox(
+        *m_sequence_combobox,
+        analyzer::sequence_names(application::dataset().sequences()));
       m_tag_labels = create_tag_labels(this, *ui->tag_layout);
-      auto* const gt_tag {new qtag {"Ground Truth", m_box_colors[0], this}};
-      ui->tracker_name_layout->addWidget(gt_tag);
+      update_tracker_ui();
       m_dataset_info_label->setToolTip(create_dataset_info());
       m_dataset_info_label->setText("OTB-100");
     }

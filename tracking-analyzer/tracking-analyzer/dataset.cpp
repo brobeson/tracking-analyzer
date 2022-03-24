@@ -1,6 +1,5 @@
 #include "tracking-analyzer/dataset.h"
 #include "tracking-analyzer/filesystem.h"
-#include "tracking-analyzer/tracking_results.h"
 #include <QDir>
 #include <filesystem>
 #include <fstream>
@@ -86,10 +85,9 @@ namespace analyzer
       return analyzer::read_bounding_boxes(s);
     }
 
-    auto read_ground_truth_boxes(const std::string& dataset_path,
-                                 const std::string& sequence_name)
+    auto read_ground_truth_boxes(const QString& path)
     {
-      return read_ground_truth_boxes(dataset_path + '/' + sequence_name);
+      return read_ground_truth_boxes(path.toStdString());
     }
 
     auto abbreviation_to_tag(const std::string& abbreviation)
@@ -171,7 +169,6 @@ namespace analyzer
     m_name {name},
     m_root_path {path},
     m_frame_paths {analyzer::make_sequence_frame_paths(path)},
-    m_target_boxes {analyzer::read_ground_truth_boxes(path.toStdString())},
     m_tags {analyzer::read_sequence_tags(path.toStdString())}
   {
     if (m_root_path.isEmpty())
@@ -201,19 +198,12 @@ namespace analyzer
   auto sequence::name() const -> QString { return m_name; }
   auto sequence::frame_paths() const -> QStringList { return m_frame_paths; }
   auto sequence::path() const -> QString { return m_root_path; }
-  auto sequence::target_boxes() const -> analyzer::bounding_box_list
-  {
-    return m_target_boxes;
-  }
   auto sequence::tags() const -> QStringList { return m_tags; }
 
   auto sequence::operator[](gsl::index index) const -> analyzer::frame
   {
-    Expects(index >= 0
-            && index < gsl::narrow_cast<gsl::index>(m_target_boxes.size()));
     return analyzer::frame {
-      m_frame_paths[gsl::narrow_cast<int>(index)].toStdString(),
-      m_target_boxes[gsl::narrow_cast<sequence::size_type>(index)]};
+      m_frame_paths[gsl::narrow_cast<int>(index)].toStdString()};
   }
 
   dataset::dataset(const QString& root_path,
@@ -256,31 +246,27 @@ namespace analyzer
     return m_sequences[gsl::narrow_cast<int>(index)];
   }
 
-  namespace
-  {
-    auto load_ground_truth_boxes(const std::string& dataset_path)
-    {
-      const auto names {
-        read_sequence_names(QString::fromStdString(dataset_path))};
-      tracker_results gt_results {"Ground Truth", {}};
-      std::transform(
-        std::begin(names),
-        std::end(names),
-        std::back_inserter(gt_results.sequences()),
-        [&dataset_path](const QString& sequence_name) {
-          return sequence_results {
-            sequence_name.toStdString(),
-            read_ground_truth_boxes(dataset_path, sequence_name.toStdString())};
-        });
-      return gt_results;
-    }
-  }  // namespace
-
-  auto load_dataset(const QString& path) -> analyzer::dataset
+  auto load_ground_truth_boxes(const QString& path) -> tracker_results
   {
     const auto dataset_path {analyzer::make_absolute_path(path)};
-    return analyzer::dataset {dataset_path,
-                              analyzer::read_sequences(dataset_path)};
+    const auto names {read_sequence_names(dataset_path)};
+    tracker_results gt_results {"Ground Truth", {}};
+    std::transform(
+      std::begin(names),
+      std::end(names),
+      std::back_inserter(gt_results.sequences()),
+      [&dataset_path](const QString& sequence_name) {
+        return sequence_results {
+          sequence_name.toStdString(),
+          read_ground_truth_boxes(dataset_path + '/' + sequence_name)};
+      });
+    return gt_results;
+  }
+
+  auto load_dataset(const QString& path) -> dataset
+  {
+    const auto dataset_path {analyzer::make_absolute_path(path)};
+    return dataset {dataset_path, analyzer::read_sequences(dataset_path)};
   }
 
   auto sequence_names(const QVector<analyzer::sequence>& sequences)

@@ -28,6 +28,8 @@ namespace analyzer::gui
   {
     const auto app {application::instance()};
     app->dataset() = analyzer::load_dataset(dataset_path);
+    analyzer::push_front(app->tracking_results(),
+                         analyzer::load_ground_truth_boxes(dataset_path));
     app->settings().setValue(settings_keys::last_loaded_dataset, dataset_path);
   }
 
@@ -42,14 +44,6 @@ namespace analyzer::gui
       frame = frame.convertToFormat(QImage::Format_RGB32);
     }
     return frame;
-  }
-
-  auto application::ground_truth_bounding_box(int sequence_index,
-                                              int frame_index)
-    -> analyzer::bounding_box
-  {
-    return application::dataset()[sequence_index][frame_index]
-      .ground_truth_bounding_box;
   }
 
   auto application::dataset_loaded() -> bool

@@ -270,6 +270,24 @@ namespace analyzer
 
     /**
      * \brief Get read-only access to the results for a specific tracker.
+     * \param[in] i The index into the tracker results list. This is a
+     *    0-based index like for any other C++ contiguous data structure.
+     * \return A read-only reference to the requested tracker results.
+     * \throws std::out_of_range If \$i \ge size()\$.
+     */
+    [[nodiscard]] auto operator[](size_type i) const -> const tracker_results&;
+
+    /**
+     * \brief Get read-write access to the results for a specific tracker.
+     * \param[in] i The index into the tracker results list. This is a
+     *    0-based index like for any other C++ contiguous data structure.
+     * \return A read-write reference to the requested tracker results.
+     * \throws std::out_of_range If \$i \ge size()\$.
+     */
+    [[nodiscard]] auto operator[](size_type i) -> tracker_results&;
+
+    /**
+     * \brief Get read-only access to the results for a specific tracker.
      * \param[in] tracker_name The name of the tracker results to get. This is
      * case sensitive.
      * \return A read-only reference to the requested tracker results.

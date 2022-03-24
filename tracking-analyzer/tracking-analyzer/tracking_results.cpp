@@ -163,6 +163,16 @@ namespace analyzer
     return m_trackers;
   }
 
+  auto results_database::operator[](size_type i) const -> const tracker_results&
+  {
+    return m_trackers.at(i);
+  }
+
+  auto results_database::operator[](size_type i) -> tracker_results&
+  {
+    return m_trackers.at(i);
+  }
+
   auto results_database::operator[](const std::string& tracker_name) const
     -> const tracker_results&
   {

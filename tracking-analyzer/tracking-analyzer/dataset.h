@@ -3,10 +3,10 @@
 
 #include "tracking-analyzer/bounding_box.h"
 #include "tracking-analyzer/exceptions.h"
+#include "tracking-analyzer/tracking_results.h"
 #include <QStringList>
 #include <QVector>
 #include <gsl/gsl_util>
-#include <stdexcept>
 
 namespace analyzer
 {
@@ -58,7 +58,6 @@ namespace analyzer
   struct frame final
   {
     std::string image_path;
-    analyzer::bounding_box ground_truth_bounding_box;
   };
 
   class sequence final
@@ -70,7 +69,6 @@ namespace analyzer
     [[nodiscard]] auto name() const -> QString;
     [[nodiscard]] auto frame_paths() const -> QStringList;
     [[nodiscard]] auto path() const -> QString;
-    [[nodiscard]] auto target_boxes() const -> analyzer::bounding_box_list;
     [[nodiscard]] auto tags() const -> QStringList;
     [[nodiscard]] auto operator[](gsl::index index) const -> analyzer::frame;
 
@@ -78,7 +76,6 @@ namespace analyzer
     QString m_name;
     QString m_root_path;
     QStringList m_frame_paths;
-    analyzer::bounding_box_list m_target_boxes;
     QStringList m_tags;
   };
 
@@ -101,6 +98,8 @@ namespace analyzer
   };
 
   auto load_dataset(const QString& path) -> dataset;
+
+  auto load_ground_truth_boxes(const QString& path) -> tracker_results;
 
   auto sequence_names(const QVector<analyzer::sequence>& sequences)
     -> QStringList;

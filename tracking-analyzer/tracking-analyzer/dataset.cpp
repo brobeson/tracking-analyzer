@@ -7,12 +7,11 @@
 
 namespace analyzer
 {
-  frame_record::frame_record(const std::string& img_path, bounding_box tgt_box):
-    m_image_path {img_path}, m_box {tgt_box}
+  frame_record::frame_record(const std::string& img_path):
+    m_image_path {img_path}
   {
   }
   auto frame_record::image_path() const -> std::string { return m_image_path; }
-  auto frame_record::target_box() const -> bounding_box { return m_box; }
 
   auto sequence_record::name() const -> std::string { return m_name; }
   auto sequence_record::root_path() const -> std::string { return m_root_path; }
@@ -200,9 +199,9 @@ namespace analyzer
   auto sequence::path() const -> QString { return m_root_path; }
   auto sequence::tags() const -> QStringList { return m_tags; }
 
-  auto sequence::operator[](gsl::index index) const -> analyzer::frame
+  auto sequence::operator[](gsl::index index) const -> frame_record
   {
-    return analyzer::frame {
+    return analyzer::frame_record {
       m_frame_paths[gsl::narrow_cast<int>(index)].toStdString()};
   }
 

@@ -43,19 +43,19 @@ namespace analyzer_test
       QVERIFY(sequence.frames().empty());
     }
 
-    void iterate_over_frames() const
-    {
-      analyzer::sequence_record sequence;
-      sequence.frames() = {{"1.jpg", {1.0f, 1.0f, 1.0f, 1.0f}},
-                           {"2.jpg", {2.0f, 2.0f, 2.0f, 2.0f}}};
-      const std::array<std::string, 2> expected_paths {{"1.jpg", "2.jpg"}};
-      uint64_t i {0};
-      for (const auto& frame : sequence)
-      {
-        QCOMPARE(frame.image_path(), expected_paths.at(i));
-        ++i;
-      }
-    }
+    // void iterate_over_frames() const
+    // {
+    //   analyzer::sequence_record sequence;
+    //   sequence.frames() = {{"1.jpg", {1.0f, 1.0f, 1.0f, 1.0f}},
+    //                        {"2.jpg", {2.0f, 2.0f, 2.0f, 2.0f}}};
+    //   const std::array<std::string, 2> expected_paths {{"1.jpg", "2.jpg"}};
+    //   uint64_t i {0};
+    //   for (const auto& frame : sequence)
+    //   {
+    //     QCOMPARE(frame.image_path(), expected_paths.at(i));
+    //     ++i;
+    //   }
+    // }
   };
 }  // namespace analyzer_test
 

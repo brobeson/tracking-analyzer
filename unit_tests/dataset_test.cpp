@@ -29,20 +29,26 @@ namespace analyzer
 
 namespace analyzer_test
 {
+  using namespace std::literals::string_literals;
+
   class dataset_test final: public QObject
   {
     // NOLINTNEXTLINE(modernize-use-trailing-return-type)
     Q_OBJECT
 
   private slots:
-    void construct_invalid_sequence_exception() const
+    void frame_record_test() const
     {
-      const analyzer::invalid_sequence e {"name", "path", "what"};
-      QCOMPARE(e.name(), "name"s);
-      QCOMPARE(e.path(), "path"s);
-      QCOMPARE(e.what(), "what");
+      const analyzer::frame_record a;
+      QVERIFY(a.image_path().empty());
+      const analyzer::frame_record b {"a path"};
+      QCOMPARE(b.image_path(), "a path"s);
     }
 
+    //--------------------------------------------------------------------------
+    //                                                old code - not refactored
+    //          yet see https://github.com/brobeson/tracking-analyzer/issues/41
+    //--------------------------------------------------------------------------
     void construct_default_dataset() const
     {
       const analyzer::dataset d;

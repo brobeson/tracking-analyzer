@@ -14,13 +14,11 @@ namespace analyzer
   {
   public:
     frame_record() = default;
-    frame_record(const std::string& img_path, bounding_box tgt_box);
+    explicit frame_record(const std::string& img_path);
     [[nodiscard]] auto image_path() const -> std::string;
-    [[nodiscard]] auto target_box() const -> bounding_box;
 
   private:
     std::string m_image_path;
-    bounding_box m_box;
   };
 
   class sequence_record final
@@ -55,11 +53,6 @@ namespace analyzer
   //                                              old code - not refactored yet
   //                see https://github.com/brobeson/tracking-analyzer/issues/41
   //----------------------------------------------------------------------------
-  struct frame final
-  {
-    std::string image_path;
-  };
-
   class sequence final
   {
   public:
@@ -70,7 +63,7 @@ namespace analyzer
     [[nodiscard]] auto frame_paths() const -> QStringList;
     [[nodiscard]] auto path() const -> QString;
     [[nodiscard]] auto tags() const -> QStringList;
-    [[nodiscard]] auto operator[](gsl::index index) const -> analyzer::frame;
+    [[nodiscard]] auto operator[](gsl::index index) const -> frame_record;
 
   private:
     QString m_name;

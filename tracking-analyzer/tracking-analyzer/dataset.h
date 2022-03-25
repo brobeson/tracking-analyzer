@@ -24,19 +24,25 @@ namespace analyzer
   class sequence_record final
   {
   public:
+    using frame_list = std::vector<frame_record>;
+    using tag_list = std::vector<std::string>;
+
+    sequence_record() = default;
+    sequence_record(const std::string& sequence_name,
+                    const std::string& sequence_path,
+                    const tag_list& challenges,
+                    const frame_list& frame_data);
     [[nodiscard]] auto name() const -> std::string;
     [[nodiscard]] auto root_path() const -> std::string;
-    [[nodiscard]] auto challenge_tags() const
-      -> const std::vector<std::string>&;
-    [[nodiscard]] auto frames() const noexcept
-      -> const std::vector<frame_record>&;
-    [[nodiscard]] auto frames() noexcept -> std::vector<frame_record>&;
+    [[nodiscard]] auto challenge_tags() const -> const tag_list&;
+    [[nodiscard]] auto frames() const noexcept -> const frame_list&;
+    [[nodiscard]] auto frames() noexcept -> frame_list&;
 
   private:
     std::string m_name;
     std::string m_root_path;
-    std::vector<std::string> m_challenge_tags;
-    std::vector<frame_record> m_frames;
+    tag_list m_challenge_tags;
+    frame_list m_frames;
   };
 
   [[nodiscard]] inline auto begin(const sequence_record& s)

@@ -194,6 +194,17 @@ namespace analyzer
     }
   }
 
+  sequence_record::sequence_record(const std::string& sequence_name,
+                                   const std::string& sequence_path,
+                                   const tag_list& challenges,
+                                   const frame_list& frame_data):
+    m_name {sequence_name},
+    m_root_path {sequence_path},
+    m_challenge_tags {challenges},
+    m_frames {frame_data}
+  {
+  }
+
   auto sequence::name() const -> QString { return m_name; }
   auto sequence::frame_paths() const -> QStringList { return m_frame_paths; }
   auto sequence::path() const -> QString { return m_root_path; }

@@ -27,6 +27,8 @@
 
 namespace analyzer_test
 {
+  using namespace std::literals::string_literals;
+
   class sequence_record_test final: public QObject
   {
     // NOLINTNEXTLINE(modernize-use-trailing-return-type)
@@ -43,19 +45,39 @@ namespace analyzer_test
       QVERIFY(sequence.frames().empty());
     }
 
-    // void iterate_over_frames() const
-    // {
-    //   analyzer::sequence_record sequence;
-    //   sequence.frames() = {{"1.jpg", {1.0f, 1.0f, 1.0f, 1.0f}},
-    //                        {"2.jpg", {2.0f, 2.0f, 2.0f, 2.0f}}};
-    //   const std::array<std::string, 2> expected_paths {{"1.jpg", "2.jpg"}};
-    //   uint64_t i {0};
-    //   for (const auto& frame : sequence)
-    //   {
-    //     QCOMPARE(frame.image_path(), expected_paths.at(i));
-    //     ++i;
-    //   }
-    // }
+    void construct_sequence_record() const
+    {
+      const analyzer::sequence_record sequence {
+        "name",
+        "path",
+        {"occlusion", "rotation"},
+        {analyzer::frame_record {"path/1.jpg"},
+         analyzer::frame_record {"path/2.jpg"},
+         analyzer::frame_record {"path/3.jpg"}}};
+      QCOMPARE(sequence.name(), "name"s);
+      QCOMPARE(sequence.root_path(), "path"s);
+      QCOMPARE(sequence.challenge_tags().size(), 2ul);
+      QCOMPARE(sequence.frames().size(), 3ul);
+    }
+
+    void iterate_over_frames() const
+    {
+      const analyzer::sequence_record sequence {
+        "",
+        "",
+        {},
+        {analyzer::frame_record {"1.jpg"},
+         analyzer::frame_record {"2.jpg"},
+         analyzer::frame_record {"3.jpg"}}};
+      const std::array<std::string, 3> expected_paths {
+        {"1.jpg", "2.jpg", "3.jpg"}};
+      uint64_t i {0};
+      for (const auto& frame : sequence)
+      {
+        QCOMPARE(frame.image_path(), expected_paths.at(i));
+        ++i;
+      }
+    }
   };
 }  // namespace analyzer_test
 

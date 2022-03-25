@@ -25,6 +25,7 @@ namespace analyzer
   {
   public:
     using frame_list = std::vector<frame_record>;
+    using size_type = frame_list::size_type;
     using tag_list = std::vector<std::string>;
 
     sequence_record() = default;
@@ -37,6 +38,8 @@ namespace analyzer
     [[nodiscard]] auto challenge_tags() const -> const tag_list&;
     [[nodiscard]] auto frames() const noexcept -> const frame_list&;
     [[nodiscard]] auto frames() noexcept -> frame_list&;
+    [[nodiscard]] auto operator[](size_type i) const -> const frame_record&;
+    [[nodiscard]] auto operator[](size_type i) -> frame_record&;
 
   private:
     std::string m_name;
@@ -45,38 +48,39 @@ namespace analyzer
     frame_list m_frames;
   };
 
-  [[nodiscard]] inline auto begin(const sequence_record& s)
-  {
-    return std::begin(s.frames());
-  }
+  [[nodiscard]] auto size(const sequence_record& seq)
+    -> sequence_record::size_type;
 
-  [[nodiscard]] inline auto end(const sequence_record& s)
-  {
-    return std::end(s.frames());
-  }
+  [[nodiscard]] auto begin(const sequence_record& s)
+    -> sequence_record::frame_list::const_iterator;
+
+  [[nodiscard]] auto end(const sequence_record& s)
+    -> sequence_record::frame_list::const_iterator;
 
   //----------------------------------------------------------------------------
   //                                              old code - not refactored yet
   //                see https://github.com/brobeson/tracking-analyzer/issues/41
   //----------------------------------------------------------------------------
-  class sequence final
-  {
-  public:
-    using size_type = analyzer::bounding_box_list::size_type;
-    sequence() = default;
-    sequence(const QString& name, const QString& path);
-    [[nodiscard]] auto name() const -> QString;
-    [[nodiscard]] auto frame_paths() const -> QStringList;
-    [[nodiscard]] auto path() const -> QString;
-    [[nodiscard]] auto tags() const -> QStringList;
-    [[nodiscard]] auto operator[](gsl::index index) const -> frame_record;
+  // class sequence final
+  // {
+  // public:
+  //   using size_type = analyzer::bounding_box_list::size_type;
+  //   sequence() = default;
+  //   sequence(const QString& name, const QString& path);
+  //   [[nodiscard]] auto name() const -> QString;
+  //   [[nodiscard]] auto frame_paths() const -> QStringList;
+  //   [[nodiscard]] auto path() const -> QString;
+  //   [[nodiscard]] auto tags() const -> QStringList;
+  //   [[nodiscard]] auto operator[](gsl::index index) const -> frame_record;
 
-  private:
-    QString m_name;
-    QString m_root_path;
-    QStringList m_frame_paths;
-    QStringList m_tags;
-  };
+  // private:
+  //   QString m_name;
+  //   QString m_root_path;
+  //   QStringList m_frame_paths;
+  //   QStringList m_tags;
+  // };
+
+  using sequence = sequence_record;
 
   class dataset final
   {

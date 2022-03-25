@@ -183,15 +183,16 @@ namespace analyzer::gui
     }
 
     void reset_tags(const std::vector<qtag*>& tag_labels,
-                    const QStringList& sequence_tags)
+                    const sequence_record::tag_list& sequence_tags)
     {
       for (const auto& tag_label : tag_labels)
       {
-        const auto shouldShow {std::any_of(std::begin(sequence_tags),
-                                           std::end(sequence_tags),
-                                           [tag_label](const QString& tag) {
-                                             return tag == tag_label->text();
-                                           })};
+        const auto shouldShow {
+          std::any_of(std::begin(sequence_tags),
+                      std::end(sequence_tags),
+                      [tag_label](const std::string& tag) {
+                        return tag == tag_label->text().toStdString();
+                      })};
         tag_label->setVisible(shouldShow);
       }
     }
@@ -326,11 +327,11 @@ namespace analyzer::gui
     analyzer::gui::clear_display(*ui);
     if (index >= 0)
     {
-      reset_tags(m_tag_labels, application::dataset()[index].tags());
+      reset_tags(m_tag_labels, application::dataset()[index].challenge_tags());
       analyzer::gui::synchronize_frame_controls(*ui, 0);
       draw_current_frame();
-      const auto maximum_frame {
-        application::dataset().sequences()[index].frame_paths().length() - 1};
+      const auto maximum_frame {gsl::narrow_cast<int>(
+        analyzer::size(application::dataset().sequences()[index]) - 1ul)};
       ui->frame_spinbox->setEnabled(true);
       ui->frame_spinbox->setSuffix(" of " + QString::number(maximum_frame));
       ui->frame_spinbox->setMaximum(maximum_frame);

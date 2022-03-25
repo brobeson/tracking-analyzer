@@ -37,7 +37,10 @@ namespace analyzer::gui
     -> QImage
   {
     const auto frame_path {
-      application::dataset()[sequence_index][frame_index].image_path()};
+      application::dataset()[sequence_index]
+                            [static_cast<sequence_record::size_type>(
+                               frame_index)]
+                              .image_path()};
     QImage frame {QString::fromStdString(frame_path)};
     if (frame.format() != QImage::Format_RGB32)
     {

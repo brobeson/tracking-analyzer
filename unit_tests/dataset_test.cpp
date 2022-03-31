@@ -3,8 +3,8 @@
 #include <QTest>
 #include <iostream>
 
-Q_DECLARE_METATYPE(analyzer::dataset)   // NOLINT
-Q_DECLARE_METATYPE(analyzer::sequence)  // NOLINT
+Q_DECLARE_METATYPE(analyzer::dataset)          // NOLINT
+Q_DECLARE_METATYPE(analyzer::sequence_record)  // NOLINT
 
 using namespace std::literals::string_literals;
 
@@ -26,8 +26,8 @@ namespace analyzer
     return a.image_path() == b.image_path();
   }
 
-  [[nodiscard]] auto operator==(const analyzer::sequence& a,
-                                const analyzer::sequence& b)
+  [[nodiscard]] auto operator==(const analyzer::sequence_record& a,
+                                const analyzer::sequence_record& b)
   {
     return a.name() == b.name() && a.frames() == b.frames();
   }
@@ -114,7 +114,7 @@ namespace analyzer_test
 
     void sequence_names_data() const
     {
-      using sequence_list = QVector<analyzer::sequence>;
+      using sequence_list = QVector<analyzer::sequence_record>;
       QTest::addColumn<sequence_list>("sequences");
       QTest::addColumn<QStringList>("expected_names");
       QTest::newRow("empty list") << sequence_list {} << QStringList {};
@@ -129,7 +129,7 @@ namespace analyzer_test
 
     void sequence_names() const
     {
-      QFETCH(const QVector<analyzer::sequence>, sequences);
+      QFETCH(const QVector<analyzer::sequence_record>, sequences);
       QTEST(analyzer::sequence_names(sequences), "expected_names");
     }
   };

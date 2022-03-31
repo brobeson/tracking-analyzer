@@ -127,47 +127,47 @@ namespace analyzer
       using namespace std::literals::string_literals;
       if (abbreviation == "IV")
       {
-        return "illumination variation"s;
+        return "illumination variation"s;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
       }
       if (abbreviation == "SV")
       {
-        return "scale variation"s;
+        return "scale variation"s;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
       }
       if (abbreviation == "OCC")
       {
-        return "occlusion"s;
+        return "occlusion"s;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
       }
       if (abbreviation == "DEF")
       {
-        return "deformation"s;
+        return "deformation"s;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
       }
       if (abbreviation == "MB")
       {
-        return "motion blur"s;
+        return "motion blur"s;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
       }
       if (abbreviation == "FM")
       {
-        return "fast motion"s;
+        return "fast motion"s;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
       }
       if (abbreviation == "IPR")
       {
-        return "in-plane rotation"s;
+        return "in-plane rotation"s;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
       }
       if (abbreviation == "OPR")
       {
-        return "out-of-plane rotation"s;
+        return "out-of-plane rotation"s;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
       }
       if (abbreviation == "OV")
       {
-        return "out-of-view"s;
+        return "out-of-view"s;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
       }
       if (abbreviation == "BC")
       {
-        return "background clutters"s;
+        return "background clutters"s;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
       }
       if (abbreviation == "LR")
       {
-        return "low resolution"s;
+        return "low resolution"s;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
       }
       return ""s;
     }
@@ -197,14 +197,14 @@ namespace analyzer
     auto read_sequences(const QString& dataset_path)
     {
       const auto names {read_sequence_names(dataset_path)};
-      QVector<analyzer::sequence> sequences;
+      QVector<sequence_record> sequences;
       sequences.reserve(names.size());
       for (const auto& name : names)
       {
         try
         {
           const auto sequence_path {(dataset_path + '/' + name)};
-          sequences.push_back(analyzer::sequence {
+          sequences.push_back(sequence_record {
             name.toStdString(),
             sequence_path.toStdString(),
             analyzer::read_sequence_tags(sequence_path.toStdString()),
@@ -219,55 +219,13 @@ namespace analyzer
     }
   }  // namespace
 
-  // sequence::sequence(const QString& name, const QString& path):
-  //   m_name {name},
-  //   m_root_path {path},
-  //   m_frame_paths {analyzer::make_sequence_frame_paths(path)},
-  //   m_tags {analyzer::read_sequence_tags(path.toStdString())}
-  // {
-  //   if (m_root_path.isEmpty())
-  //   {
-  //     throw analyzer::invalid_sequence {
-  //       m_name.toStdString(),
-  //       m_root_path.toStdString(),
-  //       "A sequence cannot have an empty root path."};
-  //   }
-  //   if (!QDir {m_root_path}.exists())
-  //   {
-  //     throw analyzer::invalid_sequence {
-  //       m_name.toStdString(),
-  //       m_root_path.toStdString(),
-  //       "The sequence path " + m_root_path.toStdString() + " does not
-  //       exist."};
-  //   }
-  //   if (m_frame_paths.isEmpty())
-  //   {
-  //     throw analyzer::invalid_sequence {
-  //       m_name.toStdString(),
-  //       m_root_path.toStdString(),
-  //       "The sequence " + m_name.toStdString() + " at path "
-  //         + m_root_path.toStdString() + " does not have frame images."};
-  //   }
-  // }
-
-  // auto sequence::name() const -> QString { return m_name; }
-  // auto sequence::frame_paths() const -> QStringList { return m_frame_paths; }
-  // auto sequence::path() const -> QString { return m_root_path; }
-  // auto sequence::tags() const -> QStringList { return m_tags; }
-
-  // auto sequence::operator[](gsl::index index) const -> frame_record
-  // {
-  //   return analyzer::frame_record {
-  //     m_frame_paths[gsl::narrow_cast<int>(index)].toStdString()};
-  // }
-
   dataset::dataset(const QString& root_path,
-                   const QVector<sequence>& sequences):
+                   const QVector<sequence_record>& sequences):
     m_root_directory {root_path}, m_sequences {sequences}
   {
   }
 
-  auto dataset::sequences() const noexcept -> const QVector<analyzer::sequence>&
+  auto dataset::sequences() const noexcept -> const QVector<sequence_record>&
   {
     return m_sequences;
   }
@@ -295,7 +253,7 @@ namespace analyzer
   }
 
   auto dataset::operator[](const gsl::index index) const
-    -> const analyzer::sequence&
+    -> const sequence_record&
   {
     Expects(index >= 0 && index < m_sequences.length());
     return m_sequences[gsl::narrow_cast<int>(index)];
@@ -324,14 +282,13 @@ namespace analyzer
     return dataset {dataset_path, analyzer::read_sequences(dataset_path)};
   }
 
-  auto sequence_names(const QVector<analyzer::sequence>& sequences)
-    -> QStringList
+  auto sequence_names(const QVector<sequence_record>& sequences) -> QStringList
   {
     QStringList names;
     std::transform(std::begin(sequences),
                    std::end(sequences),
                    std::back_insert_iterator {names},
-                   [](const analyzer::sequence& s) {
+                   [](const sequence_record& s) {
                      return QString::fromStdString(s.name());
                    });
     return names;

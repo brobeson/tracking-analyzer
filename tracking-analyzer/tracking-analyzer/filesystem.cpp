@@ -3,6 +3,11 @@
 
 namespace analyzer
 {
+  auto make_absolute_path(const std::string& path) -> std::string
+  {
+    return make_absolute_path(QString::fromStdString(path)).toStdString();
+  }
+
   auto make_absolute_path(const QString& path) -> QString
   {
     if (path.at(0) == '~')

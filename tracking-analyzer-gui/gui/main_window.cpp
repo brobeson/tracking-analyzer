@@ -183,7 +183,7 @@ namespace analyzer::gui
     }
 
     void reset_tags(const std::vector<qtag*>& tag_labels,
-                    const sequence_record::tag_list& sequence_tags)
+                    const tag_list& sequence_tags)
     {
       for (const auto& tag_label : tag_labels)
       {

@@ -3,17 +3,59 @@
 #include <QTest>
 #include <iostream>
 
+Q_DECLARE_METATYPE(std::string)                // NOLINT
+Q_DECLARE_METATYPE(analyzer::dataset_db)       // NOLINT
 Q_DECLARE_METATYPE(analyzer::dataset)          // NOLINT
 Q_DECLARE_METATYPE(analyzer::sequence_record)  // NOLINT
 
 using namespace std::literals::string_literals;
 
+namespace QTest
+{
+  inline bool qCompare(const analyzer::dataset_db& t1,
+                       const analyzer::dataset_db& t2,
+                       const char* actual,
+                       const char* expected,
+                       const char* file,
+                       int line)
+  {
+    return compare_helper(
+      t1.root_path(), t2.root_path(), ) return compare_string_helper(t1,
+                                                                     t2,
+                                                                     actual,
+                                                                     expected,
+                                                                     file,
+                                                                     line);
+  }
+
+}  // namespace QTest
 namespace analyzer
 {
   // This operator must not be in an unnamed namespace, or the compiler can't
   // find it for later operations.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
+  // [[nodiscard]] auto toString(const std::string& s)
+  // {
+  //   return QTest::toString(QString::fromStdString(s));
+  // }
+
+  [[nodiscard]] auto toString(const dataset_db& db)
+  {
+    return QTest::toString(QString::fromStdString(db.root_path()));
+  }
+
+  [[nodiscard]] auto operator==(const analyzer::dataset_db& a,
+                                const analyzer::dataset_db& b)
+  {
+    return a.root_path() == b.root_path() && a.sequences() == b.sequences();
+  }
+
+  //--------------------------------------------------------------------------
+  //                                                old code - not refactored
+  //          yet see https://github.com/brobeson/tracking-analyzer/issues/41
+  //--------------------------------------------------------------------------
+
   [[nodiscard]] auto operator==(const analyzer::dataset& a,
                                 const analyzer::dataset& b)
   {
@@ -36,6 +78,16 @@ namespace analyzer
 
 namespace analyzer_test
 {
+  namespace
+  {
+    auto make_dataset()
+    {
+      return analyzer::dataset_db {"a path",
+                                   {{"Deer", "Deer path", {}, {}},
+                                    {"Basketball", "Basketball path", {}, {}}}};
+    }
+  }  // namespace
+
   using namespace std::literals::string_literals;
 
   class dataset_test final: public QObject
@@ -52,21 +104,61 @@ namespace analyzer_test
       QCOMPARE(b.image_path(), "a path"s);
     }
 
-    //--------------------------------------------------------------------------
-    //                                                old code - not refactored
-    //          yet see https://github.com/brobeson/tracking-analyzer/issues/41
-    //--------------------------------------------------------------------------
-    void construct_default_dataset() const
+    void construct_dataset_test() const
     {
-      const analyzer::dataset d;
-      QVERIFY(d.sequences().isEmpty());
-      QVERIFY(d.root_path().isEmpty());
+      const auto db {make_dataset()};
+      QCOMPARE(db.root_path(), "a path"s);
+      QCOMPARE(db.sequences().size(), 2);
+    }
+
+    void modify_sequences_test() const
+    {
+      auto db {make_dataset()};
+      QCOMPARE(db.sequences().size(), 2);
+      db.sequences().emplace_back("David",
+                                  "David path",
+                                  analyzer::tag_list {},
+                                  analyzer::sequence_record::frame_list {});
+      QCOMPARE(db.sequences().size(), 3);
+    }
+
+    void sequence_lookup_throw_test() const
+    {
+      const auto db {make_dataset()};
+      QVERIFY_EXCEPTION_THROWN([[maybe_unused]] auto s {db["deer"]},
+                               analyzer::invalid_sequence);
+    }
+
+    void sequence_lookup_test() const
+    {
+      auto db {make_dataset()};
+      QCOMPARE(db["Deer"].root_path(), "Deer path"s);
+      QVERIFY(db["Deer"].frames().empty());
+      db["Deer"].frames().emplace_back("frame path");
+      QCOMPARE(analyzer::size(db["Deer"]), 1);
+    }
+
+    void challenge_tags_test() const
+    {
+      const auto tags {make_dataset().challenge_tags()};
+      QCOMPARE(tags,
+               analyzer::tag_list({"illumination variation",
+                                   "scale variation",
+                                   "occlusion",
+                                   "deformation",
+                                   "motion blur",
+                                   "fast motion",
+                                   "in-plane rotation",
+                                   "out-of-plane rotation",
+                                   "out-of-view",
+                                   "background clutters",
+                                   "low resolution"}));
     }
 
     void load_dataset_data() const
     {
-      QTest::addColumn<QString>("path");
-      QTest::addColumn<analyzer::dataset>("dataset");
+      QTest::addColumn<std::string>("path");
+      QTest::addColumn<analyzer::dataset_db>("dataset");
       // QTest::newRow("nonexistent directory")
       //   << "ghost/"
       //   << analyzer::dataset {"ghost/", QVector<analyzer::sequence> {}};
@@ -75,10 +167,10 @@ namespace analyzer_test
       //   << analyzer::dataset {"empty_dataset/", QVector<analyzer::sequence>
       //   {}};
       QTest::newRow("partial OTB")
-        << "test_dataset"
-        << analyzer::dataset {
-             "test_dataset",
-             QVector {
+        << "test_dataset"s
+        << analyzer::dataset_db {
+             "est_dataset",
+             analyzer::dataset_db::sequence_list {
                analyzer::sequence_record {
                  "Basketball", "test_dataset/Basketball", {}, {}},
                analyzer::sequence_record {
@@ -98,7 +190,7 @@ namespace analyzer_test
 
     void load_dataset() const
     {
-      QFETCH(const QString, path);
+      QFETCH(const std::string, path);
       // const auto ds {analyzer::load_dataset(path)};
       // QFETCH(const analyzer::dataset, dataset);
       // QCOMPARE(ds.sequences().size(), dataset.sequences().size());
@@ -109,9 +201,13 @@ namespace analyzer_test
       //            dataset.sequences()[i].frames().size());
       // }
       // QCOMPARE(ds.root_path(), QString("test_dataset"));
-      QTEST(analyzer::load_dataset(path), "dataset");
+      QTEST(analyzer::load_dataset_from_disk(path), "dataset");
     }
 
+    //--------------------------------------------------------------------------
+    //                                                old code - not refactored
+    //          yet see https://github.com/brobeson/tracking-analyzer/issues/41
+    //--------------------------------------------------------------------------
     void sequence_names_data() const
     {
       using sequence_list = QVector<analyzer::sequence_record>;

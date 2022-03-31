@@ -10,6 +10,8 @@
 
 namespace analyzer
 {
+  using tag_list = std::vector<std::string>;
+
   class frame_record final
   {
   public:
@@ -26,7 +28,6 @@ namespace analyzer
   public:
     using frame_list = std::vector<frame_record>;
     using size_type = frame_list::size_type;
-    using tag_list = std::vector<std::string>;
 
     sequence_record() = default;
     sequence_record(const std::string& sequence_name,
@@ -56,6 +57,36 @@ namespace analyzer
 
   [[nodiscard]] auto end(const sequence_record& s)
     -> sequence_record::frame_list::const_iterator;
+
+  class dataset_db
+  {
+  public:
+    using sequence_list = std::vector<sequence_record>;
+    using size_type = sequence_list::size_type;
+
+    dataset_db() = default;
+    dataset_db(const std::string& root_path, const sequence_list& sequences);
+    dataset_db(const dataset_db&) = default;
+    dataset_db(dataset_db&&) = default;
+    virtual ~dataset_db() = default;
+    auto operator=(const dataset_db&) -> dataset_db& = default;
+    auto operator=(dataset_db &&) -> dataset_db& = default;
+    [[nodiscard]] auto root_path() const -> std::string;
+    [[nodiscard]] auto sequences() const noexcept -> const sequence_list&;
+    [[nodiscard]] auto sequences() noexcept -> sequence_list&;
+    [[nodiscard]] auto operator[](const std::string& sequence_name) const
+      -> const sequence_record&;
+    [[nodiscard]] auto operator[](const std::string& sequence_name)
+      -> sequence_record&;
+    [[nodiscard]] virtual auto challenge_tags() const -> tag_list;
+
+  private:
+    std::string m_root_path;
+    sequence_list m_sequences;
+  };
+
+  [[nodiscard]] auto load_dataset_from_disk(const std::string& path)
+    -> dataset_db;
 
   //----------------------------------------------------------------------------
   //                                              old code - not refactored yet

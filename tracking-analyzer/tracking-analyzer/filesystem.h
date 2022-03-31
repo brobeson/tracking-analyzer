@@ -6,6 +6,7 @@
 
 namespace analyzer
 {
+  auto make_absolute_path(const std::string& path) -> std::string;
   auto make_absolute_path(const QString& path) -> QString;
   auto basename(const QString& path) -> QString;
   auto get_subdirectories(const std::string& path) -> QStringList;

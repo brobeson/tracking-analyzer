@@ -12,20 +12,23 @@ using namespace std::literals::string_literals;
 
 namespace QTest
 {
-  inline bool qCompare(const analyzer::dataset_db& t1,
+  template <>
+  inline auto qCompare(const analyzer::dataset_db& t1,
                        const analyzer::dataset_db& t2,
-                       const char* actual,
-                       const char* expected,
+                       [[maybe_unused]] const char* actual,
+                       [[maybe_unused]] const char* expected,
                        const char* file,
-                       int line)
+                       int line) -> bool
   {
-    return compare_helper(
-      t1.root_path(), t2.root_path(), ) return compare_string_helper(t1,
-                                                                     t2,
-                                                                     actual,
-                                                                     expected,
-                                                                     file,
-                                                                     line);
+    return compare_helper(t1.root_path() == t2.root_path(),
+                          "Dataset root paths are different.",
+                          t1.root_path().data(),
+                          t2.root_path().data(),
+                          actual,
+                          expected,
+                          file,
+                          line);
+    // return compare_string_helper(t1, t2, actual, expected, file, line);
   }
 
 }  // namespace QTest

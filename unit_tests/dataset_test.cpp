@@ -12,6 +12,14 @@ using namespace std::literals::string_literals;
 
 namespace QTest
 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-declarations"
+  [[nodiscard]] auto toString(const std::string& s) -> char*
+  {
+    return toString(QString::fromStdString(s));
+  }
+#pragma GCC diagnostic pop
+
   template <>
   inline auto qCompare(const analyzer::dataset_db& t1,
                        const analyzer::dataset_db& t2,
@@ -22,8 +30,8 @@ namespace QTest
   {
     return compare_helper(t1.root_path() == t2.root_path(),
                           "Dataset root paths are different.",
-                          t1.root_path().data(),
-                          t2.root_path().data(),
+                          toString(t1.root_path()),
+                          toString(t2.root_path()),
                           actual,
                           expected,
                           file,
@@ -32,6 +40,7 @@ namespace QTest
   }
 
 }  // namespace QTest
+
 namespace analyzer
 {
   // This operator must not be in an unnamed namespace, or the compiler can't
@@ -111,18 +120,18 @@ namespace analyzer_test
     {
       const auto db {make_dataset()};
       QCOMPARE(db.root_path(), "a path"s);
-      QCOMPARE(db.sequences().size(), 2);
+      QCOMPARE(db.sequences().size(), 2ul);
     }
 
     void modify_sequences_test() const
     {
       auto db {make_dataset()};
-      QCOMPARE(db.sequences().size(), 2);
+      QCOMPARE(db.sequences().size(), 2ul);
       db.sequences().emplace_back("David",
                                   "David path",
                                   analyzer::tag_list {},
                                   analyzer::sequence_record::frame_list {});
-      QCOMPARE(db.sequences().size(), 3);
+      QCOMPARE(db.sequences().size(), 3ul);
     }
 
     void sequence_lookup_throw_test() const
@@ -138,7 +147,7 @@ namespace analyzer_test
       QCOMPARE(db["Deer"].root_path(), "Deer path"s);
       QVERIFY(db["Deer"].frames().empty());
       db["Deer"].frames().emplace_back("frame path");
-      QCOMPARE(analyzer::size(db["Deer"]), 1);
+      QCOMPARE(analyzer::size(db["Deer"]), 1ul);
     }
 
     void challenge_tags_test() const
@@ -172,7 +181,7 @@ namespace analyzer_test
       QTest::newRow("partial OTB")
         << "test_dataset"s
         << analyzer::dataset_db {
-             "est_dataset",
+             "test_dataset",
              analyzer::dataset_db::sequence_list {
                analyzer::sequence_record {
                  "Basketball", "test_dataset/Basketball", {}, {}},

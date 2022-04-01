@@ -140,6 +140,16 @@ namespace analyzer
             "low resolution"};
   }
 
+  auto begin(const dataset_db& db) -> dataset_db::sequence_list::const_iterator
+  {
+    return std::begin(db.sequences());
+  }
+
+  auto end(const dataset_db& db) -> dataset_db::sequence_list::const_iterator
+  {
+    return std::end(db.sequences());
+  }
+
   namespace  // Functions to assist loading a dataset from disk
   {
     auto read_sequence_names(const std::string& dataset_path)
@@ -278,6 +288,15 @@ namespace analyzer
     return dataset_db {dataset_path, analyzer::read_sequences(dataset_path)};
   }
 
+  auto sequence_names(const dataset_db& db) -> std::vector<std::string>
+  {
+    std::vector<std::string> names;
+    std::transform(begin(db),
+                   end(db),
+                   std::back_insert_iterator {names},
+                   [](const sequence_record& s) { return s.name(); });
+    return names;
+  }
   //----------------------------------------------------------------------------
   //                                              old code - not refactored yet
   //                see https://github.com/brobeson/tracking-analyzer/issues/41

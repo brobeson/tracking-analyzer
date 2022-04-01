@@ -4,42 +4,10 @@
 #include <iostream>
 
 Q_DECLARE_METATYPE(std::string)                // NOLINT
-Q_DECLARE_METATYPE(analyzer::dataset_db)       // NOLINT
-Q_DECLARE_METATYPE(analyzer::dataset)          // NOLINT
 Q_DECLARE_METATYPE(analyzer::sequence_record)  // NOLINT
+Q_DECLARE_METATYPE(analyzer::dataset_db)       // NOLINT
 
 using namespace std::literals::string_literals;
-
-namespace QTest
-{
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-declarations"
-  [[nodiscard]] auto toString(const std::string& s) -> char*
-  {
-    return toString(QString::fromStdString(s));
-  }
-#pragma GCC diagnostic pop
-
-  template <>
-  inline auto qCompare(const analyzer::dataset_db& t1,
-                       const analyzer::dataset_db& t2,
-                       [[maybe_unused]] const char* actual,
-                       [[maybe_unused]] const char* expected,
-                       const char* file,
-                       int line) -> bool
-  {
-    return compare_helper(t1.root_path() == t2.root_path(),
-                          "Dataset root paths are different.",
-                          toString(t1.root_path()),
-                          toString(t2.root_path()),
-                          actual,
-                          expected,
-                          file,
-                          line);
-    // return compare_string_helper(t1, t2, actual, expected, file, line);
-  }
-
-}  // namespace QTest
 
 namespace analyzer
 {
@@ -47,10 +15,10 @@ namespace analyzer
   // find it for later operations.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
-  // [[nodiscard]] auto toString(const std::string& s)
-  // {
-  //   return QTest::toString(QString::fromStdString(s));
-  // }
+  [[nodiscard]] auto toString(const std::string& s)
+  {
+    return QTest::toString(QString::fromStdString(s));
+  }
 
   [[nodiscard]] auto toString(const dataset_db& db)
   {
@@ -167,78 +135,82 @@ namespace analyzer_test
                                    "low resolution"}));
     }
 
-    void load_dataset_data() const
-    {
-      QTest::addColumn<std::string>("path");
-      QTest::addColumn<analyzer::dataset_db>("dataset");
-      // QTest::newRow("nonexistent directory")
-      //   << "ghost/"
-      //   << analyzer::dataset {"ghost/", QVector<analyzer::sequence> {}};
-      // QTest::newRow("empty directory")
-      //   << "empty_dataset/"
-      //   << analyzer::dataset {"empty_dataset/", QVector<analyzer::sequence>
-      //   {}};
-      QTest::newRow("partial OTB")
-        << "test_dataset"s
-        << analyzer::dataset_db {
-             "test_dataset",
-             analyzer::dataset_db::sequence_list {
-               analyzer::sequence_record {
-                 "Basketball", "test_dataset/Basketball", {}, {}},
-               analyzer::sequence_record {
-                 "Biker",
-                 "test_dataset/Biker",
-                 {},
-                 analyzer::sequence_record::frame_list {
-                   analyzer::frame_record {"test_dataset/Biker/img/0001.jpg"},
-                   analyzer::frame_record {"test_dataset/Biker/img/0002.jpg"},
-                   analyzer::frame_record {"test_dataset/Biker/img/0003.jpg"}}},
-               analyzer::sequence_record {
-                 "Bird1", "test_dataset/Bird1", {}, {}},
-               analyzer::sequence_record {
-                 "Bird2", "test_dataset/Bird2", {}, {}},
-             }};
-    }
+    // void load_dataset_data() const
+    // {
+    //   QTest::addColumn<std::string>("path");
+    //   QTest::addColumn<analyzer::dataset_db>("dataset");
+    //   // QTest::newRow("nonexistent directory")
+    //   //   << "ghost/"
+    //   //   << analyzer::dataset {"ghost/", QVector<analyzer::sequence> {}};
+    //   // QTest::newRow("empty directory")
+    //   //   << "empty_dataset/"
+    //   //   << analyzer::dataset {"empty_dataset/",
+    //   QVector<analyzer::sequence>
+    //   //   {}};
+    //   QTest::newRow("partial OTB")
+    //     << "test_dataset"s
+    //     << analyzer::dataset_db {
+    //          "test_dataset",
+    //          analyzer::dataset_db::sequence_list {
+    //            analyzer::sequence_record {
+    //              "Basketball", "test_dataset/Basketball", {}, {}},
+    //            analyzer::sequence_record {
+    //              "Biker",
+    //              "test_dataset/Biker",
+    //              {},
+    //              analyzer::sequence_record::frame_list {
+    //                analyzer::frame_record
+    //                {"test_dataset/Biker/img/0001.jpg"},
+    //                analyzer::frame_record
+    //                {"test_dataset/Biker/img/0002.jpg"},
+    //                analyzer::frame_record
+    //                {"test_dataset/Biker/img/0003.jpg"}}},
+    //            analyzer::sequence_record {
+    //              "Bird1", "test_dataset/Bird1", {}, {}},
+    //            analyzer::sequence_record {
+    //              "Bird2", "test_dataset/Bird2", {}, {}},
+    //          }};
+    // }
 
-    void load_dataset() const
-    {
-      QFETCH(const std::string, path);
-      // const auto ds {analyzer::load_dataset(path)};
-      // QFETCH(const analyzer::dataset, dataset);
-      // QCOMPARE(ds.sequences().size(), dataset.sequences().size());
-      // for (int i {0}; i < ds.sequences().size(); ++i)
-      // {
-      //   QCOMPARE(ds.sequences()[i].name(), dataset.sequences()[i].name());
-      //   QCOMPARE(ds.sequences()[i].frames().size(),
-      //            dataset.sequences()[i].frames().size());
-      // }
-      // QCOMPARE(ds.root_path(), QString("test_dataset"));
-      QTEST(analyzer::load_dataset_from_disk(path), "dataset");
-    }
+    // void load_dataset() const
+    // {
+    //   QFETCH(const std::string, path);
+    //   // const auto ds {analyzer::load_dataset(path)};
+    //   // QFETCH(const analyzer::dataset, dataset);
+    //   // QCOMPARE(ds.sequences().size(), dataset.sequences().size());
+    //   // for (int i {0}; i < ds.sequences().size(); ++i)
+    //   // {
+    //   //   QCOMPARE(ds.sequences()[i].name(), dataset.sequences()[i].name());
+    //   //   QCOMPARE(ds.sequences()[i].frames().size(),
+    //   //            dataset.sequences()[i].frames().size());
+    //   // }
+    //   // QCOMPARE(ds.root_path(), QString("test_dataset"));
+    //   QTEST(analyzer::load_dataset_from_disk(path), "dataset");
+    // }
 
-    //--------------------------------------------------------------------------
-    //                                                old code - not refactored
-    //          yet see https://github.com/brobeson/tracking-analyzer/issues/41
-    //--------------------------------------------------------------------------
     void sequence_names_data() const
     {
-      using sequence_list = QVector<analyzer::sequence_record>;
-      QTest::addColumn<sequence_list>("sequences");
-      QTest::addColumn<QStringList>("expected_names");
-      QTest::newRow("empty list") << sequence_list {} << QStringList {};
+      QTest::addColumn<analyzer::dataset_db>("db");
+      QTest::addColumn<std::vector<std::string>>("expected_names");
+      QTest::newRow("empty list")
+        << analyzer::dataset_db {} << std::vector<std::string> {};
       QTest::newRow("one sequence")
-        << sequence_list {{"Biker", "test_dataset/Biker", {}, {}}}
-        << QStringList {"Biker"};
+        << analyzer::dataset_db {"",
+                                 analyzer::dataset_db::sequence_list {
+                                   {"Biker", "test_dataset/Biker", {}, {}}}}
+        << std::vector<std::string> {"Biker"};
       QTest::newRow("two sequences")
-        << sequence_list {{"Biker", "test_dataset/Biker", {}, {}},
-                          {"Dancer", "test_dataset/Biker", {}, {}}}
-        << QStringList {"Biker", "Dancer"};
+        << analyzer::dataset_db {"",
+                                 analyzer::dataset_db::sequence_list {
+                                   {"Biker", "test_dataset/Biker", {}, {}},
+                                   {"Dancer", "test_dataset/Biker", {}, {}}}}
+        << std::vector<std::string> {"Biker", "Dancer"};
     }
 
     void sequence_names() const
     {
-      QFETCH(const QVector<analyzer::sequence_record>, sequences);
-      QTEST(analyzer::sequence_names(sequences), "expected_names");
+      QFETCH(const analyzer::dataset_db, db);
+      QTEST(analyzer::sequence_names(db), "expected_names");
     }
   };
 }  // namespace analyzer_test

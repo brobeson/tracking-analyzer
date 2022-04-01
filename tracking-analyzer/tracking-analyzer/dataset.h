@@ -85,8 +85,15 @@ namespace analyzer
     sequence_list m_sequences;
   };
 
+  [[nodiscard]] auto begin(const dataset_db& db)
+    -> dataset_db::sequence_list::const_iterator;
+  [[nodiscard]] auto end(const dataset_db& db)
+    -> dataset_db::sequence_list::const_iterator;
+
   [[nodiscard]] auto load_dataset_from_disk(const std::string& path)
     -> dataset_db;
+
+  auto sequence_names(const dataset_db& db) -> std::vector<std::string>;
 
   //----------------------------------------------------------------------------
   //                                              old code - not refactored yet

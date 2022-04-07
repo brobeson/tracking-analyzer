@@ -13,12 +13,11 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ main, develop ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ main, develop ]
-  schedule:
-    - cron: '38 0 * * 5'
+  # schedule:
+  #   - cron: '38 0 * * 5'
 
 env:
   # Conan cache environment variables

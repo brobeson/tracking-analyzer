@@ -297,17 +297,31 @@ namespace analyzer
                    [](const sequence_record& s) { return s.name(); });
     return names;
   }
+
+  auto operator==(const sequence_record& sequence,
+                  const std::string& name) noexcept -> bool
+  {
+    return sequence.name() == name;
+  }
+
+  auto contains(const dataset_db& db, const std::string& sequence_name) noexcept
+    -> bool
+  {
+    const auto i {std::find(begin(db), end(db), sequence_name)};
+    return i != end(db);
+  }
   //----------------------------------------------------------------------------
   //                                              old code - not refactored yet
   //                see https://github.com/brobeson/tracking-analyzer/issues/41
   //----------------------------------------------------------------------------
   namespace
   {
-    auto read_sequence_names(const QString& dataset_path)
-    {
-      const QDir directory {dataset_path};
-      return directory.entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
-    }
+    // auto read_sequence_names(const QString& dataset_path)
+    // {
+    //   const QDir directory {dataset_path};
+    //   return directory.entryList(QDir::Dirs | QDir::NoDotAndDotDot,
+    //   QDir::Name);
+    // }
 
     // auto make_sequence_frame_paths(const QString& sequence_path)
     // {
@@ -429,29 +443,29 @@ namespace analyzer
     //   return tags;
     // }
 
-    auto read_sequences(const QString& dataset_path)
-    {
-      const auto names {read_sequence_names(dataset_path)};
-      QVector<sequence_record> sequences;
-      sequences.reserve(names.size());
-      for (const auto& name : names)
-      {
-        try
-        {
-          const auto sequence_path {(dataset_path + '/' + name)};
-          sequences.push_back(sequence_record {
-            name.toStdString(),
-            sequence_path.toStdString(),
-            analyzer::read_sequence_tags(sequence_path.toStdString()),
-            analyzer::make_sequence_frame_paths(sequence_path)});
-        }
-        catch (...)
-        {
-          // Do nothing for now. Maybe try to report it in the future.
-        }
-      }
-      return sequences;
-    }
+    // auto read_sequences(const QString& dataset_path)
+    // {
+    //   const auto names {read_sequence_names(dataset_path)};
+    //   QVector<sequence_record> sequences;
+    //   sequences.reserve(names.size());
+    //   for (const auto& name : names)
+    //   {
+    //     try
+    //     {
+    //       const auto sequence_path {(dataset_path + '/' + name)};
+    //       sequences.push_back(sequence_record {
+    //         name.toStdString(),
+    //         sequence_path.toStdString(),
+    //         analyzer::read_sequence_tags(sequence_path.toStdString()),
+    //         analyzer::make_sequence_frame_paths(sequence_path)});
+    //     }
+    //     catch (...)
+    //     {
+    //       // Do nothing for now. Maybe try to report it in the future.
+    //     }
+    //   }
+    //   return sequences;
+    // }
   }  // namespace
 
   dataset::dataset(const QString& root_path,
@@ -497,7 +511,7 @@ namespace analyzer
   auto load_ground_truth_boxes(const QString& path) -> tracker_results
   {
     const auto dataset_path {analyzer::make_absolute_path(path)};
-    const auto names {read_sequence_names(dataset_path)};
+    const auto names {read_sequence_names(dataset_path.toStdString())};
     tracker_results gt_results {"Ground Truth", {}};
     std::transform(
       std::begin(names),
@@ -511,21 +525,22 @@ namespace analyzer
     return gt_results;
   }
 
-  auto load_dataset(const QString& path) -> dataset
-  {
-    const auto dataset_path {analyzer::make_absolute_path(path)};
-    return dataset {dataset_path, analyzer::read_sequences(dataset_path)};
-  }
+  // auto load_dataset(const QString& path) -> dataset
+  // {
+  //   const auto dataset_path {analyzer::make_absolute_path(path)};
+  //   return dataset {dataset_path, analyzer::read_sequences(dataset_path)};
+  // }
 
-  auto sequence_names(const QVector<sequence_record>& sequences) -> QStringList
-  {
-    QStringList names;
-    std::transform(std::begin(sequences),
-                   std::end(sequences),
-                   std::back_insert_iterator {names},
-                   [](const sequence_record& s) {
-                     return QString::fromStdString(s.name());
-                   });
-    return names;
-  }
+  // auto sequence_names(const QVector<sequence_record>& sequences) ->
+  // QStringList
+  // {
+  //   QStringList names;
+  //   std::transform(std::begin(sequences),
+  //                  std::end(sequences),
+  //                  std::back_insert_iterator {names},
+  //                  [](const sequence_record& s) {
+  //                    return QString::fromStdString(s.name());
+  //                  });
+  //   return names;
+  // }
 }  // namespace analyzer

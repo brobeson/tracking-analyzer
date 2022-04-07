@@ -204,6 +204,9 @@ namespace analyzer
     sequence_list m_sequences;
   };
 
+  auto operator==(const tracker_results& tracker,
+                  const std::string& name_query) noexcept -> bool;
+
   /**
    * \brief Get the number of sequences for a tracker.
    * \param[in] tracker Get the number of sequences in this tracker results.
@@ -388,6 +391,9 @@ namespace analyzer
     -> results_database;
 
   void push_front(results_database& db, const tracker_results& tracker);
+
+  auto contains(const results_database& db, const std::string& tracker_name)
+    -> bool;
 }  // namespace analyzer
 
 #endif

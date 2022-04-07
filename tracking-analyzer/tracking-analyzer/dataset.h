@@ -11,6 +11,7 @@
 namespace analyzer
 {
   using tag_list = std::vector<std::string>;
+  using name_list = tag_list;
 
   class frame_record final
   {
@@ -93,7 +94,12 @@ namespace analyzer
   [[nodiscard]] auto load_dataset_from_disk(const std::string& path)
     -> dataset_db;
 
-  auto sequence_names(const dataset_db& db) -> std::vector<std::string>;
+  auto operator==(const sequence_record& sequence,
+                  const std::string& name) noexcept -> bool;
+  auto contains(const dataset_db& db, const std::string& sequence_name) noexcept
+    -> bool;
+
+  auto sequence_names(const dataset_db& db) -> name_list;
 
   //----------------------------------------------------------------------------
   //                                              old code - not refactored yet
@@ -117,11 +123,10 @@ namespace analyzer
     QVector<sequence_record> m_sequences;
   };
 
-  auto load_dataset(const QString& path) -> dataset;
-
+  // auto load_dataset(const QString& path) -> dataset;
   auto load_ground_truth_boxes(const QString& path) -> tracker_results;
-
-  auto sequence_names(const QVector<sequence_record>& sequences) -> QStringList;
+  // auto sequence_names(const QVector<sequence_record>& sequences) ->
+  // QStringList;
 }  // namespace analyzer
 
 #endif

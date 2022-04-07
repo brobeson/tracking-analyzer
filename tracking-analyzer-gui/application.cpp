@@ -1,5 +1,6 @@
 #include "application.h"
 #include "tracking-analyzer/filesystem.h"
+#include <optional>
 
 namespace analyzer::gui
 {
@@ -17,7 +18,7 @@ namespace analyzer::gui
     return dynamic_cast<application*>(QCoreApplication::instance());
   }
 
-  auto application::dataset() -> analyzer::dataset&
+  auto application::dataset() -> analyzer::dataset_db&
   {
     return instance()->m_dataset;
   }
@@ -27,20 +28,22 @@ namespace analyzer::gui
   void application::load_dataset(const QString& dataset_path)
   {
     const auto app {application::instance()};
-    app->dataset() = analyzer::load_dataset(dataset_path);
+    app->dataset()
+      = analyzer::load_dataset_from_disk(dataset_path.toStdString());
     analyzer::push_front(app->tracking_results(),
                          analyzer::load_ground_truth_boxes(dataset_path));
     app->settings().setValue(settings_keys::last_loaded_dataset, dataset_path);
   }
 
-  auto application::frame_image(const int sequence_index, const int frame_index)
-    -> QImage
+  auto application::frame_image(
+    const analyzer::dataset_db::sequence_list::size_type sequence_index,
+    const int frame_index) -> QImage
   {
     const auto frame_path {
-      application::dataset()[sequence_index]
-                            [static_cast<sequence_record::size_type>(
-                               frame_index)]
-                              .image_path()};
+      application::dataset()
+        .sequences()[sequence_index]
+                    [static_cast<sequence_record::size_type>(frame_index)]
+        .image_path()};
     QImage frame {QString::fromStdString(frame_path)};
     if (frame.format() != QImage::Format_RGB32)
     {
@@ -51,7 +54,7 @@ namespace analyzer::gui
 
   auto application::dataset_loaded() -> bool
   {
-    return !dataset().sequences().isEmpty();
+    return !dataset().sequences().empty();
   }
 
   auto application::tracking_results() -> analyzer::results_database&
@@ -62,8 +65,14 @@ namespace analyzer::gui
   void application::load_tracking_results(const QString& results_path)
   {
     const auto app {application::instance()};
-    app->tracking_results() = analyzer::load_tracking_results_directory(
-      analyzer::make_absolute_path(results_path).toStdString());
+    auto new_results {analyzer::load_tracking_results_directory(
+      analyzer::make_absolute_path(results_path).toStdString())};
+    if (analyzer::contains(app->tracking_results(), "Ground Truth"))
+    {
+      analyzer::push_front(new_results,
+                           app->tracking_results()["Ground Truth"]);
+    }
+    app->tracking_results() = new_results;
     app->settings().setValue(settings_keys::last_loaded_results_directory,
                              results_path);
   }

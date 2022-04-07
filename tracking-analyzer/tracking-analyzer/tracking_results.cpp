@@ -135,6 +135,12 @@ namespace analyzer
     return *i;
   }
 
+  auto operator==(const tracker_results& tracker,
+                  const std::string& name_query) noexcept -> bool
+  {
+    return tracker.name() == name_query;
+  }
+
   auto size(const tracker_results& tracker) noexcept
     -> tracker_results::size_type
   {
@@ -176,11 +182,8 @@ namespace analyzer
   auto results_database::operator[](const std::string& tracker_name) const
     -> const tracker_results&
   {
-    const auto i {std::find_if(std::begin(m_trackers),
-                               std::end(m_trackers),
-                               [&tracker_name](const tracker_results& results) {
-                                 return results.name() == tracker_name;
-                               })};
+    const auto i {
+      std::find(std::begin(m_trackers), std::end(m_trackers), tracker_name)};
     if (i == std::end(m_trackers))
     {
       throw invalid_tracker {
@@ -194,11 +197,8 @@ namespace analyzer
   auto results_database::operator[](const std::string& tracker_name)
     -> tracker_results&
   {
-    const auto i {std::find_if(std::begin(m_trackers),
-                               std::end(m_trackers),
-                               [&tracker_name](const tracker_results& results) {
-                                 return results.name() == tracker_name;
-                               })};
+    const auto i {
+      std::find(std::begin(m_trackers), std::end(m_trackers), tracker_name)};
     if (i == std::end(m_trackers))
     {
       throw invalid_tracker {
@@ -234,6 +234,13 @@ namespace analyzer
                    std::back_inserter(trackers),
                    [](const tracker_results& r) { return r.name(); });
     return trackers;
+  }
+
+  auto contains(const results_database& db, const std::string& tracker_name)
+    -> bool
+  {
+    const auto i {std::find(begin(db), end(db), tracker_name)};
+    return i != end(db);
   }
 
   namespace

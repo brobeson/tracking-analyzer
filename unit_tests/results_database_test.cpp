@@ -87,6 +87,13 @@ namespace analyzer_test
         ++i;
       }
     }
+
+    void constains_test() const
+    {
+      const auto db {make_database()};
+      QVERIFY(analyzer::contains(db, "MDNet"));
+      QVERIFY(!analyzer::contains(db, "Ground Truth"));
+    }
   };
 }  // namespace analyzer_test
 

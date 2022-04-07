@@ -17,10 +17,13 @@ namespace analyzer::gui
     constexpr std::chrono::milliseconds status_bar_message_timeout {5000};
 
     void reinitialize_combobox(QComboBox& combobox,
-                               const QStringList& new_entries)
+                               const analyzer::name_list& new_entries)
     {
       combobox.clear();
-      combobox.addItems(new_entries);
+      for (const auto& entry : new_entries)
+      {
+        combobox.addItem(QString::fromStdString(entry));
+      }
       combobox.setCurrentIndex(-1);  // Ensure no item is selected.
     }
 
@@ -200,8 +203,8 @@ namespace analyzer::gui
     auto create_dataset_info()
     {
       const auto ds {application::dataset()};
-      return QString {"OTB-100\n" + ds.root_path() + "\n"
-                      + QString::number(ds.sequences().length())
+      return QString {"OTB-100\n" + QString::fromStdString(ds.root_path())
+                      + "\n" + QString::number(ds.sequences().size())
                       + " sequences"};
     }
 
@@ -327,11 +330,14 @@ namespace analyzer::gui
     analyzer::gui::clear_display(*ui);
     if (index >= 0)
     {
-      reset_tags(m_tag_labels, application::dataset()[index].challenge_tags());
+      const auto size_index {gsl::narrow<uint64_t>(index)};
+      reset_tags(
+        m_tag_labels,
+        application::dataset().sequences()[size_index].challenge_tags());
       analyzer::gui::synchronize_frame_controls(*ui, 0);
       draw_current_frame();
-      const auto maximum_frame {gsl::narrow_cast<int>(
-        analyzer::size(application::dataset().sequences()[index]) - 1ul)};
+      const auto maximum_frame {gsl::narrow<int>(
+        analyzer::size(application::dataset().sequences()[size_index]) - 1ul)};
       ui->frame_spinbox->setEnabled(true);
       ui->frame_spinbox->setSuffix(" of " + QString::number(maximum_frame));
       ui->frame_spinbox->setMaximum(maximum_frame);
@@ -384,7 +390,7 @@ namespace analyzer::gui
       connect(action, &QAction::toggled, this, &main_window::toggle_tracker);
       auto* const tag {
         new qtag {tracker_name,
-                  m_box_colors[gsl::narrow<color_map::size_type>(i + 1)],
+                  m_box_colors[gsl::narrow<color_map::size_type>(i)],
                   this}};
       tag->setVisible(false);
       ui->tracker_name_layout->addWidget(tag);
@@ -439,16 +445,16 @@ namespace analyzer::gui
     const auto cursor_reverter {
       gsl::finally([this]() { setCursor(Qt::ArrowCursor); })};
     // BUG Why am I loading the dataset twice?
-    const auto new_dataset {analyzer::load_dataset(dataset_path)};
-    if (!new_dataset.root_path().isEmpty())
+    const auto new_dataset {
+      analyzer::load_dataset_from_disk(dataset_path.toStdString())};
+    if (!new_dataset.root_path().empty())
     {
       application::load_dataset(dataset_path);
       m_box_colors = make_color_map();
       ui->action_open_dataset->setEnabled(false);
       m_sequence_combobox->setEnabled(true);
-      reinitialize_combobox(
-        *m_sequence_combobox,
-        analyzer::sequence_names(application::dataset().sequences()));
+      reinitialize_combobox(*m_sequence_combobox,
+                            analyzer::sequence_names(application::dataset()));
       m_tag_labels = create_tag_labels(this, *ui->tag_layout);
       update_tracker_ui();
       m_dataset_info_label->setToolTip(create_dataset_info());
@@ -467,7 +473,8 @@ namespace analyzer::gui
     if (m_sequence_combobox->currentIndex() >= 0)
     {
       auto frame_image {application::frame_image(
-        m_sequence_combobox->currentIndex(), ui->frame_spinbox->value())};
+        gsl::narrow<uint64_t>(m_sequence_combobox->currentIndex()),
+        ui->frame_spinbox->value())};
       if (m_draw_combobox->currentIndex() == 0)
       {
         const auto [boxes, color_indices] = get_bounding_boxes_to_draw(

@@ -138,6 +138,13 @@ namespace analyzer_test
       QVERIFY_EXCEPTION_THROWN([[maybe_unused]] auto s {results["deer"].name()},
                                analyzer::invalid_sequence);
     }
+
+    void equality_comparison_test() const
+    {
+      const analyzer::tracker_results results {"MDNet", {}};
+      QVERIFY(results == "MDNet");
+      QVERIFY(!(results == "mdnet"));
+    }
   };
 }  // namespace analyzer_test
 

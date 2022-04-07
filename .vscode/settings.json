@@ -1,4 +1,7 @@
 {
+  "cmake.configureSettings": {
+    "FETCHCONTENT_FULLY_DISCONNECTED": true
+  },
   "cSpell.words": [
     "aukio",
     "Bertel",

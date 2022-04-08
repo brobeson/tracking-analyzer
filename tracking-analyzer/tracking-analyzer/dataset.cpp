@@ -79,6 +79,8 @@ namespace analyzer
   {
   }
 
+  auto dataset::name() const -> std::string { return "OTB-100"; }
+
   auto dataset::root_path() const -> std::string { return m_root_path; }
 
   auto dataset::sequences() const noexcept -> const sequence_list&

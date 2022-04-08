@@ -72,6 +72,7 @@ namespace analyzer
     virtual ~dataset() = default;
     auto operator=(const dataset&) -> dataset& = default;
     auto operator=(dataset &&) -> dataset& = default;
+    [[nodiscard]] virtual auto name() const -> std::string;
     [[nodiscard]] auto root_path() const -> std::string;
     [[nodiscard]] auto sequences() const noexcept -> const sequence_list&;
     [[nodiscard]] auto sequences() noexcept -> sequence_list&;

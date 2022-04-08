@@ -18,7 +18,7 @@ namespace analyzer::gui
     return dynamic_cast<application*>(QCoreApplication::instance());
   }
 
-  auto application::dataset() -> analyzer::dataset_db&
+  auto application::dataset() -> analyzer::dataset&
   {
     return instance()->m_dataset;
   }
@@ -36,7 +36,7 @@ namespace analyzer::gui
   }
 
   auto application::frame_image(
-    const analyzer::dataset_db::sequence_list::size_type sequence_index,
+    const analyzer::dataset::sequence_list::size_type sequence_index,
     const int frame_index) -> QImage
   {
     const auto frame_path {

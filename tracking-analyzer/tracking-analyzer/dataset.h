@@ -59,19 +59,19 @@ namespace analyzer
   [[nodiscard]] auto end(const sequence_record& s)
     -> sequence_record::frame_list::const_iterator;
 
-  class dataset_db
+  class dataset
   {
   public:
     using sequence_list = std::vector<sequence_record>;
     using size_type = sequence_list::size_type;
 
-    dataset_db() = default;
-    dataset_db(const std::string& root_path, const sequence_list& sequences);
-    dataset_db(const dataset_db&) = default;
-    dataset_db(dataset_db&&) = default;
-    virtual ~dataset_db() = default;
-    auto operator=(const dataset_db&) -> dataset_db& = default;
-    auto operator=(dataset_db &&) -> dataset_db& = default;
+    dataset() = default;
+    dataset(const std::string& root_path, const sequence_list& sequences);
+    dataset(const dataset&) = default;
+    dataset(dataset&&) = default;
+    virtual ~dataset() = default;
+    auto operator=(const dataset&) -> dataset& = default;
+    auto operator=(dataset &&) -> dataset& = default;
     [[nodiscard]] auto root_path() const -> std::string;
     [[nodiscard]] auto sequences() const noexcept -> const sequence_list&;
     [[nodiscard]] auto sequences() noexcept -> sequence_list&;
@@ -86,20 +86,19 @@ namespace analyzer
     sequence_list m_sequences;
   };
 
-  [[nodiscard]] auto begin(const dataset_db& db)
-    -> dataset_db::sequence_list::const_iterator;
-  [[nodiscard]] auto end(const dataset_db& db)
-    -> dataset_db::sequence_list::const_iterator;
+  [[nodiscard]] auto begin(const dataset& db)
+    -> dataset::sequence_list::const_iterator;
+  [[nodiscard]] auto end(const dataset& db)
+    -> dataset::sequence_list::const_iterator;
 
-  [[nodiscard]] auto load_dataset_from_disk(const std::string& path)
-    -> dataset_db;
+  [[nodiscard]] auto load_dataset_from_disk(const std::string& path) -> dataset;
 
   auto operator==(const sequence_record& sequence,
                   const std::string& name) noexcept -> bool;
-  auto contains(const dataset_db& db, const std::string& sequence_name) noexcept
+  auto contains(const dataset& db, const std::string& sequence_name) noexcept
     -> bool;
 
-  auto sequence_names(const dataset_db& db) -> name_list;
+  auto sequence_names(const dataset& db) -> name_list;
 
   auto load_ground_truth_boxes(const QString& path) -> tracker_results;
 }  // namespace analyzer

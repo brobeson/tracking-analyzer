@@ -73,25 +73,22 @@ namespace analyzer
     return std::end(s.frames());
   }
 
-  dataset_db::dataset_db(const std::string& root_path,
-                         const sequence_list& sequences):
+  dataset::dataset(const std::string& root_path,
+                   const sequence_list& sequences):
     m_root_path {root_path}, m_sequences {sequences}
   {
   }
 
-  auto dataset_db::root_path() const -> std::string { return m_root_path; }
+  auto dataset::root_path() const -> std::string { return m_root_path; }
 
-  auto dataset_db::sequences() const noexcept -> const sequence_list&
+  auto dataset::sequences() const noexcept -> const sequence_list&
   {
     return m_sequences;
   }
 
-  auto dataset_db::sequences() noexcept -> sequence_list&
-  {
-    return m_sequences;
-  }
+  auto dataset::sequences() noexcept -> sequence_list& { return m_sequences; }
 
-  auto dataset_db::operator[](const std::string& sequence_name) const
+  auto dataset::operator[](const std::string& sequence_name) const
     -> const sequence_record&
   {
     const auto i {
@@ -108,8 +105,7 @@ namespace analyzer
     return *i;
   }
 
-  auto dataset_db::operator[](const std::string& sequence_name)
-    -> sequence_record&
+  auto dataset::operator[](const std::string& sequence_name) -> sequence_record&
   {
     const auto i {
       std::find_if(std::begin(m_sequences),
@@ -125,7 +121,7 @@ namespace analyzer
     return *i;
   }
 
-  auto dataset_db::challenge_tags() const -> tag_list
+  auto dataset::challenge_tags() const -> tag_list
   {
     return {"illumination variation",
             "scale variation",
@@ -140,12 +136,12 @@ namespace analyzer
             "low resolution"};
   }
 
-  auto begin(const dataset_db& db) -> dataset_db::sequence_list::const_iterator
+  auto begin(const dataset& db) -> dataset::sequence_list::const_iterator
   {
     return std::begin(db.sequences());
   }
 
-  auto end(const dataset_db& db) -> dataset_db::sequence_list::const_iterator
+  auto end(const dataset& db) -> dataset::sequence_list::const_iterator
   {
     return std::end(db.sequences());
   }
@@ -259,8 +255,8 @@ namespace analyzer
     auto read_sequences(const std::string& dataset_path)
     {
       const auto names {read_sequence_names(dataset_path)};
-      dataset_db::sequence_list sequences;
-      sequences.reserve(static_cast<dataset_db::size_type>(names.size()));
+      dataset::sequence_list sequences;
+      sequences.reserve(static_cast<dataset::size_type>(names.size()));
       for (const auto& name : names)
       {
         try
@@ -282,13 +278,13 @@ namespace analyzer
     }
   }  // namespace
 
-  auto load_dataset_from_disk(const std::string& path) -> dataset_db
+  auto load_dataset_from_disk(const std::string& path) -> dataset
   {
     const auto dataset_path {analyzer::make_absolute_path(path)};
-    return dataset_db {dataset_path, analyzer::read_sequences(dataset_path)};
+    return dataset {dataset_path, analyzer::read_sequences(dataset_path)};
   }
 
-  auto sequence_names(const dataset_db& db) -> std::vector<std::string>
+  auto sequence_names(const dataset& db) -> std::vector<std::string>
   {
     std::vector<std::string> names;
     std::transform(begin(db),
@@ -304,7 +300,7 @@ namespace analyzer
     return sequence.name() == name;
   }
 
-  auto contains(const dataset_db& db, const std::string& sequence_name) noexcept
+  auto contains(const dataset& db, const std::string& sequence_name) noexcept
     -> bool
   {
     const auto i {std::find(begin(db), end(db), sequence_name)};

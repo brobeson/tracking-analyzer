@@ -25,10 +25,10 @@ namespace analyzer::gui
     application(int& argc, char** argv);
     [[nodiscard]] static auto instance() -> gsl::not_null<application*>;
 
-    [[nodiscard]] static auto dataset() -> analyzer::dataset_db&;
+    [[nodiscard]] static auto dataset() -> analyzer::dataset&;
     static void load_dataset(const QString& dataset_path);
     [[nodiscard]] static auto
-    frame_image(analyzer::dataset_db::sequence_list::size_type sequence_index,
+    frame_image(analyzer::dataset::sequence_list::size_type sequence_index,
                 int frame_index) -> QImage;
     [[nodiscard]] static auto dataset_loaded() -> bool;
 
@@ -43,7 +43,7 @@ namespace analyzer::gui
       -> analyzer::bounding_box;
 
   private:
-    analyzer::dataset_db m_dataset;
+    analyzer::dataset m_dataset;
     QSettings m_settings;
     analyzer::results_database m_tracking_results;
   };

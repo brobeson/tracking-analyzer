@@ -5,7 +5,7 @@
 
 Q_DECLARE_METATYPE(std::string)                // NOLINT
 Q_DECLARE_METATYPE(analyzer::sequence_record)  // NOLINT
-Q_DECLARE_METATYPE(analyzer::dataset_db)       // NOLINT
+Q_DECLARE_METATYPE(analyzer::dataset)          // NOLINT
 
 using namespace std::literals::string_literals;
 
@@ -20,7 +20,7 @@ namespace analyzer
     return QTest::toString(QString::fromStdString(s));
   }
 
-  [[nodiscard]] auto toString(const dataset_db& db)
+  [[nodiscard]] auto toString(const dataset& db)
   {
     return QTest::toString(QString::fromStdString(db.root_path()));
   }
@@ -37,8 +37,8 @@ namespace analyzer
     return a.name() == b.name() && a.frames() == b.frames();
   }
 
-  [[nodiscard]] auto operator==(const analyzer::dataset_db& a,
-                                const analyzer::dataset_db& b)
+  [[nodiscard]] auto operator==(const analyzer::dataset& a,
+                                const analyzer::dataset& b)
   {
     return a.root_path() == b.root_path() && a.sequences() == b.sequences();
   }
@@ -51,9 +51,9 @@ namespace analyzer_test
   {
     auto make_dataset()
     {
-      return analyzer::dataset_db {"a path",
-                                   {{"Deer", "Deer path", {}, {}},
-                                    {"Basketball", "Basketball path", {}, {}}}};
+      return analyzer::dataset {"a path",
+                                {{"Deer", "Deer path", {}, {}},
+                                 {"Basketball", "Basketball path", {}, {}}}};
     }
   }  // namespace
 
@@ -179,26 +179,26 @@ namespace analyzer_test
 
     void sequence_names_data() const
     {
-      QTest::addColumn<analyzer::dataset_db>("db");
+      QTest::addColumn<analyzer::dataset>("db");
       QTest::addColumn<std::vector<std::string>>("expected_names");
       QTest::newRow("empty list")
-        << analyzer::dataset_db {} << std::vector<std::string> {};
+        << analyzer::dataset {} << std::vector<std::string> {};
       QTest::newRow("one sequence")
-        << analyzer::dataset_db {"",
-                                 analyzer::dataset_db::sequence_list {
-                                   {"Biker", "test_dataset/Biker", {}, {}}}}
+        << analyzer::dataset {"",
+                              analyzer::dataset::sequence_list {
+                                {"Biker", "test_dataset/Biker", {}, {}}}}
         << std::vector<std::string> {"Biker"};
       QTest::newRow("two sequences")
-        << analyzer::dataset_db {"",
-                                 analyzer::dataset_db::sequence_list {
-                                   {"Biker", "test_dataset/Biker", {}, {}},
-                                   {"Dancer", "test_dataset/Biker", {}, {}}}}
+        << analyzer::dataset {"",
+                              analyzer::dataset::sequence_list {
+                                {"Biker", "test_dataset/Biker", {}, {}},
+                                {"Dancer", "test_dataset/Biker", {}, {}}}}
         << std::vector<std::string> {"Biker", "Dancer"};
     }
 
     void sequence_names() const
     {
-      QFETCH(const analyzer::dataset_db, db);
+      QFETCH(const analyzer::dataset, db);
       QTEST(analyzer::sequence_names(db), "expected_names");
     }
   };

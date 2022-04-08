@@ -101,32 +101,7 @@ namespace analyzer
 
   auto sequence_names(const dataset_db& db) -> name_list;
 
-  //----------------------------------------------------------------------------
-  //                                              old code - not refactored yet
-  //                see https://github.com/brobeson/tracking-analyzer/issues/41
-  //----------------------------------------------------------------------------
-  class dataset final
-  {
-  public:
-    dataset() = default;
-    dataset(const QString& root_path,
-            const QVector<sequence_record>& sequences);
-    [[nodiscard]] auto root_path() const noexcept -> const QString&;
-    [[nodiscard]] auto sequences() const noexcept
-      -> const QVector<sequence_record>&;
-    [[nodiscard]] auto operator[](gsl::index index) const
-      -> const sequence_record&;
-    [[nodiscard]] static auto all_tags() -> QStringList;
-
-  private:
-    QString m_root_directory;
-    QVector<sequence_record> m_sequences;
-  };
-
-  // auto load_dataset(const QString& path) -> dataset;
   auto load_ground_truth_boxes(const QString& path) -> tracker_results;
-  // auto sequence_names(const QVector<sequence_record>& sequences) ->
-  // QStringList;
 }  // namespace analyzer
 
 #endif

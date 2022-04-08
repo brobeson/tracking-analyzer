@@ -25,23 +25,6 @@ namespace analyzer
     return QTest::toString(QString::fromStdString(db.root_path()));
   }
 
-  [[nodiscard]] auto operator==(const analyzer::dataset_db& a,
-                                const analyzer::dataset_db& b)
-  {
-    return a.root_path() == b.root_path() && a.sequences() == b.sequences();
-  }
-
-  //--------------------------------------------------------------------------
-  //                                                old code - not refactored
-  //          yet see https://github.com/brobeson/tracking-analyzer/issues/41
-  //--------------------------------------------------------------------------
-
-  [[nodiscard]] auto operator==(const analyzer::dataset& a,
-                                const analyzer::dataset& b)
-  {
-    return a.root_path() == b.root_path() && a.sequences() == b.sequences();
-  }
-
   [[nodiscard]] auto operator==(const analyzer::frame_record& a,
                                 const analyzer::frame_record& b)
   {
@@ -52,6 +35,12 @@ namespace analyzer
                                 const analyzer::sequence_record& b)
   {
     return a.name() == b.name() && a.frames() == b.frames();
+  }
+
+  [[nodiscard]] auto operator==(const analyzer::dataset_db& a,
+                                const analyzer::dataset_db& b)
+  {
+    return a.root_path() == b.root_path() && a.sequences() == b.sequences();
   }
 #pragma GCC diagnostic pop
 }  // namespace analyzer

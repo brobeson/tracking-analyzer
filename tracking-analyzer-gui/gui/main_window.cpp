@@ -175,12 +175,13 @@ namespace analyzer::gui
     auto create_tag_labels(main_window* parent, QHBoxLayout& tag_layout)
     {
       std::vector<qtag*> tag_labels;
-      const auto tags {analyzer::dataset::all_tags()};
+      const auto tags {application::dataset().challenge_tags()};
       std::transform(std::begin(tags),
                      std::end(tags),
                      std::back_inserter(tag_labels),
-                     [parent, &tag_layout](const QString& tag) {
-                       return create_tag_label(parent, tag, tag_layout);
+                     [parent, &tag_layout](const std::string& tag) {
+                       return create_tag_label(
+                         parent, QString::fromStdString(tag), tag_layout);
                      });
       return tag_labels;
     }

@@ -440,6 +440,22 @@ namespace analyzer::gui
     ui->action_tracker_selection->setEnabled(true);
   }
 
+  namespace
+  {
+    void ensure_ground_truth_is_checked(const QMenu* const tracker_menu)
+    {
+      const auto actions {tracker_menu->actions()};
+      const auto i {std::find_if(
+        actions.begin(), actions.end(), [](const QAction* const action) {
+          return action != nullptr && action->text() == "Ground Truth";
+        })};
+      if (i != actions.end())
+      {
+        (*i)->setChecked(true);
+      }
+    }
+  }  // namespace
+
   void main_window::load_dataset(const QString& dataset_path)
   {
     setCursor(Qt::WaitCursor);
@@ -458,8 +474,10 @@ namespace analyzer::gui
                             analyzer::sequence_names(application::dataset()));
       m_tag_labels = create_tag_labels(this, *ui->tag_layout);
       update_tracker_ui();
+      ensure_ground_truth_is_checked(ui->action_tracker_selection->menu());
       m_dataset_info_label->setToolTip(create_dataset_info());
-      m_dataset_info_label->setText("OTB-100");
+      m_dataset_info_label->setText(
+        QString::fromStdString(application::dataset().name()));
     }
   }
 

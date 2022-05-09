@@ -44,3 +44,6 @@ include(CTest)
 if(BUILD_TESTING)
   add_subdirectory(unit_tests)
 endif()
+
+include(dependencies.cmake)
+cmake_tools_make_target_dependency_graphs(VERBOSE)

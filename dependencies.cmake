@@ -1,3 +1,5 @@
+include(CMakePrintHelpers)
+
 function(cmake_tools_make_target_dependency_graphs)
   cmake_parse_arguments(
     ct
@@ -214,6 +216,11 @@ function(_write_target_to_json target)
   get_target_property(dependencies ${target} LINK_LIBRARIES)
   if(dependencies)
     string(GENEX_STRIP "${dependencies}" dependencies)
+    foreach(dependency IN LISTS dependencies)
+      if(NOT dependency IN_LIST ct_ALLOWED_DEPENDENCIES)
+        list(REMOVE_ITEM dependencies ${dependency})
+      endif()
+    endforeach()
     string(REPLACE ";" "\", \"" dependencies "${dependencies}")
     string(PREPEND dependencies "[\"")
     string(APPEND dependencies "\"]")

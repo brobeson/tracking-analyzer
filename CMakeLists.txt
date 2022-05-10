@@ -46,4 +46,7 @@ if(BUILD_TESTING)
 endif()
 
 include(dependencies.cmake)
-cmake_tools_make_target_dependency_graphs(VERBOSE)
+cmake_tools_make_target_dependency_graphs(
+  VERBOSE
+  DEPENDENCY_EXCLUDES "asan;ubsan"
+)

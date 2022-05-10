@@ -1,20 +1,22 @@
-include(CMakePrintHelpers)
-
 function(cmake_tools_make_target_dependency_graphs)
   cmake_parse_arguments(
     ct
-    "VERBOSE"
-    "NAMESPACE"
-    ""
+    "NO_PLANTUML;VERBOSE"
+    "NAMESPACE;OUTPUT_DIRECTORY;SOURCE_DIRECTORY"
+    "DEPENDENCY_EXCLUDES;PLANTUML_ARGS;TARGET_EXCLUDES"
     ${ARGN}
   )
   if(NOT ct_SOURCE_DIRECTORY)
     set(ct_SOURCE_DIRECTORY "${CMAKE_SOURCE_DIR}")
   endif()
+  if(NOT ct_OUTPUT_DIRECTORY)
+    set(ct_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/dependency_graphs")
+  endif()
   message(CHECK_START "Building target dependency graphs")
   list(APPEND CMAKE_MESSAGE_INDENT "  ")
+  _clean_output_directory()
   _get_filtered_targets()
-  cmake_print_variables(ct_TARGETS)
+  _get_filtered_dependencies()
   _write_targets_to_json()
   list(POP_BACK CMAKE_MESSAGE_INDENT)
   message(CHECK_PASS "done")
@@ -24,6 +26,29 @@ endfunction()
 #===============================================================================
 #                                                        Implementation Details
 #===============================================================================
+# Get the list of dependencies allowed in the dependency graph.
+# Return the list of dependencies in ct_ALLOWED_DEPENDENCIES in the parent
+# scope.
+function(_get_filtered_dependencies)
+  _log(CHECK_START "Filtering dependencies")
+  foreach(target IN LISTS ct_TARGETS)
+    get_target_property(dependencies ${target} LINK_LIBRARIES)
+    list(APPEND all_dependencies ${dependencies})
+  endforeach()
+  list(REMOVE_DUPLICATES all_dependencies)
+  # TODO This can probably be string(GENEX_STRIP)
+  list(FILTER all_dependencies EXCLUDE REGEX "\\$<.*")
+  _filter_by_regex(
+    all_dependencies
+    EXCLUDE_PATTERNS ${ct_DEPENDENCY_EXCLUDES}
+    LIST ${all_dependencies}
+  )
+  list(SORT all_dependencies)
+  set(ct_ALLOWED_DEPENDENCIES ${all_dependencies} PARENT_SCOPE)
+  list(LENGTH all_dependencies length)
+  _log(CHECK_PASS "Found ${length} dependencies")
+endfunction()
+
 # Get the list of project targets allowed in the dependency graph.
 # Return the list of targets in ct_TARGETS in the parent scope.
 function(_get_filtered_targets)
@@ -116,6 +141,14 @@ endfunction()
 #===============================================================================
 #                                                             Utility Functions
 #===============================================================================
+# Remove all files from the graph output directory.
+function(_clean_output_directory)
+  file(GLOB old_files LIST_DIRECTORIES false "${ct_OUTPUT_DIRECTORY}/*")
+  if(old_files)
+    file(REMOVE ${old_files})
+  endif()
+endfunction()
+
 # Write a message to the console if the user enabled `VERBOSE`.
 # Parameters:
 #   level: The level of the message. This must be a valid `mode` or `checkState`
@@ -135,6 +168,23 @@ function(_log level)
   set(CMAKE_MESSAGE_INDENT ${CMAKE_MESSAGE_INDENT} PARENT_SCOPE)
 endfunction()
 
+# Remove elements from a list by regular expression.
+# Parameters:
+#   output: The variable to hold the filtered list to return to the calling
+#     function.
+#   EXCLUDE_PATTERNS pattern [pattern ...]
+#     The list of regular expressions to use for filtering list elements. If an
+#     element matches any of these patterns, the function removes it from the
+#     list.
+#   LIST item [item ...]
+#     The list to filter.
+function(_filter_by_regex output)
+  cmake_parse_arguments(filter "" "" "EXCLUDE_PATTERNS;LIST" ${ARGN})
+  foreach(regex IN LISTS filter_EXCLUDE_PATTERNS)
+    list(FILTER filter_LIST EXCLUDE REGEX "${regex}")
+  endforeach()
+  set(${output} ${filter_LIST} PARENT_SCOPE)
+endfunction()
 
 #===============================================================================
 #                                                         JSON Output Functions

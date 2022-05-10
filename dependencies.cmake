@@ -4,7 +4,7 @@ function(cmake_tools_make_target_dependency_graphs)
   cmake_parse_arguments(
     ct
     "VERBOSE"
-    ""
+    "NAMESPACE"
     ""
     ${ARGN}
   )
@@ -144,13 +144,30 @@ function(_write_targets_to_json)
   foreach(target IN LISTS ct_TARGETS)
     _write_target_to_json(${target})
     string(APPEND targets_json "${target_json}" ",")
-    cmake_print_variables(target_json)
   endforeach()
   # Remove the trailing comma, then append the closing ']' to create valid JSON.
   string(REGEX REPLACE ",$" "]" targets_json "${targets_json}")
-  cmake_print_variables(targets_json)
+  file(WRITE "${CMAKE_SOURCE_DIR}/targets.json" "${targets_json}")
 endfunction()
 
 function(_write_target_to_json target)
-  set(target_json "{\"target\": \"${target}\"}" PARENT_SCOPE)
+  set(target_json "{}")
+  string(JSON target_json SET "${target_json}" "target" "\"${target}\"")
+  get_target_property(target_type ${target} TYPE)
+  string(JSON target_json SET "${target_json}" "type" "\"${target_type}\"")
+  if(ct_NAMESPACE AND TARGET ${ct_NAMESPACE}::${target})
+    get_target_property(aliased_target ${ct_NAMESPACE}::${target} ALIASED_TARGET)
+    if(aliased_target)
+      string(JSON target_json SET "${target_json}" "alias" "\"${ct_NAMESPACE}::${target}\"")
+    endif()
+  endif()
+  get_target_property(dependencies ${target} LINK_LIBRARIES)
+  if(dependencies)
+    string(GENEX_STRIP "${dependencies}" dependencies)
+    string(REPLACE ";" "\", \"" dependencies "${dependencies}")
+    string(PREPEND dependencies "[\"")
+    string(APPEND dependencies "\"]")
+    string(JSON target_json SET "${target_json}" "dependencies" "${dependencies}")
+  endif()
+  set(target_json "${target_json}" PARENT_SCOPE)
 endfunction()

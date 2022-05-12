@@ -49,4 +49,5 @@ include(dependencies.cmake)
 cmake_tools_make_target_dependency_graphs(
   VERBOSE
   DEPENDENCY_EXCLUDES "asan;ubsan"
+  OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/graphs"
 )

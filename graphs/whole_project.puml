@@ -1,0 +1,194 @@
+@startuml
+skinparam linetype ortho
+[bounding_box_test] <<executable>> as bounding_box_test
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[exceptions_test] <<executable>> as exceptions_test
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[exceptions_test] <<executable>> as exceptions_test
+[filesystem_test] <<executable>> as filesystem_test
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[exceptions_test] <<executable>> as exceptions_test
+[filesystem_test] <<executable>> as filesystem_test
+[results_database_test] <<executable>> as results_database_test
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[exceptions_test] <<executable>> as exceptions_test
+[filesystem_test] <<executable>> as filesystem_test
+[results_database_test] <<executable>> as results_database_test
+[sequence_results_test] <<executable>> as sequence_results_test
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[exceptions_test] <<executable>> as exceptions_test
+[filesystem_test] <<executable>> as filesystem_test
+[results_database_test] <<executable>> as results_database_test
+[sequence_results_test] <<executable>> as sequence_results_test
+[tracker_results_test] <<executable>> as tracker_results_test
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[exceptions_test] <<executable>> as exceptions_test
+[filesystem_test] <<executable>> as filesystem_test
+[results_database_test] <<executable>> as results_database_test
+[sequence_results_test] <<executable>> as sequence_results_test
+[tracker_results_test] <<executable>> as tracker_results_test
+[tracking-analyzer] <<static library>> as tracking_analyzer
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[exceptions_test] <<executable>> as exceptions_test
+[filesystem_test] <<executable>> as filesystem_test
+[results_database_test] <<executable>> as results_database_test
+[sequence_results_test] <<executable>> as sequence_results_test
+[tracker_results_test] <<executable>> as tracker_results_test
+[tracking-analyzer] <<static library>> as tracking_analyzer
+[tracking-analyzer-gui] <<executable>> as tracking_analyzer_gui
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[exceptions_test] <<executable>> as exceptions_test
+[filesystem_test] <<executable>> as filesystem_test
+[results_database_test] <<executable>> as results_database_test
+[sequence_results_test] <<executable>> as sequence_results_test
+[tracker_results_test] <<executable>> as tracker_results_test
+[tracking-analyzer] <<static library>> as tracking_analyzer
+[tracking-analyzer-gui] <<executable>> as tracking_analyzer_gui
+[training_metadata_test] <<executable>> as training_metadata_test
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[exceptions_test] <<executable>> as exceptions_test
+[filesystem_test] <<executable>> as filesystem_test
+[results_database_test] <<executable>> as results_database_test
+[sequence_results_test] <<executable>> as sequence_results_test
+[tracker_results_test] <<executable>> as tracker_results_test
+[tracking-analyzer] <<static library>> as tracking_analyzer
+[tracking-analyzer-gui] <<executable>> as tracking_analyzer_gui
+[training_metadata_test] <<executable>> as training_metadata_test
+[GSL] <<interface library>> as GSL
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[exceptions_test] <<executable>> as exceptions_test
+[filesystem_test] <<executable>> as filesystem_test
+[results_database_test] <<executable>> as results_database_test
+[sequence_results_test] <<executable>> as sequence_results_test
+[tracker_results_test] <<executable>> as tracker_results_test
+[tracking-analyzer] <<static library>> as tracking_analyzer
+[tracking-analyzer-gui] <<executable>> as tracking_analyzer_gui
+[training_metadata_test] <<executable>> as training_metadata_test
+[GSL] <<interface library>> as GSL
+frame "Qt5" {
+[Charts] <<shared library>> as Qt5__Charts
+}
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[exceptions_test] <<executable>> as exceptions_test
+[filesystem_test] <<executable>> as filesystem_test
+[results_database_test] <<executable>> as results_database_test
+[sequence_results_test] <<executable>> as sequence_results_test
+[tracker_results_test] <<executable>> as tracker_results_test
+[tracking-analyzer] <<static library>> as tracking_analyzer
+[tracking-analyzer-gui] <<executable>> as tracking_analyzer_gui
+[training_metadata_test] <<executable>> as training_metadata_test
+[GSL] <<interface library>> as GSL
+frame "Qt5" {
+[Charts] <<shared library>> as Qt5__Charts
+}
+frame "Qt5" {
+[Core] <<shared library>> as Qt5__Core
+}
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[exceptions_test] <<executable>> as exceptions_test
+[filesystem_test] <<executable>> as filesystem_test
+[results_database_test] <<executable>> as results_database_test
+[sequence_results_test] <<executable>> as sequence_results_test
+[tracker_results_test] <<executable>> as tracker_results_test
+[tracking-analyzer] <<static library>> as tracking_analyzer
+[tracking-analyzer-gui] <<executable>> as tracking_analyzer_gui
+[training_metadata_test] <<executable>> as training_metadata_test
+[GSL] <<interface library>> as GSL
+frame "Qt5" {
+[Charts] <<shared library>> as Qt5__Charts
+}
+frame "Qt5" {
+[Core] <<shared library>> as Qt5__Core
+}
+frame "Qt5" {
+[Test] as Qt5__Test
+}
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[exceptions_test] <<executable>> as exceptions_test
+[filesystem_test] <<executable>> as filesystem_test
+[results_database_test] <<executable>> as results_database_test
+[sequence_results_test] <<executable>> as sequence_results_test
+[tracker_results_test] <<executable>> as tracker_results_test
+[tracking-analyzer] <<static library>> as tracking_analyzer
+[tracking-analyzer-gui] <<executable>> as tracking_analyzer_gui
+[training_metadata_test] <<executable>> as training_metadata_test
+[GSL] <<interface library>> as GSL
+frame "Qt5" {
+[Charts] <<shared library>> as Qt5__Charts
+}
+frame "Qt5" {
+[Core] <<shared library>> as Qt5__Core
+}
+frame "Qt5" {
+[Test] as Qt5__Test
+}
+frame "Qt5" {
+[Widgets] <<shared library>> as Qt5__Widgets
+}
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[exceptions_test] <<executable>> as exceptions_test
+[filesystem_test] <<executable>> as filesystem_test
+[results_database_test] <<executable>> as results_database_test
+[sequence_results_test] <<executable>> as sequence_results_test
+[tracker_results_test] <<executable>> as tracker_results_test
+[tracking-analyzer] <<static library>> as tracking_analyzer
+[tracking-analyzer-gui] <<executable>> as tracking_analyzer_gui
+[training_metadata_test] <<executable>> as training_metadata_test
+[GSL] <<interface library>> as GSL
+frame "Qt5" {
+[Charts] <<shared library>> as Qt5__Charts
+}
+frame "Qt5" {
+[Core] <<shared library>> as Qt5__Core
+}
+frame "Qt5" {
+[Test] as Qt5__Test
+}
+frame "Qt5" {
+[Widgets] <<shared library>> as Qt5__Widgets
+}
+[stdc++fs] as stdcppfs
+[bounding_box_test] <<executable>> as bounding_box_test
+[dataset_test] <<executable>> as dataset_test
+[exceptions_test] <<executable>> as exceptions_test
+[filesystem_test] <<executable>> as filesystem_test
+[results_database_test] <<executable>> as results_database_test
+[sequence_results_test] <<executable>> as sequence_results_test
+[tracker_results_test] <<executable>> as tracker_results_test
+[tracking-analyzer] <<static library>> as tracking_analyzer
+[tracking-analyzer-gui] <<executable>> as tracking_analyzer_gui
+[training_metadata_test] <<executable>> as training_metadata_test
+[GSL] <<interface library>> as GSL
+frame "Qt5" {
+[Charts] <<shared library>> as Qt5__Charts
+}
+frame "Qt5" {
+[Core] <<shared library>> as Qt5__Core
+}
+frame "Qt5" {
+[Test] as Qt5__Test
+}
+frame "Qt5" {
+[Widgets] <<shared library>> as Qt5__Widgets
+}
+[stdc++fs] as stdcppfs
+frame "tracking" {
+[analyzer] <<static library>> as tracking__analyzer
+}
+@enduml

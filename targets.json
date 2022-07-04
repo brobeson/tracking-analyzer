@@ -1,0 +1,107 @@
+[
+  {
+    "cmake_id" : "bounding_box_test",
+    "name" : "bounding_box_test",
+    "plantuml_id" : "bounding_box_test",
+    "stereotype" : "executable"
+  },
+  {
+    "cmake_id" : "dataset_test",
+    "name" : "dataset_test",
+    "plantuml_id" : "dataset_test",
+    "stereotype" : "executable"
+  },
+  {
+    "cmake_id" : "exceptions_test",
+    "name" : "exceptions_test",
+    "plantuml_id" : "exceptions_test",
+    "stereotype" : "executable"
+  },
+  {
+    "cmake_id" : "filesystem_test",
+    "name" : "filesystem_test",
+    "plantuml_id" : "filesystem_test",
+    "stereotype" : "executable"
+  },
+  {
+    "cmake_id" : "results_database_test",
+    "name" : "results_database_test",
+    "plantuml_id" : "results_database_test",
+    "stereotype" : "executable"
+  },
+  {
+    "cmake_id" : "sequence_results_test",
+    "name" : "sequence_results_test",
+    "plantuml_id" : "sequence_results_test",
+    "stereotype" : "executable"
+  },
+  {
+    "cmake_id" : "tracker_results_test",
+    "name" : "tracker_results_test",
+    "plantuml_id" : "tracker_results_test",
+    "stereotype" : "executable"
+  },
+  {
+    "cmake_id" : "tracking-analyzer",
+    "name" : "tracking-analyzer",
+    "plantuml_id" : "tracking_analyzer",
+    "stereotype" : "static library"
+  },
+  {
+    "cmake_id" : "tracking-analyzer-gui",
+    "name" : "tracking-analyzer-gui",
+    "plantuml_id" : "tracking_analyzer_gui",
+    "stereotype" : "executable"
+  },
+  {
+    "cmake_id" : "training_metadata_test",
+    "name" : "training_metadata_test",
+    "plantuml_id" : "training_metadata_test",
+    "stereotype" : "executable"
+  },
+  {
+    "cmake_id" : "GSL",
+    "name" : "GSL",
+    "plantuml_id" : "GSL",
+    "stereotype" : "interface library"
+  },
+  {
+    "cmake_id" : "Qt5::Charts",
+    "name" : "Charts",
+    "namespace" : "Qt5",
+    "plantuml_id" : "Qt5__Charts",
+    "stereotype" : "shared library"
+  },
+  {
+    "cmake_id" : "Qt5::Core",
+    "name" : "Core",
+    "namespace" : "Qt5",
+    "plantuml_id" : "Qt5__Core",
+    "stereotype" : "shared library"
+  },
+  {
+    "cmake_id" : "Qt5::Test",
+    "name" : "Test",
+    "namespace" : "Qt5",
+    "plantuml_id" : "Qt5__Test"
+  },
+  {
+    "cmake_id" : "Qt5::Widgets",
+    "name" : "Widgets",
+    "namespace" : "Qt5",
+    "plantuml_id" : "Qt5__Widgets",
+    "stereotype" : "shared library"
+  },
+  {
+    "cmake_id" : "stdc++fs",
+    "name" : "stdc++fs",
+    "plantuml_id" : "stdcppfs"
+  },
+  {
+    "cmake_id" : "tracking::analyzer",
+    "name" : "analyzer",
+    "namespace" : "tracking",
+    "plantuml_id" : "tracking__analyzer",
+    "stereotype" : "static library"
+  }
+]

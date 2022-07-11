@@ -388,6 +388,10 @@ namespace analyzer::gui
       const auto tracker_name {QString::fromStdString(trackers[i])};
       auto* const action {tracker_menu->addAction(tracker_name)};
       action->setCheckable(true);
+      if (tracker_name == "Ground Truth")  // && ground_truth_enabled)
+      {
+        action->setChecked(true);
+      }
       connect(action, &QAction::toggled, this, &main_window::toggle_tracker);
       auto* const tag {
         new qtag {tracker_name,

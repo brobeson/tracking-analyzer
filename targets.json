@@ -93,11 +93,6 @@
     "stereotype" : "shared library"
   },
   {
-    "cmake_id" : "stdc++fs",
-    "name" : "stdc++fs",
-    "plantuml_id" : "stdcppfs"
-  },
-  {
     "cmake_id" : "tracking::analyzer",
     "name" : "analyzer",
     "namespace" : "tracking",
